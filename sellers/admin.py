@@ -1,3 +1,6 @@
 from django.contrib import admin
+from .models import Organizzatore, Evento, Biglietto
 
-# Register your models here.
+admin.site.register(Organizzatore)
+admin.site.register(Evento)
+admin.site.register(Biglietto)
