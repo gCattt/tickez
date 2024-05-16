@@ -19,7 +19,7 @@ class Evento(models.Model):
     nome = models.CharField(max_length=100, null=False, blank=False)
     descrizione = models.TextField(null=True, blank=True, default='')
     data_ora = models.DateTimeField(null=False, blank=False, default=datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
-    categoria = models.CharField(max_length=100)
+    categoria = models.CharField(max_length=100, null=True, blank=True, default='')
     # locandina = models.
 
     organizzatore = models.ForeignKey(Organizzatore, on_delete=models.CASCADE, null=True, blank=True, related_name='eventi_organizzati')
@@ -31,8 +31,8 @@ class Evento(models.Model):
         verbose_name_plural = 'Eventi'
 
 class Biglietto(models.Model):
-    tipologia = models.CharField(max_length=100)
-    prezzo = models.FloatField(null=False, blank=False, default=0.00)
+    tipologia = models.CharField(max_length=100, null=True, blank=True, default='')
+    prezzo = models.FloatField(null=True, blank=True, default=0.00)
     descrizione = models.TextField(null=True, blank=True, default='')
     
     organizzatore = models.ForeignKey(Organizzatore, on_delete=models.CASCADE, null=True, blank=True, related_name='biglietti_generati')
