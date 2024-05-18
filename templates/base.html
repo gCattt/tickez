@@ -8,6 +8,8 @@
     {% load static %}
 
     <link rel="shortcut icon" type="image/png" href="{% static 'images/icons/favicon.ico' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static '/css/style.css' %}" />
+    <link rel="stylesheet" href="{% static "/css/bootstrap.min.css" %}" />
 
     {% block head %} {% endblock %}
 
@@ -15,5 +17,7 @@
   </head>
   <body>
     {% block content %} {% endblock %}
+    
+    {% include 'footer.html' %}
   </body>
 </html>
