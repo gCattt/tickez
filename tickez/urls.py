@@ -16,6 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, re_path, include
+from .initcmds import *
 from django.views.generic.base import RedirectView
 from . import views
 
@@ -28,3 +29,6 @@ urlpatterns = [
     path('sellers/', include('sellers.urls')),
     path('orders/', include('orders.urls'))
 ]
+
+#erase_db()
+init_db()
