@@ -8,7 +8,7 @@
         <hr style="opacity:0.1;">
         <div class="row">
             <div class="col-md-4 col-sm-4 d-flex justify-content-center">
-                <a href="#" class="w-100 text-decoration-none">
+                <a href="{% url 'common:events' %}?category=Concerti" class="w-100 text-decoration-none">
                 <div class="card bg-dark text-white w-100" style="height: 12rem">
                     <img src="/static/images/thumbnails/concerti.jpg" class="card-img" alt="Concerti">
                     <div class="card-img-overlay d-flex justify-content-center align-items-center">
@@ -18,7 +18,7 @@
                 </a>
             </div>
             <div class="col-md-4 col-sm-4 d-flex justify-content-center">
-                <a href="#" class="w-100 text-decoration-none">
+                <a href="{% url 'common:events' %}?category=Festival" class="w-100 text-decoration-none">
                 <div class="card bg-dark text-white w-100" style="height: 12rem">
                     <img src="/static/images/thumbnails/festival.jpg" class="card-img" alt="Festival">
                     <div class="card-img-overlay d-flex justify-content-center align-items-center">
@@ -28,7 +28,7 @@
                 </a>
             </div>
             <div class="col-md-4 col-sm-4 d-flex justify-content-center">
-                <a href="#" class="w-100 text-decoration-none">
+                <a href="{% url 'common:events' %}?category=Teatro" class="w-100 text-decoration-none">
                 <div class="card bg-dark text-white w-100" style="height: 12rem">
                     <img src="/static/images/thumbnails/teatro.jpg" class="card-img" alt="Teatro">
                     <div class="card-img-overlay d-flex justify-content-center align-items-center">
@@ -57,7 +57,7 @@
                     </li>
                 {% endfor %}
                 <li class="button d-flex justify-content-center align-items-center" style="width: 15rem;">
-                    <a href="#" class="btn btn-dark btn-lg">Vedi tutti</a>
+                    <a href="{% url 'common:events' %}" class="btn btn-dark btn-lg">Vedi tutti</a>
                 </li>
             </ul>
         </div>

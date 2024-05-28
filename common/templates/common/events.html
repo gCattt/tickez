@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Eventi{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <form method="GET">
+            <select name="sort" id="sort" onchange="this.form.submit()">
+                <option value="data_ora" {% if current_sort == 'data_ora' %} selected {% endif %}>Ordina per data</option>
+                <option value="nome" {% if current_sort == 'nome' %} selected {% endif %}>Ordina per nome</option>
+            </select>
+
+            <select name="city" id="city" onchange="this.form.submit()">
+                <option value="" selected disabled hidden>Città</option>
+                {% for c in cities %}
+                    <option value={{ c }} {% if current_city == c %} selected {% endif %}>{{ c }}</option>
+                {% endfor %}
+            </select>
+            {% if request.GET.city %}
+                <a href="?{% for key, value in request.GET.items %}{% if key != 'city' %}{{ key }}={{ value }}{% if not forloop.last %}&{% endif %}{% endif %}{% endfor %}">Rimuovi filtro città</a>
+            {% endif %}
+
+            <select name="category" id="category" onchange="this.form.submit()">
+                <option value="" selected disabled hidden>Categoria</option>
+                {% for c in categories %}
+                    <option value={{ c }} {% if current_category == c %} selected {% endif %}>{{ c }}</option>
+                {% endfor %}
+            </select>
+            {% if request.GET.category %}
+                <a href="?{% for key, value in request.GET.items %}{% if key != 'category' %}{{ key }}={{ value }}{% if not forloop.last %}&{% endif %}{% endif %}{% endfor %}">Rimuovi filtro categoria</a>
+            {% endif %}
+            
+            <div>
+                <input type="text" placeholder="Da" {% if request.GET.from_date %} value="{{ request.GET.from_date }}" {% endif %} id="from_date" name="from_date" class="datepicker" readonly onchange="this.form.submit()">
+            </div>
+            <div>
+                <input type="text" placeholder="A" {% if request.GET.until_date %} value="{{ request.GET.until_date }}" {% endif %} id="until_date" name="until_date" class="datepicker" readonly onchange="this.form.submit()">
+            </div>
+            {% if request.GET.from_date or request.GET.until_date %}
+                <a href="?{% for key, value in request.GET.items %}{% if key != 'from_date' and key != 'until_date' %}{{ key }}={{ value }}{% if not forloop.last %}&{% endif %}{% endif %}{% endfor %}">Rimuovi filtro data</a>
+            {% endif %}
+        </form>
+        
+        <p>Risultati: {{ events_number }}</p>
+        {% for e in page_obj %}
+            <p>{{e.nome}}, {{e.categoria}}, {{e.data_ora}}, {{e.luogo.citta}}</p>
+        {% endfor %}
+        <nav aria-label="Page navigation">
+            <ul class="pagination pagination-sm justify-content-center">
+              <li class="page-item">
+                {% if page_obj.has_previous %}
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                {% endif %}
+              </li>
+
+              {% for p in paginator.page_range %}
+                <li class="page-item {% if request.GET.page|stringformat:"s" == p|stringformat:"s" %} active {% endif %}">
+                    <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ p }}">{{ p }}</a></li>
+              {% endfor %}
+
+              <li class="page-item">
+                {% if page_obj.has_next %}
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                {% endif %}
+              </li>
+            </ul>
+        </nav>
+    </div>
+{% endblock %}

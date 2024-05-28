@@ -58,11 +58,11 @@ def init_db():
     luoghi = list(Luogo.objects.all())
     organizzatori = list(Organizzatore.objects.all())
     eventi = [
-        {"nome": "Concerto di Capodanno", "descrizione": "Concerto speciale per celebrare il nuovo anno.", "data_ora": datetime.now() + timedelta(days=30), "categoria": "Concerto"},
+        {"nome": "Concerto di Capodanno", "descrizione": "Concerto speciale per celebrare il nuovo anno.", "data_ora": datetime.now() + timedelta(days=30), "categoria": "Concerti"},
         {"nome": "Festival Estivo", "descrizione": "Festival musicale estivo con vari artisti.", "data_ora": datetime.now() + timedelta(days=60), "categoria": "Festival"},
-        {"nome": "Jazz Night", "descrizione": "Serata dedicata alla musica jazz.", "data_ora": datetime.now() + timedelta(days=90), "categoria": "Concerto"},
+        {"nome": "Jazz Night", "descrizione": "Serata dedicata alla musica jazz.", "data_ora": datetime.now() + timedelta(days=90), "categoria": "Concerti"},
         {"nome": "Rock Fest", "descrizione": "Festival di musica rock con band internazionali.", "data_ora": datetime.now() + timedelta(days=120), "categoria": "Festival"},
-        {"nome": "Classica sotto le stelle", "descrizione": "Concerto di musica classica", "data_ora": datetime.now() + timedelta(days=150), "categoria": "Spettacolo Teatrale"}
+        {"nome": "Classica sotto le stelle", "descrizione": "Concerto di musica classica", "data_ora": datetime.now() + timedelta(days=150), "categoria": "Teatro"}
     ]
     for evento in eventi:
         evento['luogo'] = random.choice(luoghi)

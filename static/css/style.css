@@ -1,6 +1,7 @@
 body {
   font-family: 'Helvetica', 'Arial', sans-serif;
 }
+
 .scroll-container {
   overflow-x: auto;
   white-space: nowrap;
@@ -24,6 +25,7 @@ body {
   flex: 0 0 auto;
   margin-right: 20px;
 }
+
 .site-footer
 {
   background-color:#ffffff;
@@ -61,7 +63,6 @@ body {
   color:#737373;
   margin:0
 }
-
 @media (max-width: 767px) { /* schermi più piccoli */
     .copyright-text {
         text-align: center;
@@ -70,7 +71,6 @@ body {
         text-align: center;
     }
 }
-
 @media (min-width: 768px) { /* schermi più grandi */
     .cookies-text {
         text-align: right;
