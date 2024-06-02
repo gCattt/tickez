@@ -1,19 +1,5 @@
 from django.db import models
 from datetime import datetime
-#from common.models import Luogo
-
-class Organizzatore(models.Model):
-    nome = models.CharField(max_length=100, null=False, blank=False)
-    descrizione = models.TextField(null=True, blank=True, default='')
-    # immagine_profilo = models.
-    notifiche = models.BooleanField(null=False, default=False)
-
-    luoghi_affittati = models.ManyToManyField(to='common.Luogo', blank=True, default=None, related_name='affittuari')
-
-    # def __str__(self):
-
-    class Meta:
-        verbose_name_plural = 'Organizzatori'
 
 class Evento(models.Model):
     nome = models.CharField(max_length=100, null=False, blank=False)
@@ -22,8 +8,9 @@ class Evento(models.Model):
     categoria = models.CharField(max_length=100, null=True, blank=True, default='')
     # locandina = models.
 
-    organizzatore = models.ForeignKey(Organizzatore, on_delete=models.CASCADE, null=True, blank=True, related_name='eventi_organizzati')
+    organizzatore = models.ForeignKey(to='users.Organizzatore', on_delete=models.CASCADE, null=True, blank=True, related_name='eventi_organizzati')
     luogo = models.ForeignKey(to='common.Luogo', on_delete=models.CASCADE, null=True, blank=True, related_name='eventi_programmati')
+    followers = models.ManyToManyField(to='users.Utente', blank=True, default=None, related_name='eventi_preferiti')
     
     # def __str__(self):
 
@@ -35,8 +22,9 @@ class Biglietto(models.Model):
     prezzo = models.FloatField(null=True, blank=True, default=0.00)
     descrizione = models.TextField(null=True, blank=True, default='')
     
-    organizzatore = models.ForeignKey(Organizzatore, on_delete=models.CASCADE, null=True, blank=True, related_name='biglietti_generati')
+    organizzatore = models.ForeignKey(to='users.Organizzatore', on_delete=models.CASCADE, null=True, blank=True, related_name='biglietti_generati')
     evento = models.ForeignKey(Evento, on_delete=models.CASCADE, null=True, blank=True, related_name='biglietti_disponibili')
+    ordine = models.ManyToManyField(to='orders.Ordine', blank=True, default=None, related_name='biglietti_ordinati')
 
     # def __str__(self):
 

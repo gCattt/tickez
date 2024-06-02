@@ -1,7 +1,5 @@
 from django.db import models
 from datetime import datetime
-#from orders.models import Ordine
-#from sellers.models import Organizzatore, Evento
 
 class Luogo(models.Model):
     nome = models.CharField(max_length=50, null=False, blank=False)
@@ -11,6 +9,9 @@ class Luogo(models.Model):
     stato = models.CharField(max_length=100)
     codice_postale = models.CharField(max_length=30)
     # preview = models.
+
+    followers = models.ManyToManyField(to='users.Utente', blank=True, default=None, related_name='luoghi_preferiti')
+    affittuari = models.ManyToManyField(to='users.Organizzatore', blank=True, default=None, related_name='luoghi_affittati')
     
     #def __str__(self):
     
@@ -22,9 +23,8 @@ class Notifica(models.Model):
     data_ora = models.DateTimeField(null=False, blank=False, default=datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
 
     ordine = models.ForeignKey(to='orders.Ordine', on_delete=models.CASCADE, null=True, blank=True, related_name='notifiche_ordine')
-    organizzatore = models.ForeignKey(to='sellers.Organizzatore', on_delete=models.CASCADE, null=True, blank=True, related_name='notifiche_organizzatore')
+    organizzatore = models.ForeignKey(to='users.Organizzatore', on_delete=models.CASCADE, null=True, blank=True, related_name='notifiche_organizzatore')
     luogo = models.ForeignKey(Luogo, on_delete=models.CASCADE, null=True, blank=True, related_name='notifiche_luogo')
-    evento = models.ForeignKey(to='sellers.Evento', on_delete=models.CASCADE, null=True, blank=True, related_name='notifiche_evento')
     
     # def __str__(self):
 

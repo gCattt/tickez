@@ -25,8 +25,8 @@ urlpatterns = [
     path('favicon.ico', RedirectView.as_view(url='/static/images/icons/favicon.ico', permanent=True)),
     re_path(r"^$|^\/$|^home\/$", views.home_page, name='homepage'),
     path('common/', include('common.urls')),
-    path('customers/', include('customers.urls')),
-    path('sellers/', include('sellers.urls')),
+    path('users/', include('users.urls')),
+    path('products/', include('products.urls')),
     path('orders/', include('orders.urls'))
 ]
 

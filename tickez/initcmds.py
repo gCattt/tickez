@@ -1,7 +1,7 @@
 from common.models import Luogo, Notifica
-from customers.models import Utente
+from users.models import Organizzatore, Utente
 from orders.models import Ordine
-from sellers.models import Organizzatore, Evento, Biglietto
+from products.models import Evento, Biglietto
 from datetime import datetime, timedelta
 import random
 

@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import render
-from sellers.models import Evento
+from products.models import Evento
 from django.utils import timezone
 
 def home_page(request):

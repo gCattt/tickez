@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.generic.list import ListView
 from django.core.paginator import Paginator
-from sellers.models import Evento
+from products.models import Evento
 from datetime import datetime, timedelta
 
 

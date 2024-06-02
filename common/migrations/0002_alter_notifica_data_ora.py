@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('orders', '0001_initial'),
+        ('common', '0001_initial'),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='ordine',
+            model_name='notifica',
             name='data_ora',
-            field=models.DateTimeField(default='03/06/2024 00:20:05'),
+            field=models.DateTimeField(default='03/06/2024 00:20:17'),
         ),
     ]

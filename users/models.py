@@ -1,7 +1,5 @@
 from django.db import models
 from datetime import date
-#from common.models import Luogo
-#from sellers.models import Organizzatore, Evento
 
 class Utente(models.Model):
         
@@ -26,11 +24,20 @@ class Utente(models.Model):
     scadenza_carta = models.DateField(null=True, blank=True, default=date.today)
     notifiche = models.BooleanField(null=False, default=False)
     
-    luoghi_preferiti = models.ManyToManyField(to='common.Luogo', blank=True, default=None, related_name='followers')
-    organizzatori_preferiti = models.ManyToManyField(to='sellers.Organizzatore', blank=True, default=None, related_name='followers')
-    eventi_preferiti = models.ManyToManyField(to='sellers.Evento', blank=True, default=None, related_name='followers')
-    
     # def __str__(self):
 
     class Meta:
         verbose_name_plural = 'Utenti'
+
+class Organizzatore(models.Model):
+    nome = models.CharField(max_length=100, null=False, blank=False)
+    descrizione = models.TextField(null=True, blank=True, default='')
+    # immagine_profilo = models.
+    notifiche = models.BooleanField(null=False, default=False)
+
+    followers = models.ManyToManyField(Utente, blank=True, default=None, related_name='organizzatori_preferiti')
+
+    # def __str__(self):
+
+    class Meta:
+        verbose_name_plural = 'Organizzatori'
