@@ -7,4 +7,5 @@ app_name = 'products'
 urlpatterns = [
     path('admin/', admin.site.urls),
     re_path(r"^$|^\/$", views.products, name=app_name),
+    path('events/', views.EventsListView.as_view(), name="events"),
 ]
