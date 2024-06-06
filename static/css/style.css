@@ -2,6 +2,10 @@ body {
   font-family: 'Helvetica', 'Arial', sans-serif;
 }
 
+.card:hover {
+  background-color: #f3f3f3;
+}
+
 .scroll-container {
   overflow-x: auto;
   white-space: nowrap;

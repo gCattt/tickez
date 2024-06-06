@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}{{title}} | Tickez{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <p>{{object.nome}}</p>
+        <p>{{object.luogo.nome}}</p>
+        <p>{{object.data_ora}}</p>
+
+        <hr>
+
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab" aria-controls="description" aria-selected="true">Descrizione</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="location-tab" data-bs-toggle="tab" data-bs-target="#location" type="button" role="tab" aria-controls="location" aria-selected="false">Info Location</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="artist-tab" data-bs-toggle="tab" data-bs-target="#artist" type="button" role="tab" aria-controls="artist" aria-selected="false">Artista</button>
+          </li>
+        </ul>
+
+        <div class="tab-content">
+          <div class="tab-pane active" id="description" role="tabpanel" aria-labelledby="description-tab">{{object.descrizione}}</div>
+          <div class="tab-pane" id="location" role="tabpanel" aria-labelledby="location-tab">{{object.luogo.nome}}, {{object.luogo.indirizzo}}</div>
+          <div class="tab-pane" id="artist" role="tabpanel" aria-labelledby="artist-tab">{{object.organizzatore.nome}}</div>
+        </div>
+
+
+    </div>
+{% endblock %}

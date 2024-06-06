@@ -1,8 +1,11 @@
 from django.db import models
+from django.urls import reverse
+from django.template.defaultfilters import slugify
 from datetime import datetime
 
 class Evento(models.Model):
     nome = models.CharField(max_length=100, null=False, blank=False)
+    slug = models.SlugField(max_length=200, null=False, unique=True, blank=True)
     descrizione = models.TextField(null=True, blank=True, default='')
     data_ora = models.DateTimeField(null=False, blank=False, default=datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
     categoria = models.CharField(max_length=100, null=True, blank=True, default='')
@@ -13,6 +16,14 @@ class Evento(models.Model):
     followers = models.ManyToManyField(to='users.Utente', blank=True, default=None, related_name='eventi_preferiti')
     
     # def __str__(self):
+
+    def get_absolute_url(self):
+        return reverse("products:event_details", kwargs={"slug": self.slug, "pk": self.pk})
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.nome)
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name_plural = 'Eventi'

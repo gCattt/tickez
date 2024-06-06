@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Eventi{% endblock %}
+{% block title %}Eventi | Tickez{% endblock %}
 
 {% block content %}
     <div class="container">
@@ -43,7 +43,9 @@
         
         <p>Risultati: {{ events_number }}</p>
         {% for e in page_obj %}
-            <p>{{e.nome}}, {{e.categoria}}, {{e.data_ora}}, {{e.luogo.citta}}</p>
+            <a href="{{ e.get_absolute_url }}" style="text-decoration: none; color: inherit;">
+                <p>{{e.nome}}, {{e.categoria}}, {{e.data_ora}}, {{e.luogo.citta}}</p>
+            </a>
         {% endfor %}
         <nav aria-label="Page navigation">
             <ul class="pagination pagination-sm justify-content-center">

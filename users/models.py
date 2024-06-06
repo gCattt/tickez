@@ -37,7 +37,8 @@ class Organizzatore(models.Model):
 
     followers = models.ManyToManyField(Utente, blank=True, default=None, related_name='organizzatori_preferiti')
 
-    # def __str__(self):
+    def __str__(self):
+        return self.nome
 
     class Meta:
         verbose_name_plural = 'Organizzatori'

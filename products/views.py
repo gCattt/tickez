@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.generic.list import ListView
+from django.views.generic.detail import DetailView
 from products.models import Evento
 from datetime import datetime
 
@@ -69,5 +70,16 @@ class EventsListView(ListView):
         
         context['current_from'] = self.request.GET.get('from_date', '')
         context['current_until'] = self.request.GET.get('until_date', '')
+
+        return context
+    
+class EventDetailView(DetailView):
+    model = Evento
+    template_name = "products/event_details.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['title'] = str(self.get_object().organizzatore) + ' - ' + self.get_object().nome
 
         return context
