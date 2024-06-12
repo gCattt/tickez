@@ -1,4 +1,7 @@
 from django.db import models
+from django.urls import reverse
+from django.template.defaultfilters import slugify
+import itertools
 from datetime import date
 
 class Utente(models.Model):
@@ -31,6 +34,7 @@ class Utente(models.Model):
 
 class Organizzatore(models.Model):
     nome = models.CharField(max_length=100, null=False, blank=False)
+    slug = models.SlugField(max_length=200, null=False, unique=True, blank=True)
     descrizione = models.TextField(null=True, blank=True, default='')
     # immagine_profilo = models.
     notifiche = models.BooleanField(null=False, default=False)
@@ -39,6 +43,21 @@ class Organizzatore(models.Model):
 
     def __str__(self):
         return self.nome
+    
+    def get_absolute_url(self):
+        return reverse("users:artist_details", kwargs={"slug": self.slug, "pk": self.pk})
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.nome)
+            original_slug = self.slug
+            for i in itertools.count(1):
+                if not Organizzatore.objects.filter(slug=self.slug).exists():
+                    break
+                self.slug = f'{original_slug}-{i}'
+                print(f'Attempting slug: {self.slug}')
+        super().save(*args, **kwargs)
+        print(f'Final slug: {self.slug}')
 
     class Meta:
         verbose_name_plural = 'Organizzatori'
