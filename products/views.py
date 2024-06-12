@@ -18,18 +18,19 @@ class EventsListView(ListView):
         event_list = super().get_queryset()
 
         order_by = self.request.GET.get('sort', 'data_ora')
-        event_list = self.order_style(event_list, order_by)
 
         city = self.request.GET.get('city', '')
-        event_list = self.filter_by_city(event_list, city)
 
         category = self.request.GET.get('category', '')
-        event_list = self.filter_by_category(event_list, category)
 
         from_date = self.request.GET.get('from_date', '')
         until_date = self.request.GET.get('until_date', '')
-        event_list = self.filter_by_date(event_list, from_date, until_date)
-        
+
+        event_list = ( self.order_style(event_list, order_by) &
+                       self.filter_by_city(event_list, city) &
+                       self.filter_by_category(event_list, category) &
+                       self.filter_by_date(event_list, from_date, until_date)
+        )
         return event_list
     
     def order_style(self, queryset, order_by):
