@@ -14,9 +14,9 @@ class ArtistsListView(ListView):
     paginate_by = 3
 
     def get_queryset(self):
-        event_list = super().get_queryset()
+        artist_list = super().get_queryset()
         
-        return event_list.order_by('nome')
+        return artist_list.order_by('nome')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
