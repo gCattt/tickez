@@ -50,14 +50,7 @@ class Organizzatore(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.nome)
-            original_slug = self.slug
-            for i in itertools.count(1):
-                if not Organizzatore.objects.filter(slug=self.slug).exists():
-                    break
-                self.slug = f'{original_slug}-{i}'
-                print(f'Attempting slug: {self.slug}')
         super().save(*args, **kwargs)
-        print(f'Final slug: {self.slug}')
 
     class Meta:
         verbose_name_plural = 'Organizzatori'

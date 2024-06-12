@@ -1,8 +1,11 @@
 from django.db import models
+from django.urls import reverse
+from django.template.defaultfilters import slugify
 from datetime import datetime
 
 class Luogo(models.Model):
     nome = models.CharField(max_length=50, null=False, blank=False)
+    slug = models.SlugField(max_length=200, null=False, unique=True, blank=True)
     indirizzo = models.CharField(max_length=255)
     capienza_persone = models.PositiveIntegerField()
     citta = models.CharField(max_length=100)
@@ -14,6 +17,14 @@ class Luogo(models.Model):
     affittuari = models.ManyToManyField(to='users.Organizzatore', blank=True, default=None, related_name='luoghi_affittati')
     
     #def __str__(self):
+
+    def get_absolute_url(self):
+        return reverse("common:venue_details", kwargs={"slug": self.slug, "pk": self.pk})
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.nome)
+        super().save(*args, **kwargs)
     
     class Meta:
         verbose_name_plural = 'Luoghi'

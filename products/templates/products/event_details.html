@@ -24,7 +24,11 @@
 
         <div class="tab-content">
           <div class="tab-pane active" id="description" role="tabpanel" aria-labelledby="description-tab">{{object.descrizione}}</div>
-          <div class="tab-pane" id="location" role="tabpanel" aria-labelledby="location-tab">{{object.luogo.nome}}, {{object.luogo.indirizzo}}</div>
+          <div class="tab-pane" id="location" role="tabpanel" aria-labelledby="location-tab">
+            <a href="{{ object.luogo.get_absolute_url }}" style="text-decoration: none; color: inherit;">
+              {{object.luogo.nome}}, {{object.luogo.indirizzo}}
+            </a>
+          </div>
           <div class="tab-pane" id="artist" role="tabpanel" aria-labelledby="artist-tab">
             <a href="{{ object.organizzatore.get_absolute_url }}" style="text-decoration: none; color: inherit;">
               {{object.organizzatore.nome}}
