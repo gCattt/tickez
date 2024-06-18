@@ -1,0 +1,16 @@
+<nav class="navbar navbar-light" style="background-color: #ffffff; padding:10px 30px;">
+    <div class="container-fluid d-flex align-items-end">
+        <a class="navbar-brand me-auto" href="/">
+            <img src="/static/images/tickez_logo.jpg" alt="tickez logo" width="110">
+        </a>
+
+        <div class="d-flex justify-content-center flex-grow-1">
+            <form class="d-flex w-100 justify-content-center" method="GET" action="{% url 'products:events' %}">
+                <input class="form-control me-2" type="search" name="keywords" placeholder="Artista, Evento o Località" aria-label="Search" style="min-width: 200px; max-width: 400px;">
+                <button class="btn btn-dark" type="submit"><i class="fas fa-search"></i></button>
+            </form>
+        </div>
+
+        <button id="profileButton" class="btn btn-dark ms-auto" type="button"><i class="fas fa-user-circle fa-lg"></i></button>
+    </div>
+  </nav>
