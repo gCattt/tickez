@@ -9,4 +9,7 @@ urlpatterns = [
     re_path(r"^$|^\/$", views.products, name=app_name),
     path('events/', views.EventsListView.as_view(), name="events"),
     path('events/<slug:slug>-<int:pk>/', views.EventDetailView.as_view(), name="event_details"),
+    path('create_event/', views.create_event, name="create-event"),
+    path('update_event/<slug:slug>-<int:pk>/', views.UpdateEventView.as_view(), name="update-event"),
+    path('delete_event/<slug:slug>-<int:pk>/', views.DeleteEventView.as_view(), name="delete-event"),
 ]

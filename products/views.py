@@ -1,8 +1,13 @@
-from django.http import HttpResponse
-from django.shortcuts import render
-from django.views.generic.list import ListView
-from django.views.generic.detail import DetailView
-from products.models import Evento
+from typing import Any
+from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
+
+from products.models import Evento, Biglietto
+
+from django.views.generic import ListView, DetailView, UpdateView, DeleteView
+
+from .forms import *
+
 from datetime import datetime
 
 def products(request):
@@ -82,3 +87,35 @@ class EventDetailView(DetailView):
         context['title'] = str(self.get_object().organizzatore) + ' - ' + self.get_object().nome
 
         return context
+    
+def create_event(request):
+    if request.method == 'POST':
+        form = EventCrispyForm(request.POST)
+        if form.is_valid():
+            event = form.save(commit=False)
+            # event.organizzatore = <utente_attuale> --> poi rimuovi organizzatore dal form
+            event.save()
+            return redirect(event.get_absolute_url())
+    else:
+        form = EventCrispyForm()
+    
+    return render(request, 'products/create_event.html', {'form': form})
+
+class UpdateEventView(UpdateView):
+    model = Evento
+    form_class = EventCrispyForm
+    template_name = "products/update_event.html"
+    
+    def get_success_url(self):
+        return self.get_object().get_absolute_url()
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['action'] = 'Salva Modifiche'
+        return kwargs
+    
+# UTILIZZA UN'UNICA VIEW DELETEENTITA' PER EVENTI E BIGLIETTI
+class DeleteEventView(DeleteView):
+    model = Evento
+    template_name = "products/delete_event.html"
+    success_url = reverse_lazy('products:events')
