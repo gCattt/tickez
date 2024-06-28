@@ -41,7 +41,7 @@
             {% endif %}
         </form>
         
-        <p>Risultati: {{view.get_queryset.count}}</p>
+        <p>{{view.get_queryset.count}} risultati</p>
         {% for e in page_obj %}
             <a href="{{ e.get_absolute_url }}" style="text-decoration: none; color: inherit;">
                 <p>{{e.nome}}, {{e.categoria}}, {{e.data_ora}}, {{e.luogo.citta}}</p>

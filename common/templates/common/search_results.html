@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Ricerca | Tickez{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="events-tab" data-bs-toggle="tab" data-bs-target="#events" type="button" role="tab" aria-controls="events" aria-selected="true">Eventi</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="venues-tab" data-bs-toggle="tab" data-bs-target="#venues" type="button" role="tab" aria-controls="venues" aria-selected="false">Luoghi</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="artists-tab" data-bs-toggle="tab" data-bs-target="#artists" type="button" role="tab" aria-controls="artists" aria-selected="false">Artisti</button>
+          </li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="events" role="tabpanel" aria-labelledby="events-tab">
+                <p>{{events.count}} risultati {% if keywords %} per "{{keywords}}" &nbsp;
+                    
+                    <a href="{% url 'common:search-results' %}" class="text-decoration-none text-dark"><strong>X</strong></a>
+                    {% endif %}
+                </p>
+                
+                {% if events %}
+                <ul>
+                    {% for e in events %}
+                        <a href="{{ e.get_absolute_url }}" style="text-decoration: none; color: inherit;">
+                            <li>{{ e.nome }}</li>
+                        </a>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                    <p>Prova un'altra scheda sopra o digita un testo di ricerca diverso</p>
+                {% endif %}
+            </div>
+        
+            <div class="tab-pane fade" id="venues" role="tabpanel" aria-labelledby="venues-tab">
+                <p>{{venues.count}} risultati {% if keywords %} per "{{keywords}}" &nbsp;
+                    
+                    <a href="{% url 'common:search-results' %}" class="text-decoration-none text-dark"><strong>X</strong></a>
+                    {% endif %}
+                </p>
+                {% if venues %}
+                <ul>
+                    {% for v in venues %}
+                    <a href="{{ v.get_absolute_url }}" style="text-decoration: none; color: inherit;">
+                        <li>{{ v.nome }}</li>
+                    </a>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                    <p>Prova un'altra scheda sopra o digita un testo di ricerca diverso</p>
+                {% endif %}
+            </div>
+
+            <div class="tab-pane fade" id="artists" role="tabpanel" aria-labelledby="artist-tab">
+                <p>{{artists.count}} risultati {% if keywords %} per "{{keywords}}" &nbsp;
+                    
+                    <a href="{% url 'common:search-results' %}" class="text-decoration-none text-dark"><strong>X</strong></a>
+                    {% endif %}
+                </p>
+                {% if artists %}
+                <ul>
+                    {% for a in artists %}
+                    <a href="{{ a.get_absolute_url }}" style="text-decoration: none; color: inherit;">
+                        <li>{{ a.nome }}</li>
+                    </a>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                    <p>Prova un'altra scheda sopra o digita un testo di ricerca diverso</p>
+                {% endif %}
+            </div>
+            
+        </div>
+    </div>
+{% endblock %}
