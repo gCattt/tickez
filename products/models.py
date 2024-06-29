@@ -39,6 +39,7 @@ class Biglietto(models.Model):
     tipologia = models.CharField(max_length=100, null=True, blank=True, default='')
     prezzo = models.FloatField(null=True, blank=True, default=0.00)
     descrizione = models.TextField(null=True, blank=True, default='')
+    quantita = models.IntegerField(default=0)
     
     organizzatore = models.ForeignKey(to='users.Organizzatore', on_delete=models.CASCADE, null=True, blank=True, related_name='biglietti_generati')
     evento = models.ForeignKey(Evento, on_delete=models.CASCADE, null=True, blank=True, related_name='biglietti_disponibili')

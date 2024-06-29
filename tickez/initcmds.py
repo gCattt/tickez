@@ -2,6 +2,7 @@ from common.models import Luogo, Notifica
 from users.models import Organizzatore, Utente
 from orders.models import Ordine
 from products.models import Evento, Biglietto
+
 from datetime import datetime, timedelta
 import random
 
@@ -82,6 +83,7 @@ def init_db():
     for biglietto in biglietti:
         biglietto['evento'] = random.choice(eventi)
         biglietto['organizzatore'] = random.choice(organizzatori)
+        biglietto['quantita'] = random.randint(0, 100)
         b = Biglietto(**biglietto)
         b.save()
 

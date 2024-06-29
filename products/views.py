@@ -8,7 +8,7 @@ from django.views.generic import ListView, DetailView, UpdateView, DeleteView
 
 from .forms import *
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 def products(request):
     #return HttpResponse("products test view.")
@@ -85,6 +85,9 @@ class EventDetailView(DetailView):
         context = super().get_context_data(**kwargs)
 
         context['title'] = str(self.get_object().organizzatore) + ' - ' + self.get_object().nome
+        context['tickets'] = self.get_object().biglietti_disponibili.all()
+        context['range_dropdown'] = range(0, 6)
+        context['name_change'] = self.get_object().data_ora - timedelta(days=30)
 
         return context
     
