@@ -28,7 +28,7 @@ class Evento(models.Model):
         return reverse("products:event_details", kwargs={"slug": self.slug, "pk": self.pk})
     
     def save(self, *args, **kwargs):
-        if not self.slug or self.nome != self.slug:
+        if not self.slug or slugify(self.nome) != self.slug:
             self.slug = slugify(self.nome)
         super().save(*args, **kwargs)
 
@@ -37,6 +37,7 @@ class Evento(models.Model):
 
 class Biglietto(models.Model):
     tipologia = models.CharField(max_length=100, null=True, blank=True, default='')
+    slug = models.SlugField(max_length=200, null=False, unique=True, blank=True)
     prezzo = models.FloatField(null=True, blank=True, default=0.00)
     descrizione = models.TextField(null=True, blank=True, default='')
     quantita = models.IntegerField(default=0)
@@ -46,6 +47,14 @@ class Biglietto(models.Model):
     ordine = models.ManyToManyField(to='orders.Ordine', blank=True, default=None, related_name='biglietti_ordinati')
 
     # def __str__(self):
+
+    def get_absolute_url(self):
+        return self.evento.get_absolute_url()
+    
+    def save(self, *args, **kwargs):
+        if not self.slug or slugify(self.tipologia) != self.slug:
+            self.slug = slugify(self.tipologia)
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name_plural = 'Biglietti'

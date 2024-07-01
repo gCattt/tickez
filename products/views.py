@@ -1,5 +1,5 @@
 from typing import Any
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 
 from products.models import Evento, Biglietto
@@ -13,6 +13,7 @@ from datetime import datetime, timedelta
 def products(request):
     #return HttpResponse("products test view.")
     return render(request, template_name="products/base_products.html")
+
 
 class EventsListView(ListView):
     model = Evento
@@ -87,27 +88,48 @@ class EventDetailView(DetailView):
         context['title'] = str(self.get_object().organizzatore) + ' - ' + self.get_object().nome
         context['tickets'] = self.get_object().biglietti_disponibili.all()
         context['range_dropdown'] = range(0, 6)
-        context['name_change'] = self.get_object().data_ora - timedelta(days=30)
+        context['name_change'] = self.get_object().data_ora - timedelta(days=15)
 
         return context
     
+
 def create_event(request):
+    entity = 'Evento'
     if request.method == 'POST':
         form = EventCrispyForm(request.POST)
         if form.is_valid():
             event = form.save(commit=False)
             # event.organizzatore = <utente_attuale> --> poi rimuovi organizzatore dal form
             event.save()
+
             return redirect(event.get_absolute_url())
     else:
         form = EventCrispyForm()
     
-    return render(request, 'products/create_event.html', {'form': form})
+    return render(request, 'products/create_entity.html', {'form': form, 'entity': entity})
+
+def create_ticket(request, event_slug, event_pk):
+    entity = 'Biglietto'
+    event = get_object_or_404(Evento, slug=event_slug, pk=event_pk)
+
+    if request.method == 'POST':
+        form = TicketCrispyForm(request.POST)
+        if form.is_valid():
+            ticket = form.save(commit=False)
+            ticket.evento = event
+            ticket.organizzatore = event.organizzatore
+            ticket.save()
+            return redirect(ticket.get_absolute_url())
+    else:
+        form = TicketCrispyForm()
+
+    return render(request, 'products/create_entity.html', {'form': form, 'entity': entity, 'event': event})
+
 
 class UpdateEventView(UpdateView):
     model = Evento
     form_class = EventCrispyForm
-    template_name = "products/update_event.html"
+    template_name = "products/update_entity.html"
     
     def get_success_url(self):
         return self.get_object().get_absolute_url()
@@ -117,8 +139,68 @@ class UpdateEventView(UpdateView):
         kwargs['action'] = 'Salva Modifiche'
         return kwargs
     
-# UTILIZZA UN'UNICA VIEW DELETEENTITA' PER EVENTI E BIGLIETTI
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['entity'] = 'Evento'+self.nome
+        return context
+    
+class UpdateTicketView(UpdateView):
+    model = Biglietto
+    form_class = TicketCrispyForm
+    template_name = "products/update_entity.html"
+    slug_field = 'slug'
+
+    def get_object(self, queryset=None):
+        self.event = get_object_or_404(Evento, slug=self.kwargs.get('event_slug'), pk=self.kwargs.get('event_pk'))
+
+        queryset = self.event.biglietti_disponibili.all()
+        ticket = get_object_or_404(queryset, slug=self.kwargs.get('ticket_slug'), pk=self.kwargs.get('ticket_pk'))
+
+        return ticket
+
+    def get_success_url(self):
+        return self.event.get_absolute_url()
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['action'] = 'Salva Modifiche'
+        return kwargs
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['entity'] = 'Biglietto'
+        return context
+    
+
 class DeleteEventView(DeleteView):
     model = Evento
-    template_name = "products/delete_event.html"
+    template_name = "products/delete_entity.html"
     success_url = reverse_lazy('products:events')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['entity'] = 'Evento'
+        context['name'] = self.object.nome
+        return context
+
+class DeleteTicketView(DeleteView):
+    model = Biglietto
+    template_name = "products/delete_entity.html"
+
+    def get_object(self, queryset=None):
+        self.event = get_object_or_404(Evento, slug=self.kwargs.get('event_slug'), pk=self.kwargs.get('event_pk'))
+
+        queryset = self.event.biglietti_disponibili.all()
+        ticket = get_object_or_404(queryset, slug=self.kwargs.get('ticket_slug'), pk=self.kwargs.get('ticket_pk'))
+
+        return ticket
+
+    # get_success_url permette di determinare l'URL di reindirizzamento in modo dinamico, basandosi sull'oggetto manipolato (a differenza di reverse_lazy)
+    def get_success_url(self):
+        return self.event.get_absolute_url()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['entity'] = 'Biglietto'
+        context['name'] = self.object.tipologia+' ('+self.object.evento.nome+')'
+        return context

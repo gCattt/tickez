@@ -2,12 +2,12 @@
 
 {% load crispy_forms_tags %}
 
-{% block title %}Elimina Evento | Tickez{% endblock %}
+{% block title %}Elimina {{entity}} | Tickez{% endblock %}
 
 {% block content %}
     <div class="container">
         <form method="POST"> {% csrf_token %}
-            <p><strong>{{ object.nome }}</strong> verrà eliminato. Sei sicuro?</p>
+            <p>Sei sicuro di voler eliminare <strong>{{entity}}: {{name}}</strong>?</p>
             <input type="submit" value="Conferma" class="btn btn-danger">
         </form>
     </div>
