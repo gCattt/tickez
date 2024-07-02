@@ -15,19 +15,31 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.contrib.auth import views as auth_views
+
 from django.urls import path, re_path, include
-from .initcmds import *
-from django.views.generic.base import RedirectView
+
 from . import views
+from django.views.generic.base import RedirectView
+
+from .initcmds import *
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
     path('favicon.ico', RedirectView.as_view(url='/static/images/icons/favicon.ico', permanent=True)),
     re_path(r"^$|^\/$|^home\/$", views.home_page, name='homepage'),
+
     path('common/', include('common.urls')),
     path('users/', include('users.urls')),
     path('products/', include('products.urls')),
-    path('orders/', include('orders.urls'))
+    path('orders/', include('orders.urls')),
+
+    #path('register/', views.UserCreateView.as_view(), name='register-customer'),
+    #path('register_organizer/', views.OrganizerCreateView.as_view(), name='register-organizer'),
+    path('login/', views.login_user, name='login'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
 ]
 
 #erase_db()

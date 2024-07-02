@@ -2,6 +2,9 @@ from typing import Any
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 
+from django.contrib.auth.decorators import login_required, user_passes_test
+from braces.views import GroupRequiredMixin
+
 from products.models import Evento, Biglietto
 
 from django.views.generic import ListView, DetailView, UpdateView, DeleteView
@@ -9,6 +12,11 @@ from django.views.generic import ListView, DetailView, UpdateView, DeleteView
 from .forms import *
 
 from datetime import datetime, timedelta
+
+'''
+def is_organizer(user):
+    return user.groups.filter(name="Organizzatori").exists()
+'''
 
 def products(request):
     #return HttpResponse("products test view.")
@@ -93,13 +101,14 @@ class EventDetailView(DetailView):
         return context
     
 
+#@user_passes_test(is_organizer)
 def create_event(request):
     entity = 'Evento'
     if request.method == 'POST':
         form = EventCrispyForm(request.POST)
         if form.is_valid():
             event = form.save(commit=False)
-            # event.organizzatore = <utente_attuale> --> poi rimuovi organizzatore dal form
+            # event.organizzatore = request.user.nome --> poi rimuovi organizzatore dal form
             event.save()
 
             return redirect(event.get_absolute_url())
@@ -108,6 +117,7 @@ def create_event(request):
     
     return render(request, 'products/create_entity.html', {'form': form, 'entity': entity})
 
+#@user_passes_test(is_organizer)
 def create_ticket(request, event_slug, event_pk):
     entity = 'Biglietto'
     event = get_object_or_404(Evento, slug=event_slug, pk=event_pk)
@@ -125,8 +135,9 @@ def create_ticket(request, event_slug, event_pk):
 
     return render(request, 'products/create_entity.html', {'form': form, 'entity': entity, 'event': event})
 
-
+#class UpdateEventView(GroupRequiredMixin, UpdateView):
 class UpdateEventView(UpdateView):
+    #group_required = ["Organizzatori"]
     model = Evento
     form_class = EventCrispyForm
     template_name = "products/update_entity.html"
@@ -144,7 +155,9 @@ class UpdateEventView(UpdateView):
         context['entity'] = 'Evento'+self.nome
         return context
     
+#class UpdateTicketView(GroupRequiredMixin, UpdateView):
 class UpdateTicketView(UpdateView):
+    #group_required = ["Organizzatori"]
     model = Biglietto
     form_class = TicketCrispyForm
     template_name = "products/update_entity.html"
@@ -171,8 +184,9 @@ class UpdateTicketView(UpdateView):
         context['entity'] = 'Biglietto'
         return context
     
-
+#class DeleteEventView(GroupRequiredMixin, DeleteView):
 class DeleteEventView(DeleteView):
+    #group_required = ["Organizzatori"]
     model = Evento
     template_name = "products/delete_entity.html"
     success_url = reverse_lazy('products:events')
@@ -183,7 +197,9 @@ class DeleteEventView(DeleteView):
         context['name'] = self.object.nome
         return context
 
+#class DeleteEventView(GroupRequiredMixin, DeleteView):
 class DeleteTicketView(DeleteView):
+    #group_required = ["Organizzatori"]
     model = Biglietto
     template_name = "products/delete_entity.html"
 
