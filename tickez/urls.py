@@ -32,3 +32,7 @@ urlpatterns = [
 
 #erase_db()
 init_db()
+
+admin.site.site_header = "Tickez Administration Page"
+admin.site.site_title = "Tickez"
+admin.site.index_title = "Admin Area"
