@@ -1,33 +1,47 @@
 <nav class="navbar navbar-light" style="background-color: #ffffff; padding:10px 30px;">
-    <div class="container-fluid d-flex align-items-end">
-        <a class="navbar-brand me-auto" href="/">
+    <div class="container-fluid d-flex align-items-end position-relative">
+        <a class="navbar-brand" href="/" style="z-index: 1;">
             <img src="/static/images/tickez_logo.jpg" alt="tickez logo" width="110">
         </a>
 
-        <div class="d-flex justify-content-center flex-grow-1">
-            <form class="d-flex w-100 justify-content-center" method="GET" action="{% url 'common:search-results' %}">
-                <input class="form-control me-2" type="search" name="keywords" placeholder="Artista, Evento o Località" aria-label="Search" style="width: 250px;">
+        <div class="dropdown d-inline ms-5" style="margin-bottom: 7px; z-index: 1;">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Eventi
+            </a>
+            <ul class="dropdown-menu" style="min-width: max-content;">
+                <li><a class="dropdown-item" href="{% url 'products:events' %}?category=Concerti">Concerti</a></li>
+                <li><a class="dropdown-item" href="{% url 'products:events' %}?category=Festival">Festival</a></li>
+                <li><a class="dropdown-item" href="{% url 'products:events' %}?category=Teatro">Teatro</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{% url 'products:events' %}">Tutti gli eventi</a></li>
+            </ul>
+        </div>
+
+        <div class="position-absolute w-100" style="left: 50%; transform: translateX(-50%); top: 30%; z-index: 0;">
+            <form class="d-flex justify-content-center w-100" method="GET" action="{% url 'common:search-results' %}">
+                <input class="form-control me-2" type="search" name="keywords" placeholder="Evento, Artista o Luogo" aria-label="Search" style="width: 350px;">
                 <button class="btn btn-dark" type="submit"><i class="fas fa-search"></i></button>
             </form>
         </div>
 
-        {% if user.is_authenticated %}
-            <a href="#" class="btn btn-dark ms-auto me-2">
-                <span style="margin-right: 5px;">{{ user }}</span>
-                <i class="fas fa-user-circle fa-lg"></i>
-            </a>
-        {% else %}
-            <a href="{% url 'login' %}" class="btn btn-dark ms-auto me-2">
-                <span style="margin-right: 5px;">Accedi</span>
-                <i class="fas fa-user-circle fa-lg"></i>
-            </a>
-        {% endif %}
-        {% if user.is_authenticated %}
-        <form id="logout-form" method="POST" action="{% url 'logout' %}" style="display: inline;"> {% csrf_token %}
-            <button type="submit" class="btn btn-dark">
-                <i class="fas fa-sign-out-alt"></i>
-            </button>
-        </form>
-        {% endif %}
+        <div class="ms-auto d-flex align-items-end" style="z-index: 1;">
+            {% if user.is_authenticated %}
+                <a href="#" class="btn btn-dark me-2">
+                    <span style="margin-right: 5px;">{{ user }}</span>
+                    <i class="fas fa-user-circle fa-lg"></i>
+                </a>
+                <form id="logout-form" method="POST" action="{% url 'logout' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-dark">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn btn-dark me-2">
+                    <span style="margin-right: 5px;">Accedi</span>
+                    <i class="fas fa-user-circle fa-lg"></i>
+                </a>
+            {% endif %}
+        </div>
     </div>
-  </nav>
+</nav>
