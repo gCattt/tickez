@@ -28,21 +28,21 @@
 
         <div>
             {% if user.is_authenticated %}
-                <a href="#" class="btn btn-dark me-2">
-                    <span style="margin-right: 5px;">{{ user }}</span>
-                    <i class="fas fa-user-circle fa-lg"></i>
-                </a>
-                <form id="logout-form" method="POST" action="{% url 'logout' %}" style="display: inline;">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-dark">
-                        <i class="fas fa-sign-out-alt"></i>
-                    </button>
-                </form>
+            <a href="#" class="btn btn-dark me-2">
+                <span style="margin-right: 5px;">{{ user }}</span>
+                <i class="fas fa-user-circle fa-lg"></i>
+            </a>
+            <form id="logout-form" method="POST" action="{% url 'logout' %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-dark">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </form>
             {% else %}
-                <a href="{% url 'login' %}" class="btn btn-dark me-2">
-                    <span style="margin-right: 5px;">Accedi</span>
-                    <i class="fas fa-user-circle fa-lg"></i>
-                </a>
+            <a href="{% url 'login' %}" class="btn btn-dark me-2">
+                <span style="margin-right: 5px;">Accedi</span>
+                <i class="fas fa-user-circle fa-lg"></i>
+            </a>
             {% endif %}
         </div>
     </div>
