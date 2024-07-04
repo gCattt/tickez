@@ -2,7 +2,7 @@
 
 {% load crispy_forms_tags %} 
 
-{% block title %}Registrazione | Tickez{% endblock %}
+{% block title %}Registrazione {{entity}} | Tickez{% endblock %}
 
 {% block content %}
     <div class="container">
@@ -17,14 +17,14 @@
             Si è verificato un errore. Per favore, correggi i campi evidenziati.
         </div>
         {% endif %}
-        <h2>Registrati</h2>
-        <p>Già registrato? <strong><a href="{% url 'login' %}" style="color: black; text-decoration: none;">Accedi</a></strong></p>
+        <h2>Registrazione {{entity}}</h2>
+        <p>Hai già un account? <strong><a href="{% url 'login' %}" style="color: black; text-decoration: none;">Accedi</a></strong></p>
 
-        <form method="POST" action="{% url 'register-customer' %}" class="mt-4">
+        <form method="POST" action="" class="mt-4">
             {% csrf_token %}
             {{ form | crispy }}
             
-            <input type="submit" class="btn btn-success mt-2" value="Registrati">
+            <input type="submit" class="btn btn-success mt-2" value="Crea">
         </form>
     </div>
 {% endblock %}

@@ -37,7 +37,7 @@ urlpatterns = [
     path('orders/', include('orders.urls')),
 
     path('register/', views.CustomerCreateView.as_view(), name='register-customer'),
-    #path('register_organizer/', views.OrganizerCreateView.as_view(), name='register-organizer'),
+    path('register_organizer/', views.OrganizerCreateView.as_view(), name='register-organizer'),
     path('login/', views.login_user, name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
 ]

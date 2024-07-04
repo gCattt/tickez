@@ -1,8 +1,8 @@
 from django import forms
-from django.contrib.auth.models import User, Group
 from django.contrib.auth.forms import UserCreationForm
 
-from users.models import Utente
+from django.contrib.auth.models import User, Group
+from users.models import Utente, Organizzatore
 
 class CustomerCreationForm(UserCreationForm):
     nome = forms.CharField(max_length=100, required=True)
@@ -21,8 +21,8 @@ class CustomerCreationForm(UserCreationForm):
         model = User
         # username, password1 e password2 possono essere inclusi anche tramite 'fields = UserCreationForm.Meta.fields + (...)'
         fields = (
-            'nome', 'cognome', 'username', 'email', 'password1', 'password2', 
-            'data_nascita', 'sesso', 'stato', 'indirizzo', 'telefono', 'carta_credito', 'cvv', 'scadenza_carta'
+            'username', 'email', 'password1', 'password2', 
+            'nome', 'cognome', 'data_nascita', 'sesso', 'stato', 'indirizzo', 'telefono', 'carta_credito', 'cvv', 'scadenza_carta'
         )
 
     def save(self, commit=True):
@@ -33,7 +33,7 @@ class CustomerCreationForm(UserCreationForm):
         
         if commit:
             user.save()
-            utente = Utente(
+            u = Utente(
                 user=user,
                 nome=self.cleaned_data['nome'],
                 cognome=self.cleaned_data['cognome'],
@@ -47,5 +47,36 @@ class CustomerCreationForm(UserCreationForm):
                 cvv=self.cleaned_data['cvv'],
                 scadenza_carta=self.cleaned_data['scadenza_carta']
             )
-            utente.save()
+            u.save()
+            #group = Group.objects.get(name="Clienti")
+            #user.groups.add(group) -> controlla se user o utente
+        return user
+
+
+class OrganizerCreationForm(UserCreationForm):
+    nome = forms.CharField(max_length=100, required=True)
+    email = forms.EmailField(max_length=254, required=True)
+    descrizione = forms.CharField(widget=forms.Textarea, required=False)
+
+    class Meta(UserCreationForm.Meta):
+        model = User
+        fields = (
+            'username', 'email', 'password1', 'password2', 
+            'nome', 'descrizione'
+        )
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.email = self.cleaned_data["email"]
+        if commit:
+            user.save()
+            o = Organizzatore(
+                user=user,
+                nome=self.cleaned_data['nome'],
+                email=self.cleaned_data['email'],
+                descrizione=self.cleaned_data['descrizione'],
+            )
+            o.save()
+            #group = Group.objects.get(name="Organizzatori")
+            #user.groups.add(group) -> controlla se user o organizzatore
         return user

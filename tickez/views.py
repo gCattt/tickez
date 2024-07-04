@@ -1,16 +1,17 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 
+from django.contrib import messages
+
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
 from django.views.generic import CreateView
 
-from django.contrib import messages
-
 from products.models import Evento
 
 from .forms import *
+
 
 def home_page(request):
     home_page_events = Evento.objects.order_by('data_ora')[:5]
@@ -37,8 +38,8 @@ def login_user(request):
     else:
         return render(request, 'registration/login.html', {})
     
+
 class CustomerCreateView(CreateView):
-    #form_class = UserCreationForm
     form_class = CustomerCreationForm
     template_name = "registration/user_create.html"
     success_url = reverse_lazy("homepage")
@@ -48,3 +49,25 @@ class CustomerCreateView(CreateView):
         login(self.request, user)
         messages.success(self.request, "Account creato con successo!")
         return redirect(self.success_url)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['entity'] = 'Utente'
+        return context
+    
+class OrganizerCreateView(PermissionRequiredMixin, CreateView):
+    permission_required = "is_staff" # solo l'admin (is_staff di default) può registrare gli organizzatori
+    form_class = OrganizerCreationForm
+    template_name = "registration/user_create.html"
+    success_url = reverse_lazy("homepage")
+
+    def form_valid(self, form):
+        user = form.save()
+        login(self.request, user)
+        messages.success(self.request, "Account Organizzatore creato con successo!")
+        return redirect(self.success_url)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['entity'] = 'Organizzatore'
+        return context

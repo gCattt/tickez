@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import User
 
 from django.urls import reverse
@@ -9,7 +8,6 @@ from django.template.defaultfilters import slugify
 from datetime import date
 
 
-#class Utente(AbstractUser):
 class Utente(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -23,7 +21,6 @@ class Utente(models.Model):
     nome = models.CharField(max_length=100, null=False, blank=False)
     cognome = models.CharField(max_length=100, null=False, blank=False)
     email = models.EmailField(max_length=254, null=False, blank=False, unique=True)
-    
     data_nascita = models.DateField(null=True, blank=True, default=date.today)
     sesso = models.CharField(max_length=10, choices=GENDER_CHOICES, null=True, blank=True, default='Altro')
     stato = models.CharField(max_length=100)
@@ -42,16 +39,21 @@ class Utente(models.Model):
         self.user.email = self.email
         self.user.save()
         super(Utente, self).save(*args, **kwargs)
-
     
-    # def __str__(self):
+    def __str__(self):
+        return self.user.username
 
     class Meta:
         verbose_name_plural = 'Utenti'
 
+
 class Organizzatore(models.Model):
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
     nome = models.CharField(max_length=100, null=False, blank=False)
     slug = models.SlugField(max_length=200, null=False, unique=True, blank=True)
+    email = models.EmailField(max_length=254, null=False, blank=False, unique=True)
     descrizione = models.TextField(null=True, blank=True, default='')
     # immagine_profilo = models.
     notifiche = models.BooleanField(null=False, default=False)
@@ -65,7 +67,9 @@ class Organizzatore(models.Model):
         return reverse("users:artist_details", kwargs={"slug": self.slug, "pk": self.pk})
     
     def save(self, *args, **kwargs):
-        if not self.slug:
+        self.user.email = self.email
+        self.user.save()
+        if not self.slug or slugify(self.nome) != self.slug:
             self.slug = slugify(self.nome)
         super().save(*args, **kwargs)
 
