@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import User, Group
 from django.contrib.auth.forms import UserCreationForm
 
 from users.models import Utente
@@ -18,7 +18,7 @@ class CustomerCreationForm(UserCreationForm):
     scadenza_carta = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))
 
     class Meta(UserCreationForm.Meta):
-        model = Utente
+        model = User
         # username, password1 e password2 possono essere inclusi anche tramite 'fields = UserCreationForm.Meta.fields + (...)'
         fields = (
             'nome', 'cognome', 'username', 'email', 'password1', 'password2', 
@@ -27,19 +27,25 @@ class CustomerCreationForm(UserCreationForm):
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.nome = self.cleaned_data['nome']
-        user.cognome = self.cleaned_data['cognome']
+        user.first_name = self.cleaned_data['nome']
+        user.last_name = self.cleaned_data['cognome']
         user.email = self.cleaned_data['email']
-        user.data_nascita = self.cleaned_data['data_nascita']
-        user.sesso = self.cleaned_data['sesso']
-        user.stato = self.cleaned_data['stato']
-        user.indirizzo = self.cleaned_data['indirizzo']
-        user.telefono = self.cleaned_data['telefono']
-        user.carta_credito = self.cleaned_data['carta_credito']
-        user.cvv = self.cleaned_data['cvv']
-        user.scadenza_carta = self.cleaned_data['scadenza_carta']
+        
         if commit:
             user.save()
-            #group = Group.objects.get(name="Clienti")
-            #user.groups.add(group)
+            utente = Utente(
+                user=user,
+                nome=self.cleaned_data['nome'],
+                cognome=self.cleaned_data['cognome'],
+                email=self.cleaned_data['email'],
+                data_nascita=self.cleaned_data['data_nascita'],
+                sesso=self.cleaned_data['sesso'],
+                stato=self.cleaned_data['stato'],
+                indirizzo=self.cleaned_data['indirizzo'],
+                telefono=self.cleaned_data['telefono'],
+                carta_credito=self.cleaned_data['carta_credito'],
+                cvv=self.cleaned_data['cvv'],
+                scadenza_carta=self.cleaned_data['scadenza_carta']
+            )
+            utente.save()
         return user

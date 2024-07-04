@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import User
 
 from django.urls import reverse
 
@@ -8,8 +9,11 @@ from django.template.defaultfilters import slugify
 from datetime import date
 
 
-class Utente(AbstractUser):
-        
+#class Utente(AbstractUser):
+class Utente(models.Model):
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
     GENDER_CHOICES = [
         ('M', 'Maschio'),
         ('F', 'Femmina'),
@@ -31,11 +35,14 @@ class Utente(AbstractUser):
     scadenza_carta = models.DateField(null=True, blank=True, default=date.today)
     notifiche = models.BooleanField(null=False, default=False)
 
-    # sincronizzazione tra Utente.nome-User.first_name e tra Utente.cognome-User.last_name
+    # sincronizzazione tra i campi nome, cognome ed email delle tabelle auth_user e users_utente
     def save(self, *args, **kwargs):
-        self.first_name = self.nome
-        self.last_name = self.cognome
+        self.user.first_name = self.nome
+        self.user.last_name = self.cognome
+        self.user.email = self.email
+        self.user.save()
         super(Utente, self).save(*args, **kwargs)
+
     
     # def __str__(self):
 

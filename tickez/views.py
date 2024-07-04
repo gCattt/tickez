@@ -37,7 +37,8 @@ def login_user(request):
     else:
         return render(request, 'registration/login.html', {})
     
-class UserCreateView(CreateView):
+class CustomerCreateView(CreateView):
+    #form_class = UserCreationForm
     form_class = CustomerCreationForm
     template_name = "registration/user_create.html"
     success_url = reverse_lazy("homepage")
@@ -47,8 +48,3 @@ class UserCreateView(CreateView):
         login(self.request, user)
         messages.success(self.request, "Account creato con successo!")
         return redirect(self.success_url)
-
-    def form_invalid(self, form):
-        messages.error(self.request, "Si è verificato un errore. Per favore, correggi i campi evidenziati.")
-        # renderizzare il template con il contesto aggiornato (messaggi di errore e campi errati ripuliti)
-        return self.render_to_response(self.get_context_data(form=form)) 
