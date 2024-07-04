@@ -4,11 +4,6 @@
 
 {% block title %}Login | Tickez{% endblock %} 
 
-{% block header1 %}
-  <h1>Pagina di Login</h1>
-  <p>Si prega di compilare i campi necessari</p> 
-{% endblock %}
-
 {% block content %} 
     <div class="container">
         {% if "notok" in request.GET.auth %}
@@ -25,9 +20,10 @@
         {% endif %}
 
         <h2>Login</h2>
+        <p>Sei un nuovo utente? <strong><a href="{% url 'register-customer' %}" style="color: black; text-decoration: none;">Registrati ora</a></strong>
 
         <form method="POST" action=""> {% csrf_token %}
-            <div class="mb-4">
+            <div class="mt-4 mb-4">
                 <label class="form-label">Username</label>
                 <input type="text" class="form-control" name="username">
             </div>
@@ -39,5 +35,3 @@
         </form>
     </div>
 {% endblock %}
-
-{% block footer %} {% endblock %}

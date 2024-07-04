@@ -5,6 +5,7 @@ from products.models import Evento, Biglietto
 
 from datetime import datetime, timedelta
 import random
+from django.contrib.auth.hashers import make_password
 
 def erase_db():
     Luogo.objects.all().delete()
@@ -33,15 +34,16 @@ def init_db():
 
 
     utenti = [
-        {"nome": "Mario", "cognome": "Rossi", "email": "mario.rossi@example.com", "data_nascita": "1980-05-15", "sesso": "M", "stato": "Italia", "indirizzo": "Via Roma 1, Milano", "telefono": "3456789012", "carta_credito": "1234567812345678", "cvv": "123", "scadenza_carta": "2025-06-30", "notifiche": False},
-        {"nome": "Luigi", "cognome": "Verdi", "email": "luigi.verdi@example.com", "data_nascita": "1990-07-20", "sesso": "M", "stato": "Italia", "indirizzo": "Via Milano 2, Roma", "telefono": "3456789013", "carta_credito": "2345678923456789", "cvv": "234", "scadenza_carta": "2026-07-30", "notifiche": False},
-        {"nome": "Giulia", "cognome": "Bianchi", "email": "giulia.bianchi@example.com", "data_nascita": "1985-03-10", "sesso": "F", "stato": "Italia", "indirizzo": "Via Torino 3, Firenze", "telefono": "3456789014", "carta_credito": "3456789034567890", "cvv": "345", "scadenza_carta": "2027-08-30", "notifiche": False},
-        {"nome": "Francesca", "cognome": "Neri", "email": "francesca.neri@example.com", "data_nascita": "1995-12-25", "sesso": "F", "stato": "Italia", "indirizzo": "Via Napoli 4, Napoli", "telefono": "3456789015", "carta_credito": "4567890145678901", "cvv": "456", "scadenza_carta": "2028-09-30", "notifiche": False},
-        {"nome": "Alessandro", "cognome": "Gialli", "email": "alessandro.gialli@example.com", "data_nascita": "1975-08-05", "sesso": "M", "stato": "Italia", "indirizzo": "Via Firenze 5, Bologna", "telefono": "3456789016", "carta_credito": "5678901256789012", "cvv": "567", "scadenza_carta": "2029-10-30", "notifiche": False}
+        {"username": "mario", "nome": "Mario", "cognome": "Rossi", "email": "mario.rossi@example.com", "data_nascita": "1980-05-15", "sesso": "M", "stato": "Italia", "indirizzo": "Via Roma 1, Milano", "telefono": "3456789012", "carta_credito": "1234567812345678", "cvv": "123", "scadenza_carta": "2025-06-30", "notifiche": False},
+        {"username": "luigi", "nome": "Luigi", "cognome": "Verdi", "email": "luigi.verdi@example.com", "data_nascita": "1990-07-20", "sesso": "M", "stato": "Italia", "indirizzo": "Via Milano 2, Roma", "telefono": "3456789013", "carta_credito": "2345678923456789", "cvv": "234", "scadenza_carta": "2026-07-30", "notifiche": False},
+        {"username": "giulia", "nome": "Giulia", "cognome": "Bianchi", "email": "giulia.bianchi@example.com", "data_nascita": "1985-03-10", "sesso": "F", "stato": "Italia", "indirizzo": "Via Torino 3, Firenze", "telefono": "3456789014", "carta_credito": "3456789034567890", "cvv": "345", "scadenza_carta": "2027-08-30", "notifiche": False},
+        {"username": "francesca", "nome": "Francesca", "cognome": "Neri", "email": "francesca.neri@example.com", "data_nascita": "1995-12-25", "sesso": "F", "stato": "Italia", "indirizzo": "Via Napoli 4, Napoli", "telefono": "3456789015", "carta_credito": "4567890145678901", "cvv": "456", "scadenza_carta": "2028-09-30", "notifiche": False},
+        {"username": "alessandro", "nome": "Alessandro", "cognome": "Gialli", "email": "alessandro.gialli@example.com", "data_nascita": "1975-08-05", "sesso": "M", "stato": "Italia", "indirizzo": "Via Firenze 5, Bologna", "telefono": "3456789016", "carta_credito": "5678901256789012", "cvv": "567", "scadenza_carta": "2029-10-30", "notifiche": False}
     ]
     for utente in utenti:
-        u = Utente(**utente)
-        u.save()
+        password = make_password('default_password')
+        utente_obj = Utente(username=utente['username'], password=password, **utente)
+        utente_obj.save()
 
 
     organizzatori = [

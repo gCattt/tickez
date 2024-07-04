@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% load crispy_forms_tags %} 
+
+{% block title %}Registrazione | Tickez{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h2>Registrati</h2>
+        <p>Già registrato? <strong><a href="{% url 'login' %}" style="color: black; text-decoration: none;">Accedi</a></strong></p>
+
+        <form method="POST" action="{% url 'register-customer' %}" class="mt-4">
+            {% csrf_token %}
+            {{ form | crispy }}
+            
+            <input type="submit" class="btn btn-success mt-2" value="Registrati">
+        </form>
+    </div>
+{% endblock %}

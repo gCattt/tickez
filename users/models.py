@@ -1,10 +1,14 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
+
 from django.urls import reverse
+
 from django.template.defaultfilters import slugify
-import itertools
+
 from datetime import date
 
-class Utente(models.Model):
+
+class Utente(AbstractUser):
         
     GENDER_CHOICES = [
         ('M', 'Maschio'),
@@ -14,7 +18,7 @@ class Utente(models.Model):
 
     nome = models.CharField(max_length=100, null=False, blank=False)
     cognome = models.CharField(max_length=100, null=False, blank=False)
-    email = models.EmailField(max_length=254, null=False, blank=False)
+    email = models.EmailField(max_length=254, null=False, blank=False, unique=True)
     
     data_nascita = models.DateField(null=True, blank=True, default=date.today)
     sesso = models.CharField(max_length=10, choices=GENDER_CHOICES, null=True, blank=True, default='Altro')
@@ -26,6 +30,12 @@ class Utente(models.Model):
     cvv = models.CharField(max_length=3, null=True, blank=True, default=None)
     scadenza_carta = models.DateField(null=True, blank=True, default=date.today)
     notifiche = models.BooleanField(null=False, default=False)
+
+    # sincronizzazione tra Utente.nome-User.first_name e tra Utente.cognome-User.last_name
+    def save(self, *args, **kwargs):
+        self.first_name = self.nome
+        self.last_name = self.cognome
+        super(Utente, self).save(*args, **kwargs)
     
     # def __str__(self):
 
