@@ -1,7 +1,7 @@
 from django.db import models
 from django.urls import reverse
 from django.template.defaultfilters import slugify
-from datetime import datetime
+from django.utils import timezone
 
 class Evento(models.Model):
     
@@ -15,7 +15,7 @@ class Evento(models.Model):
     slug = models.SlugField(max_length=200, null=False, unique=True, blank=True)
     categoria = models.CharField(max_length=100, choices=CATEGORY_CHOICES, null=False, blank=False)
     descrizione = models.TextField(null=True, blank=True, default='')
-    data_ora = models.DateTimeField(null=False, blank=False, default=datetime.now())
+    data_ora = models.DateTimeField(null=False, blank=False, default=timezone.now)
     # locandina = models.
 
     organizzatore = models.ForeignKey(to='users.Organizzatore', on_delete=models.CASCADE, null=False, blank=False, related_name='eventi_organizzati')

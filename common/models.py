@@ -1,7 +1,7 @@
 from django.db import models
 from django.urls import reverse
 from django.template.defaultfilters import slugify
-from datetime import datetime
+from django.utils import timezone
 
 class Luogo(models.Model):
     nome = models.CharField(max_length=50, null=False, blank=False)
@@ -32,7 +32,7 @@ class Luogo(models.Model):
 
 class Notifica(models.Model):
     testo = models.CharField(max_length=50, null=False, blank=False)
-    data_ora = models.DateTimeField(null=False, blank=False, default=datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
+    data_ora = models.DateTimeField(null=False, blank=False, default=timezone.now)
 
     ordine = models.ForeignKey(to='orders.Ordine', on_delete=models.CASCADE, null=True, blank=True, related_name='notifiche_ordine')
     organizzatore = models.ForeignKey(to='users.Organizzatore', on_delete=models.CASCADE, null=True, blank=True, related_name='notifiche_organizzatore')

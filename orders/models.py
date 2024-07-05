@@ -1,8 +1,8 @@
 from django.db import models
-from datetime import datetime
+from django.utils import timezone
 
 class Ordine(models.Model):
-    data_ora = models.DateTimeField(null=False, blank=False, default=datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
+    data_ora = models.DateTimeField(null=False, blank=False, default=timezone.now)
     totale = models.FloatField(null=False, blank=False, default=0.00)
     
     utente = models.ForeignKey(to='users.Utente', on_delete=models.PROTECT, null=False, blank=False, related_name="ordini")
