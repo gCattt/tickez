@@ -3,9 +3,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 
 from django.contrib.auth.decorators import login_required, user_passes_test
-from braces.views import GroupRequiredMixin
+from django.contrib.auth.mixins import UserPassesTestMixin
+#from braces.views import GroupRequiredMixin, SuperuserRequiredMixin
 
 from products.models import Evento, Biglietto
+from users.models import Organizzatore
 
 from django.views.generic import ListView, DetailView, UpdateView, DeleteView
 
@@ -13,15 +15,8 @@ from .forms import *
 
 from datetime import datetime, timedelta
 
-'''
-def is_organizer(user):
-    return user.groups.filter(name="Organizzatori").exists()
-'''
-
 def products(request):
-    #return HttpResponse("products test view.")
     return render(request, template_name="products/base_products.html")
-
 
 class EventsListView(ListView):
     model = Evento
@@ -100,24 +95,50 @@ class EventDetailView(DetailView):
 
         return context
     
+# funzione di test per gestire l'autenticazione di admin ed organizzatori
+def is_allowed(user):
+    return user.is_superuser or user.groups.filter(name="Organizzatori").exists()
 
-#@user_passes_test(is_organizer)
+# mixin personalizzato per gestire l'autenticazione di admin ed organizzatori
+class OrganizerOrSuperuserRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        user = self.request.user
+        return user.is_superuser or user.groups.filter(name="Organizzatori").exists()
+    
+    login_url = reverse_lazy('login')
+
+    # se l'utente è autenticato ma non ha i permessi, solleva PermissionDenied
+    def handle_no_permission(self):
+        # in caso di tentato accesso ad una view protetta, senza i permessi adatti, reindirizza al login
+        return redirect(f'{self.login_url}?auth=notok&next={self.request.path}')
+    
+@user_passes_test(is_allowed)
 def create_event(request):
     entity = 'Evento'
     if request.method == 'POST':
-        form = EventCrispyForm(request.POST)
-        if form.is_valid():
-            event = form.save(commit=False)
-            # event.organizzatore = request.user.nome --> poi rimuovi organizzatore dal form
-            event.save()
+        if request.user.is_superuser:
+            form = AdminEventCrispyForm(request.POST)
+            if form.is_valid():
+                event = form.save()
+                return redirect(event.get_absolute_url())
+        else:
+            form = EventCrispyForm(request.POST)
+            if form.is_valid():
+                event = form.save(commit=False)
+                organizzatore = Organizzatore.objects.get(user=request.user) # istanza di Organizzatore associata a User
+                event.organizzatore = organizzatore
+                event.save()
 
-            return redirect(event.get_absolute_url())
+                return redirect(event.get_absolute_url())
     else:
-        form = EventCrispyForm()
+        if request.user.is_superuser:
+            form = AdminEventCrispyForm()
+        else:
+            form = EventCrispyForm()
     
     return render(request, 'products/create_entity.html', {'form': form, 'entity': entity})
 
-#@user_passes_test(is_organizer)
+@user_passes_test(is_allowed)
 def create_ticket(request, event_slug, event_pk):
     entity = 'Biglietto'
     event = get_object_or_404(Evento, slug=event_slug, pk=event_pk)
@@ -135,12 +156,15 @@ def create_ticket(request, event_slug, event_pk):
 
     return render(request, 'products/create_entity.html', {'form': form, 'entity': entity, 'event': event})
 
-#class UpdateEventView(GroupRequiredMixin, UpdateView):
-class UpdateEventView(UpdateView):
-    #group_required = ["Organizzatori"]
+class UpdateEventView(OrganizerOrSuperuserRequiredMixin, UpdateView):
     model = Evento
-    form_class = EventCrispyForm
     template_name = "products/update_entity.html"
+
+    # sovrascrive get_form_class per determinare il form da utilizzare sulla base di self.request.user
+    def get_form_class(self):
+        if self.request.user.is_superuser:
+            return AdminEventCrispyForm
+        return EventCrispyForm
     
     def get_success_url(self):
         return self.get_object().get_absolute_url()
@@ -152,12 +176,10 @@ class UpdateEventView(UpdateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['entity'] = 'Evento'+self.nome
+        context['entity'] = 'Evento'+self.object.nome
         return context
     
-#class UpdateTicketView(GroupRequiredMixin, UpdateView):
-class UpdateTicketView(UpdateView):
-    #group_required = ["Organizzatori"]
+class UpdateTicketView(OrganizerOrSuperuserRequiredMixin, UpdateView):
     model = Biglietto
     form_class = TicketCrispyForm
     template_name = "products/update_entity.html"
@@ -184,9 +206,7 @@ class UpdateTicketView(UpdateView):
         context['entity'] = 'Biglietto'
         return context
     
-#class DeleteEventView(GroupRequiredMixin, DeleteView):
-class DeleteEventView(DeleteView):
-    #group_required = ["Organizzatori"]
+class DeleteEventView(OrganizerOrSuperuserRequiredMixin, DeleteView):
     model = Evento
     template_name = "products/delete_entity.html"
     success_url = reverse_lazy('products:events')
@@ -197,9 +217,7 @@ class DeleteEventView(DeleteView):
         context['name'] = self.object.nome
         return context
 
-#class DeleteEventView(GroupRequiredMixin, DeleteView):
-class DeleteTicketView(DeleteView):
-    #group_required = ["Organizzatori"]
+class DeleteTicketView(OrganizerOrSuperuserRequiredMixin, DeleteView):
     model = Biglietto
     template_name = "products/delete_entity.html"
 

@@ -32,7 +32,7 @@ class Utente(models.Model):
     scadenza_carta = models.DateField(null=True, blank=True, default=date.today)
     notifiche = models.BooleanField(null=False, default=False)
 
-    # sincronizzazione tra i campi nome, cognome ed email delle tabelle auth_user e users_utente
+    # sincronizzazione tra i campi nome, cognome ed email delle tabelle users_utente e auth_user
     def save(self, *args, **kwargs):
         self.user.first_name = self.nome
         self.user.last_name = self.cognome
@@ -67,8 +67,10 @@ class Organizzatore(models.Model):
         return reverse("users:artist_details", kwargs={"slug": self.slug, "pk": self.pk})
     
     def save(self, *args, **kwargs):
+        # sincronizzazione dell'email tra users_utente e auth_user
         self.user.email = self.email
         self.user.save()
+        
         if not self.slug or slugify(self.nome) != self.slug:
             self.slug = slugify(self.nome)
         super().save(*args, **kwargs)

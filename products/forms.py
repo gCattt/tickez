@@ -4,10 +4,23 @@ from crispy_forms.layout import Submit
 
 from .models import Evento, Biglietto
 
-class EventCrispyForm(forms.ModelForm):
+class AdminEventCrispyForm(forms.ModelForm):
     class Meta:
         model = Evento
         fields = ('organizzatore', 'categoria', 'nome', 'luogo', 'data_ora', 'descrizione')
+
+    def __init__(self, *args, **kwargs):
+        action = kwargs.pop('action', 'Crea Evento')
+        super(AdminEventCrispyForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_id = 'event-crispy-form'
+        self.helper.form_method = 'POST'
+        self.helper.add_input(Submit('submit', action, css_class="btn-dark"))
+
+class EventCrispyForm(forms.ModelForm):
+    class Meta:
+        model = Evento
+        fields = ('categoria', 'nome', 'luogo', 'data_ora', 'descrizione')
 
     def __init__(self, *args, **kwargs):
         action = kwargs.pop('action', 'Crea Evento')

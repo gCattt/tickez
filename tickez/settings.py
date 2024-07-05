@@ -137,6 +137,6 @@ STATICFILES_DIRS =  [os.path.join(BASE_DIR, 'static')]
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-LOGIN_URL = "/login/?auth=notok" # redireziona al login, con un parametro GET
-LOGIN_REDIRECT_URL = "/?login=ok"  # redireziona alla home, con un parametro GET
-LOGOUT_REDIRECT_URL = "/?logout=ok"  # redireziona alla home, con un parametro GET
+LOGIN_URL = "/login/?auth=notok" # in caso di tentato accesso ad una view protetta, senza i permessi adatti, reindirizza al login
+LOGIN_REDIRECT_URL = "/?login=ok"  # in caso di login corretto reindirizza alla home
+LOGOUT_REDIRECT_URL = "/?logout=ok"  # in caso di logout corretto reindirizza alla home

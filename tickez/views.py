@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 
 from django.contrib import messages
+from urllib.parse import urlparse, parse_qs
 
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -30,11 +31,16 @@ def login_user(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
+            next_url = request.GET.get('next')
+            if next_url:
+                # verifica che il next_url sia un URL sicuro (relativo)
+                parsed_next_url = urlparse(next_url)
+                if parsed_next_url.path.startswith('/'):
+                    return redirect(next_url)
             return redirect('homepage')
         else:
             messages.error(request, ("Si è verificato un errore. Riprova"))
             return redirect('login')
-            
     else:
         return render(request, 'registration/login.html', {})
     

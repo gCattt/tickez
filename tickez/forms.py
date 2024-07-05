@@ -48,8 +48,8 @@ class CustomerCreationForm(UserCreationForm):
                 scadenza_carta=self.cleaned_data['scadenza_carta']
             )
             u.save()
-            #group = Group.objects.get(name="Clienti")
-            #user.groups.add(group) -> controlla se user o utente
+            group = Group.objects.get(name="Clienti")
+            user.groups.add(group) # la gestione dei gruppi e delle autorizzazioni in Django è strettamente legata al modello User
         return user
 
 
@@ -77,6 +77,6 @@ class OrganizerCreationForm(UserCreationForm):
                 descrizione=self.cleaned_data['descrizione'],
             )
             o.save()
-            #group = Group.objects.get(name="Organizzatori")
-            #user.groups.add(group) -> controlla se user o organizzatore
+            group = Group.objects.get(name="Organizzatori")
+            user.groups.add(group) # la gestione dei gruppi e delle autorizzazioni in Django è strettamente legata al modello User
         return user

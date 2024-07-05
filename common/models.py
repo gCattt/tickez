@@ -16,7 +16,8 @@ class Luogo(models.Model):
     followers = models.ManyToManyField(to='users.Utente', blank=True, default=None, related_name='luoghi_preferiti')
     affittuari = models.ManyToManyField(to='users.Organizzatore', blank=True, default=None, related_name='luoghi_affittati')
     
-    #def __str__(self):
+    def __str__(self):
+        return self.nome
 
     def get_absolute_url(self):
         return reverse("common:venue_details", kwargs={"slug": self.slug, "pk": self.pk})

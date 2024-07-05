@@ -1,11 +1,9 @@
-from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from users.models import Utente, Organizzatore
 
 def users(request):
-    #return HttpResponse("users test view.")
     return render(request, template_name="users/base_users.html")
 
 class ArtistsListView(ListView):

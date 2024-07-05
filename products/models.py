@@ -6,7 +6,7 @@ from datetime import datetime
 class Evento(models.Model):
     
     CATEGORY_CHOICES = [
-        ('Concerto', 'Concerto'),
+        ('Concerti', 'Concerti'),
         ('Festival', 'Festival'),
         ('Teatro', 'Teatro')
     ]
@@ -22,7 +22,8 @@ class Evento(models.Model):
     luogo = models.ForeignKey(to='common.Luogo', on_delete=models.CASCADE, null=False, blank=False, related_name='eventi_programmati')
     followers = models.ManyToManyField(to='users.Utente', blank=True, default=None, related_name='eventi_preferiti')
     
-    # def __str__(self):
+    def __str__(self):
+        return self.nome
 
     def get_absolute_url(self):
         return reverse("products:event_details", kwargs={"slug": self.slug, "pk": self.pk})
