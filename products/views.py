@@ -103,7 +103,8 @@ def is_allowed(user):
 class OrganizerOrSuperuserRequiredMixin(UserPassesTestMixin):
     def test_func(self):
         user = self.request.user
-        return user.is_superuser or user.groups.filter(name="Organizzatori").exists()
+        obj = self.get_object()
+        return user.is_superuser or (user.groups.filter(name="Organizzatori").exists() and obj.organizzatore.user == user)
     
     login_url = reverse_lazy('login')
 
