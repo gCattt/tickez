@@ -26,7 +26,7 @@ class Evento(models.Model):
         return self.nome
 
     def get_absolute_url(self):
-        return reverse("products:event_details", kwargs={"slug": self.slug, "pk": self.pk})
+        return reverse("products:event-details", kwargs={"slug": self.slug, "pk": self.pk})
     
     def save(self, *args, **kwargs):
         if not self.slug or slugify(self.nome) != self.slug:

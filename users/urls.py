@@ -8,5 +8,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     re_path(r"^$|^\/$", views.users, name=app_name),
     path('artists/', views.ArtistsListView.as_view(), name="artists"),
-    path('artists/<slug:slug>-<int:pk>/', views.ArtistDetailView.as_view(), name="artist_details"),
+    path('artists/<slug:slug>-<int:pk>/', views.ArtistDetailView.as_view(), name="artist-details"),
 ]

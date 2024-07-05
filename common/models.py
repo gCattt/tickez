@@ -20,7 +20,7 @@ class Luogo(models.Model):
         return self.nome
 
     def get_absolute_url(self):
-        return reverse("common:venue_details", kwargs={"slug": self.slug, "pk": self.pk})
+        return reverse("common:venue-details", kwargs={"slug": self.slug, "pk": self.pk})
     
     def save(self, *args, **kwargs):
         if not self.slug:

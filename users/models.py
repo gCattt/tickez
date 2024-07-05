@@ -64,7 +64,7 @@ class Organizzatore(models.Model):
         return self.nome
     
     def get_absolute_url(self):
-        return reverse("users:artist_details", kwargs={"slug": self.slug, "pk": self.pk})
+        return reverse("users:artist-details", kwargs={"slug": self.slug, "pk": self.pk})
     
     def save(self, *args, **kwargs):
         # sincronizzazione dell'email tra users_utente e auth_user
