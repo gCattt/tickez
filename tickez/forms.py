@@ -5,6 +5,7 @@ from django.contrib.auth.models import User, Group
 from users.models import Utente, Organizzatore
 
 class CustomerCreationForm(UserCreationForm):
+    # campi aggiuntivi che non fanno parte direttamente del modello User
     nome = forms.CharField(max_length=100, required=True)
     cognome = forms.CharField(max_length=100, required=True)
     email = forms.EmailField(max_length=254, required=True)

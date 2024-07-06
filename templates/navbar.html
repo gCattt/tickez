@@ -28,7 +28,7 @@
 
         <div>
             {% if user.is_authenticated %}
-            <a href="#" class="btn btn-dark me-2">
+            <a href="{% url 'users:profile' %}" class="btn btn-dark me-2">
                 <span style="margin-right: 5px;">{{ user }}</span>
                 <i class="fas fa-user-circle fa-lg"></i>
             </a>

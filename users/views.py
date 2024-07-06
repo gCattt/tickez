@@ -1,10 +1,42 @@
 from django.shortcuts import render
-from django.views.generic.list import ListView
-from django.views.generic.detail import DetailView
+from django.urls import reverse_lazy
+
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+from django.views.generic import ListView, DetailView, UpdateView, FormView
+
 from users.models import Utente, Organizzatore
+
+from .forms import *
+
 
 def users(request):
     return render(request, template_name="users/base_users.html")
+
+
+class ProfileView(LoginRequiredMixin, UpdateView):
+    model = Utente
+    form_class = CustomerEditCrispyForm
+    template_name = 'users/profile.html'
+    success_url = reverse_lazy('users:profile')
+
+    def get_object(self, queryset=None):
+        return self.request.user.utente
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        utente = self.get_object()
+
+        context['user'] = self.request.user
+        context['orders'] = utente.ordini.all()
+        context['starred_events'] = utente.eventi_preferiti.all()
+        context['starred_artists'] = utente.organizzatori_preferiti.all()
+        context['starred_locations'] = utente.luoghi_preferiti.all()
+        return context
+
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))
+    
 
 class ArtistsListView(ListView):
     model = Organizzatore
