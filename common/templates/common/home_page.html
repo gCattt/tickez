@@ -1,4 +1,6 @@
 {% extends "common/base_common.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
 
 {% block title %}Tickez | Biglietti per Concerti, Festival e Teatro{% endblock %}
 
@@ -10,7 +12,7 @@
             <div class="col-md-4 col-sm-4 d-flex justify-content-center">
                 <a href="{% url 'products:events' %}?category=Concerti" class="w-100 text-decoration-none">
                 <div class="card bg-dark text-white w-100" style="height: 12rem">
-                    <img src="/static/images/thumbnails/concerti.jpg" class="card-img" alt="Concerti">
+                    <img src="{% static 'images/thumbnails/concerti.jpg' %}" class="card-img" alt="Concerti">
                     <div class="card-img-overlay d-flex justify-content-center align-items-center">
                       <h3 class="card-title">Concerti</h3>
                     </div>
@@ -20,7 +22,7 @@
             <div class="col-md-4 col-sm-4 d-flex justify-content-center">
                 <a href="{% url 'products:events' %}?category=Festival" class="w-100 text-decoration-none">
                 <div class="card bg-dark text-white w-100" style="height: 12rem">
-                    <img src="/static/images/thumbnails/festival.jpg" class="card-img" alt="Festival">
+                    <img src="{% static 'images/thumbnails/festival.jpg' %}" class="card-img" alt="Festival">
                     <div class="card-img-overlay d-flex justify-content-center align-items-center">
                       <h3 class="card-title">Festival</h3>
                     </div>
@@ -30,7 +32,7 @@
             <div class="col-md-4 col-sm-4 d-flex justify-content-center">
                 <a href="{% url 'products:events' %}?category=Teatro" class="w-100 text-decoration-none">
                 <div class="card bg-dark text-white w-100" style="height: 12rem">
-                    <img src="/static/images/thumbnails/teatro.jpg" class="card-img" alt="Teatro">
+                    <img src="{% static 'images/thumbnails/teatro.jpg' %}" class="card-img" alt="Teatro">
                     <div class="card-img-overlay d-flex justify-content-center align-items-center">
                       <h3 class="card-title">Teatro</h3>
                     </div>
@@ -49,7 +51,8 @@
                 {% for e in object_list %}
                     <a href="{{ e.get_absolute_url }}" style="text-decoration: none; color: inherit;">
                         <li class="card" style="width: 16rem;">
-                            <img src="/static/images/test_image.jpg" class="card-img-top">
+                            <!--utilizzo la property locandina_url per determinare, appunto, l'url dell'immagine-->
+                            <img src="{{ e.locandina_url }}" class="card-img-top w-100" style="height: 166px; object-fit: cover;">
                             <div class="card-body d-flex flex-column justify-content-center">
                             <p class="card-title" style="font-weight:600;">{{e.nome}}</p>
                             <p class="card-text">{{e.luogo.nome}}<br>{{e.data_ora|date:"d/m/Y"}}</p>
@@ -76,7 +79,7 @@
             <div class="col-md-6 col-sm-6 d-flex">
                 <a href="{% url 'users:artists' %}" class="w-100 text-decoration-none">
                 <div class="card bg-dark text-white w-100" style="height: 12rem">
-                    <img src="/static/images/thumbnails/artisti.jpg" class="card-img" alt="Festival">
+                    <img src="{% static 'images/thumbnails/artisti.jpg' %}" class="card-img" alt="Festival">
                     <div class="card-img-overlay d-flex justify-content-center align-items-center">
                       <h3 class="card-title">Artisti</h3>
                     </div>
@@ -86,7 +89,7 @@
             <div class="col-md-6 col-sm-6 d-flex">
                 <a href="{% url 'common:venues' %}" class="w-100 text-decoration-none">
                 <div class="card bg-dark text-white w-100" style="height: 12rem">
-                    <img src="/static/images/thumbnails/luoghi.jpg" class="card-img" alt="Festival">
+                    <img src="{% static 'images/thumbnails/luoghi.jpg' %}" class="card-img" alt="Festival">
                     <div class="card-img-overlay d-flex justify-content-center align-items-center">
                       <h3 class="card-title">Luoghi</h3>
                     </div>

@@ -118,12 +118,12 @@ def create_event(request):
     entity = 'Evento'
     if request.method == 'POST':
         if request.user.is_superuser:
-            form = AdminEventCrispyForm(request.POST)
+            form = AdminEventCrispyForm(request.POST, request.FILES)
             if form.is_valid():
                 event = form.save()
                 return redirect(event.get_absolute_url())
         else:
-            form = EventCrispyForm(request.POST)
+            form = EventCrispyForm(request.POST, request.FILES)
             if form.is_valid():
                 event = form.save(commit=False)
                 organizzatore = Organizzatore.objects.get(user=request.user) # istanza di Organizzatore associata a User

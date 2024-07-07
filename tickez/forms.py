@@ -14,6 +14,7 @@ class CustomerCreationForm(UserCreationForm):
     stato = forms.CharField(max_length=100, required=True)
     indirizzo = forms.CharField(max_length=50, required=False)
     telefono = forms.CharField(max_length=20, required=False)
+    immagine_profilo = forms.ImageField(required=False)
     carta_credito = forms.CharField(max_length=16, required=False)
     cvv = forms.CharField(max_length=3, required=False)
     scadenza_carta = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))
@@ -22,8 +23,8 @@ class CustomerCreationForm(UserCreationForm):
         model = User
         # username, password1 e password2 possono essere inclusi anche tramite 'fields = UserCreationForm.Meta.fields + (...)'
         fields = (
-            'username', 'email', 'password1', 'password2', 
-            'nome', 'cognome', 'data_nascita', 'sesso', 'stato', 'indirizzo', 'telefono', 'carta_credito', 'cvv', 'scadenza_carta'
+            'username', 'email', 'password1', 'password2',
+            'immagine_profilo', 'nome', 'cognome', 'data_nascita', 'sesso', 'stato', 'indirizzo', 'telefono', 'carta_credito', 'cvv', 'scadenza_carta'
         )
 
     def save(self, commit=True):
@@ -36,6 +37,7 @@ class CustomerCreationForm(UserCreationForm):
             user.save()
             u = Utente(
                 user=user,
+                immagine_profilo=self.cleaned_data['immagine_profilo'],
                 nome=self.cleaned_data['nome'],
                 cognome=self.cleaned_data['cognome'],
                 email=self.cleaned_data['email'],
@@ -58,12 +60,13 @@ class OrganizerCreationForm(UserCreationForm):
     nome = forms.CharField(max_length=100, required=True)
     email = forms.EmailField(max_length=254, required=True)
     descrizione = forms.CharField(widget=forms.Textarea, required=False)
+    immagine_profilo = forms.ImageField(required=False)
 
     class Meta(UserCreationForm.Meta):
         model = User
         fields = (
             'username', 'email', 'password1', 'password2', 
-            'nome', 'descrizione'
+            'immagine_profilo', 'nome', 'descrizione',
         )
 
     def save(self, commit=True):
@@ -73,6 +76,7 @@ class OrganizerCreationForm(UserCreationForm):
             user.save()
             o = Organizzatore(
                 user=user,
+                immagine_profilo=self.cleaned_data['immagine_profilo'],
                 nome=self.cleaned_data['nome'],
                 email=self.cleaned_data['email'],
                 descrizione=self.cleaned_data['descrizione'],

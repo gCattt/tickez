@@ -28,6 +28,7 @@ class ProfileView(LoginRequiredMixin, UpdateView):
         utente = self.get_object()
 
         context['user'] = self.request.user
+        context['immagine_profilo'] = utente.immagine_profilo_url
         context['orders'] = utente.ordini.all()
         context['starred_events'] = utente.eventi_preferiti.all()
         context['starred_artists'] = utente.organizzatori_preferiti.all()

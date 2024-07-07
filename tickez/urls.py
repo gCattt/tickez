@@ -19,6 +19,9 @@ from django.contrib.auth import views as auth_views
 
 from django.urls import path, re_path, include
 
+from django.conf import settings
+from django.conf.urls.static import static
+
 from . import views
 from django.views.generic.base import RedirectView
 
@@ -40,7 +43,7 @@ urlpatterns = [
     path('register-organizer/', views.OrganizerCreateView.as_view(), name='register-organizer'),
     path('login/', views.login_user, name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 #erase_db()
 #init_db()

@@ -7,7 +7,7 @@ from .models import Evento, Biglietto
 class AdminEventCrispyForm(forms.ModelForm):
     class Meta:
         model = Evento
-        fields = ('organizzatore', 'categoria', 'nome', 'luogo', 'data_ora', 'descrizione')
+        fields = ('organizzatore', 'categoria', 'nome', 'luogo', 'data_ora', 'descrizione', 'locandina')
 
     def __init__(self, *args, **kwargs):
         action = kwargs.pop('action', 'Crea Evento')
@@ -20,7 +20,7 @@ class AdminEventCrispyForm(forms.ModelForm):
 class EventCrispyForm(forms.ModelForm):
     class Meta:
         model = Evento
-        fields = ('categoria', 'nome', 'luogo', 'data_ora', 'descrizione')
+        fields = ('categoria', 'nome', 'luogo', 'data_ora', 'descrizione', 'locandina')
 
     def __init__(self, *args, **kwargs):
         action = kwargs.pop('action', 'Crea Evento')

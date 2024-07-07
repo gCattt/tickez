@@ -1,7 +1,14 @@
 from django.db import models
+
+from django.conf import settings
+
+from os.path import join
 from django.urls import reverse
+
 from django.template.defaultfilters import slugify
+
 from django.utils import timezone
+
 
 class Luogo(models.Model):
     nome = models.CharField(max_length=50, null=False, blank=False)
@@ -11,13 +18,21 @@ class Luogo(models.Model):
     citta = models.CharField(max_length=100)
     stato = models.CharField(max_length=100)
     codice_postale = models.CharField(max_length=30)
-    # preview = models.
+    immagine = models.ImageField(blank=True, upload_to="images/venues", default=join('static', 'images', 'defaults', 'default_venue.jpg'))
 
     followers = models.ManyToManyField(to='users.Utente', blank=True, default=None, related_name='luoghi_preferiti')
     affittuari = models.ManyToManyField(to='users.Organizzatore', blank=True, default=None, related_name='luoghi_affittati')
     
     def __str__(self):
         return self.nome
+    
+    # django tratta il valore di default di un ImageField come un file media, cercandolo nella directory MEDIA_ROOT
+    @property # trasforma un metodo di una classe in un attributo di sola lettura
+    def immagine_url(self):
+        if self.immagine and hasattr(self.immagine, 'url'):
+            return self.immagine.url
+        else:
+            return join(settings.STATIC_URL, 'images/defaults/default_venue.jpg')
 
     def get_absolute_url(self):
         return reverse("common:venue-details", kwargs={"slug": self.slug, "pk": self.pk})

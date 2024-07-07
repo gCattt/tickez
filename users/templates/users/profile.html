@@ -1,12 +1,16 @@
 {% extends "users/base_users.html" %}
-
+{% load static %}
 {% load crispy_forms_tags %}
 
 {% block title %}Profilo | Tickez{% endblock %}
 
 {% block content %}
     <div class="container">
-        <h2>Bentornato <strong>{{user}}</strong></h2>
+        
+        <h2>
+          <img src="{{ immagine_profilo }}" style="width: 100px; height: 100px; object-fit: cover">
+          Bentornato <strong>{{user}}</strong>
+        </h2>
 
         <hr>
 
@@ -30,7 +34,7 @@
 
         <div class="tab-content">
             <div class="tab-pane mt-3 active" id="data" role="tabpanel" aria-labelledby="data-tab">
-                <form method="POST"> {% csrf_token %}
+                <form method="POST" enctype="multipart/form-data"> {% csrf_token %}
                     {% crispy form %}
                 </form>
             </div>

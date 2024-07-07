@@ -1,6 +1,6 @@
 {% extends "base.html" %}
-
-{% load crispy_forms_tags %} 
+{% load static %}
+{% load crispy_forms_tags %}
 
 {% block title %}Registrazione {{entity}} | Tickez{% endblock %}
 
@@ -20,7 +20,7 @@
         <h2>Registrazione {{entity}}</h2>
         <p>Hai già un account? <strong><a href="{% url 'login' %}" style="color: black; text-decoration: none;">Accedi</a></strong></p>
 
-        <form method="POST" action="" class="mt-4">
+        <form method="POST" action="" class="mt-4" enctype="multipart/form-data">
             {% csrf_token %}
             {{ form | crispy }}
             

@@ -1,6 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+from django.conf import settings
+
+from os.path import join
 from django.urls import reverse
 
 from django.template.defaultfilters import slugify
@@ -26,7 +29,7 @@ class Utente(models.Model):
     stato = models.CharField(max_length=100)
     indirizzo = models.CharField(max_length=50, null=True, blank=True, default=None)
     telefono = models.CharField(max_length=20, null=True, blank=True, default=None)
-    # immagine_profilo = models.
+    immagine_profilo = models.ImageField(null=True, blank=True, upload_to="images/customers", default=join('static', 'images', 'defaults', 'default_user.jpg'))
     carta_credito = models.CharField(max_length=16, null=True, default=None, blank=True)
     cvv = models.CharField(max_length=3, null=True, blank=True, default=None)
     scadenza_carta = models.DateField(null=True, blank=True, default=date.today)
@@ -42,6 +45,14 @@ class Utente(models.Model):
     
     def __str__(self):
         return self.user.username
+    
+    # django tratta il valore di default di un ImageField come un file media, cercandolo nella directory MEDIA_ROOT
+    @property # trasforma un metodo di una classe in un attributo di sola lettura
+    def immagine_profilo_url(self):
+        if self.immagine_profilo and hasattr(self.immagine_profilo, 'url'):
+            return self.immagine_profilo.url
+        else:
+            return join(settings.STATIC_URL, 'images/defaults/default_user.jpg')
 
     class Meta:
         verbose_name_plural = 'Utenti'
@@ -55,13 +66,21 @@ class Organizzatore(models.Model):
     slug = models.SlugField(max_length=200, null=False, unique=True, blank=True)
     email = models.EmailField(max_length=254, null=False, blank=False, unique=True)
     descrizione = models.TextField(null=True, blank=True, default='')
-    # immagine_profilo = models.
+    immagine_profilo = models.ImageField(blank=True, upload_to="images/organizers", default=join('static', 'images', 'defaults', 'default_user.jpg'))
     notifiche = models.BooleanField(null=False, default=False)
 
     followers = models.ManyToManyField(Utente, blank=True, default=None, related_name='organizzatori_preferiti')
 
     def __str__(self):
         return self.nome
+    
+    # django tratta il valore di default di un ImageField come un file media, cercandolo nella directory MEDIA_ROOT
+    @property # trasforma un metodo di una classe in un attributo di sola lettura
+    def immagine_profilo_url(self):
+        if self.immagine_profilo and hasattr(self.immagine_profilo, 'url'):
+            return self.immagine_profilo.url
+        else:
+            return join(settings.STATIC_URL, 'images/defaults/default_user.jpg')
     
     def get_absolute_url(self):
         return reverse("users:artist-details", kwargs={"slug": self.slug, "pk": self.pk})

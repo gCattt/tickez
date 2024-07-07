@@ -10,7 +10,7 @@ class CustomerEditCrispyForm(forms.ModelForm):
 
     class Meta:
         model = Utente
-        fields = ('username', 'email', 
+        fields = ('username', 'email', 'immagine_profilo',
                   'nome', 'cognome', 
                   'data_nascita', 'sesso', 'stato',
                   'indirizzo', 'telefono', 
@@ -34,6 +34,7 @@ class CustomerEditCrispyForm(forms.ModelForm):
         self.helper.layout = Layout(
             'username',
             'email',
+            'immagine_profilo',
             Row(
                 Column('nome', css_class='form-group col-md-6 mb-0'),
                 Column('cognome', css_class='form-group col-md-6 mb-0'),
