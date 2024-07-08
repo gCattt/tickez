@@ -10,6 +10,17 @@
         <p>{{object.luogo.nome}}</p>
         <p>{{object.data_ora}}</p>
 
+        <form method="POST" action="{% url 'toggle-follow' entity_type='evento' entity_pk=object.id %}"> {% csrf_token %}
+          <input type="hidden" name="action" value="{% if request.user.utente in object.followers.all %}unfollow{% else %}follow{% endif %}">
+          <button type="submit" class="btn {% if request.user.utente in object.followers.all %}btn-secondary{% else %}btn-dark{% endif %}">
+            {% if request.user.utente in object.followers.all %}
+              <i class="fas fa-heart me-1"></i> Seguito
+            {% else %}
+              <i class="far fa-heart me-1"></i> Segui
+            {% endif %}
+          </button>
+        </form>
+
         <hr>
 
         <ul class="nav nav-tabs" id="myTab" role="tablist">

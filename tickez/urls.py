@@ -43,6 +43,9 @@ urlpatterns = [
     path('register-organizer/', views.OrganizerCreateView.as_view(), name='register-organizer'),
     path('login/', views.login_user, name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+
+    path('toggle-follow/<str:entity_type>/<int:entity_pk>/', views.toggle_follow, name='toggle-follow'),
+
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 #erase_db()

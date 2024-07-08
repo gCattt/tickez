@@ -1,15 +1,18 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 
 from django.contrib import messages
 from urllib.parse import urlparse, parse_qs
 
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
 from django.views.generic import CreateView
 
 from products.models import Evento
+from users.models import Organizzatore
+from common.models import Luogo
 
 from .forms import *
 
@@ -77,3 +80,27 @@ class OrganizerCreateView(PermissionRequiredMixin, CreateView):
         context = super().get_context_data(**kwargs)
         context['entity'] = 'Organizzatore'
         return context
+    
+
+@login_required
+def toggle_follow(request, entity_type, entity_pk):
+    # mappa il tipo di entità al modello corrispondente
+    entity_model = {
+        'evento': Evento,
+        'organizzatore': Organizzatore,
+        'luogo': Luogo,
+    }
+
+    entity = get_object_or_404(entity_model[entity_type], id=entity_pk)
+
+    if request.method == "POST":
+        if request.POST.get('action') == 'follow':
+            if request.user.utente not in entity.followers.all():
+                entity.followers.add(request.user.utente)
+                return redirect(entity.get_absolute_url())
+        elif request.POST.get('action') == 'unfollow':
+            if request.user.utente in entity.followers.all():
+                entity.followers.remove(request.user.utente)
+                return redirect(entity.get_absolute_url())
+            
+    return redirect(entity.get_absolute_url())

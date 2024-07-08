@@ -20,7 +20,7 @@
         {% endif %}
 
         <h2>Login</h2>
-        <p>Sei un nuovo utente? <strong><a href="{% url 'register-customer' %}" style="color: black; text-decoration: none;">Registrati ora</a></strong>
+        <p>Sei un nuovo utente? <strong><a href="{% url 'register-customer' %}" style="color: black; text-decoration: none;">Registrati ora</a></strong></p>
 
         <form method="POST" action=""> {% csrf_token %}
             <div class="mt-4 mb-4">
