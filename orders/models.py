@@ -7,8 +7,10 @@ class Ordine(models.Model):
     
     utente = models.ForeignKey(to='users.Utente', on_delete=models.PROTECT, null=False, blank=False, related_name="ordini")
     organizzatore = models.ForeignKey(to='users.Organizzatore', on_delete=models.PROTECT, null=False, blank=False, related_name="ordini")
-    
-    # def __str__(self):
+    biglietti = models.ManyToManyField(to='products.Biglietto', blank=False, related_name="ordini")
+
+    def __str__(self):
+        return f"Ordine N. {self.pk} - {self.utente.nome} {self.utente.cognome}, {self.utente.email}"
 
     class Meta:
         verbose_name_plural = 'Ordini'

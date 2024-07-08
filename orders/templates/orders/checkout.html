@@ -1,0 +1,25 @@
+{% extends "orders/base_orders.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Checkout | Tickez{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Checkout</h1>
+    <hr>
+    <h4>Riepilogo Ordine</h4>
+    <ul>
+        {% for item in selected_tickets %}
+        <li>{{ item.biglietto.tipologia }} - {{ item.biglietto.prezzo }}€ x {{ item.quantita }}</li>
+        {% endfor %}
+    </ul>
+    <p>Totale: {{ totale }}€</p>
+
+    <h4>Dati di Pagamento</h4>
+    <form method="POST" action="{% url 'orders:process-payment' %}">
+        {% csrf_token %}
+        {% crispy form %}
+    </form>
+</div>
+{% endblock %}

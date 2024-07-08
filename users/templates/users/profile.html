@@ -40,7 +40,16 @@
             </div>
             <div class="tab-pane" id="orders" role="tabpanel" aria-labelledby="orders-tab">
               {% for o in orders %}
-
+              <div>
+                  <h5>Ordine N. {{ o.id }}</h5>
+                  <ul>
+                      {% for biglietto in o.biglietti.all %}
+                      <li>{{ biglietto.tipologia }} - {{ biglietto.prezzo }}€</li>
+                      {% endfor %}
+                  </ul>
+                  <p>Totale: {{ o.totale }}€</p>
+                  <p>Data: {{ o.data_ora }}</p>
+              </div>
               {% endfor %}
             </div>
             <div class="tab-pane mt-3" id="events" role="tabpanel" aria-labelledby="events-tab">
