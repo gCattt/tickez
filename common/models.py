@@ -48,8 +48,10 @@ class Luogo(models.Model):
 class Notifica(models.Model):
     testo = models.CharField(max_length=50, null=False, blank=False)
     data_ora = models.DateTimeField(null=False, blank=False, default=timezone.now)
+    letta = models.BooleanField(default=False)
 
     ordine = models.ForeignKey(to='orders.Ordine', on_delete=models.CASCADE, null=True, blank=True, related_name='notifiche_ordine')
+    evento = models.ForeignKey(to='products.Evento', on_delete=models.CASCADE, null=True, blank=True, related_name='notifiche_evento')
     organizzatore = models.ForeignKey(to='users.Organizzatore', on_delete=models.CASCADE, null=True, blank=True, related_name='notifiche_organizzatore')
     luogo = models.ForeignKey(Luogo, on_delete=models.CASCADE, null=True, blank=True, related_name='notifiche_luogo')
     

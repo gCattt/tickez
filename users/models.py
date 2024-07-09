@@ -33,7 +33,6 @@ class Utente(models.Model):
     carta_credito = models.CharField(max_length=16, null=True, default=None, blank=True)
     cvv = models.CharField(max_length=3, null=True, blank=True, default=None)
     scadenza_carta = models.DateField(null=True, blank=True, default=date.today)
-    notifiche = models.BooleanField(null=False, default=False)
 
     # sincronizzazione tra i campi nome, cognome ed email delle tabelle users_utente e auth_user
     def save(self, *args, **kwargs):
@@ -67,7 +66,6 @@ class Organizzatore(models.Model):
     email = models.EmailField(max_length=254, null=False, blank=False, unique=True)
     descrizione = models.TextField(null=True, blank=True, default='')
     immagine_profilo = models.ImageField(blank=True, upload_to="images/organizers", default=join('static', 'images', 'defaults', 'default_user.jpg'))
-    notifiche = models.BooleanField(null=False, default=False)
 
     followers = models.ManyToManyField(Utente, blank=True, default=None, related_name='organizzatori_preferiti')
 

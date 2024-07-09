@@ -1,3 +1,5 @@
+{% load tz %}
+
 <nav class="navbar navbar-light" style="background-color: #ffffff; padding:10px 30px;">
     <div class="container-fluid d-flex justify-content-between align-items-end">
         <div class="d-flex align-items-end">
@@ -21,28 +23,56 @@
 
         <div>
             <form class="d-flex w-100 ms-3 me-3" method="GET" action="{% url 'common:search-results' %}">
-                <input class="form-control me-2" type="search" name="keywords" placeholder="Evento, Artista o Luogo" aria-label="Search" style="width: 350px;">
+                <input class="form-control me-2" type="search" name="keywords" placeholder="Evento, Artista o Luogo" aria-label="Search" style="width: 320px;">
                 <button class="btn btn-dark" type="submit"><i class="fas fa-search"></i></button>
             </form>
         </div>
 
         <div>
             {% if user.is_authenticated %}
+            <div class="btn-group me-2">
+                <button class="btn btn-dark rounded-end" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-bell position-relative" style="position: relative;">
+                        {% if unread_count > 0 %}
+                            <span class="notification-badge" style="position: absolute; top: -4px; right: -2px; width: 9px; height: 9px; background-color: red; border-radius: 50%;"></span>
+                        {% endif %}
+                    </i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    {% for notification in notifications %}
+                        <li>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a class="dropdown-item" href="{{ notification.evento.get_absolute_url }}" {% if not notification.letta %}style="font-weight: bold;"{% endif %}>
+                                    {{ notification.testo }}
+                                </a>
+                                <span class="text-muted me-3" style="font-size: smaller; font-size: 11px; white-space: nowrap;">{{ notification.data_ora|timezone:"Europe/Rome"|date:"d/m/Y H:i" }}</span>
+                            </div>
+                        </li>
+                    {% empty %}
+                        <li class="dropdown-item">Nessuna notifica</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
             <a href="{% url 'users:profile' %}" class="btn btn-dark me-2">
                 <span style="margin-right: 5px;">{{ user }}</span>
                 <i class="fas fa-user-circle fa-lg"></i>
             </a>
+
             <form id="logout-form" method="POST" action="{% url 'logout' %}" style="display: inline;">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-dark">
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
             </form>
+
             {% else %}
+
             <a href="{% url 'login' %}" class="btn btn-dark me-2">
                 <span style="margin-right: 5px;">Accedi</span>
                 <i class="fas fa-user-circle fa-lg"></i>
             </a>
+
             {% endif %}
         </div>
     </div>

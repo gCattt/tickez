@@ -8,12 +8,14 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 
 from products.models import Evento, Biglietto
 from users.models import Organizzatore
+from common.models import Notifica
 
 from django.views.generic import ListView, DetailView, UpdateView, DeleteView
 
 from .forms import *
 
 from datetime import datetime, timedelta
+from django.utils import timezone
 
 def products(request):
     return render(request, template_name="products/base_products.html")
@@ -88,6 +90,17 @@ class EventDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        if self.request.user.is_authenticated:
+            try:
+                utente = self.request.user.utente
+                evento = self.get_object()
+                notification = Notifica.objects.filter(evento=evento, organizzatore__in=utente.organizzatori_preferiti.all()).first()
+                if notification and not notification.letta:
+                    notification.letta = True
+                    notification.save()
+            except:
+                utente = None
+
         context['title'] = str(self.get_object().organizzatore) + ' - ' + self.get_object().nome
         context['tickets'] = self.get_object().biglietti_disponibili.all()
         context['range_dropdown'] = range(0, 6)
@@ -113,6 +126,18 @@ class OrganizerOrSuperuserRequiredMixin(UserPassesTestMixin):
         # in caso di tentato accesso ad una view protetta, senza i permessi adatti, reindirizza al login
         return redirect(f'{self.login_url}?auth=notok&next={self.request.path}')
     
+def notify(event):
+    organizzatore = event.organizzatore
+    notification_text = f"Nuovo evento di {organizzatore.nome}: {event.nome} | Scopri i dettagli e Acquista!"
+
+    Notifica.objects.create(
+        testo=notification_text,
+        data_ora=timezone.now(),
+        organizzatore=organizzatore,
+        luogo=event.luogo,
+        evento=event
+    )
+    
 @user_passes_test(is_allowed)
 def create_event(request):
     entity = 'Evento'
@@ -121,6 +146,9 @@ def create_event(request):
             form = AdminEventCrispyForm(request.POST, request.FILES)
             if form.is_valid():
                 event = form.save()
+
+                notify(event)
+
                 return redirect(event.get_absolute_url())
         else:
             form = EventCrispyForm(request.POST, request.FILES)
@@ -129,6 +157,8 @@ def create_event(request):
                 organizzatore = Organizzatore.objects.get(user=request.user) # istanza di Organizzatore associata a User
                 event.organizzatore = organizzatore
                 event.save()
+
+                notify(event)
 
                 return redirect(event.get_absolute_url())
     else:
