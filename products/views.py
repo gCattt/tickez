@@ -2,13 +2,17 @@ from typing import Any
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.mixins import UserPassesTestMixin
 #from braces.views import GroupRequiredMixin, SuperuserRequiredMixin
 
 from products.models import Evento, Biglietto
 from users.models import Organizzatore
 from common.models import Notifica
+from orders.models import BigliettoAcquistato
+
+from django.db.models import Count, Sum
+from django.db.models.functions import TruncDay
 
 from django.views.generic import ListView, DetailView, UpdateView, DeleteView
 
@@ -16,6 +20,7 @@ from .forms import *
 
 from datetime import datetime, timedelta
 from django.utils import timezone
+
 
 def products(request):
     return render(request, template_name="products/base_products.html")
@@ -89,6 +94,13 @@ class EventDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+
+        evento = self.get_object()
+
+        evento.visualizzazioni += 1
+        evento.save()
+        print(evento.visualizzazioni)
 
         if self.request.user.is_authenticated:
             try:
@@ -269,3 +281,95 @@ class DeleteTicketView(OrganizerOrSuperuserRequiredMixin, DeleteView):
         context['entity'] = 'Biglietto'
         context['name'] = self.object.tipologia+' ('+self.object.evento.nome+')'
         return context
+    
+@user_passes_test(is_allowed)
+def event_statistics(request, slug, pk):
+    evento = Evento.objects.get(id=pk)
+
+    visualizzazioni_evento = evento.visualizzazioni
+    biglietti_venduti = BigliettoAcquistato.objects.filter(biglietto__evento=evento).count()
+    revenue_totale = BigliettoAcquistato.objects.filter(biglietto__evento=evento).aggregate(Sum('biglietto__prezzo'))['biglietto__prezzo__sum'] or 0
+    
+    # calcolo delle fasce di età dei partecipanti
+    current_year = datetime.now().year
+    fasce_eta = {
+        '0_18': BigliettoAcquistato.objects.filter(
+            biglietto__evento=evento,
+            ordine__utente__data_nascita__year__gte=current_year - 18
+        ).values('nome_acquirente', 'cognome_acquirente').distinct().count(),
+
+        '19_35': BigliettoAcquistato.objects.filter(
+            biglietto__evento=evento,
+            ordine__utente__data_nascita__year__range=[current_year - 35, current_year - 19]
+        ).values('nome_acquirente', 'cognome_acquirente').distinct().count(),
+
+        '36_50': BigliettoAcquistato.objects.filter(
+            biglietto__evento=evento,
+            ordine__utente__data_nascita__year__range=[current_year - 50, current_year - 36]
+        ).values('nome_acquirente', 'cognome_acquirente').distinct().count(),
+
+        '50_plus': BigliettoAcquistato.objects.filter(
+            biglietto__evento=evento,
+            ordine__utente__data_nascita__year__lt=current_year - 50
+        ).values('nome_acquirente', 'cognome_acquirente').distinct().count(),
+    }
+    
+    # nazionalità dei partecipanti (esempio con 5 nazionalità più comuni)
+    nazionalita_partecipanti = (
+    BigliettoAcquistato.objects
+        .filter(biglietto__evento=evento)
+        .values('ordine__utente__stato', 'nome_acquirente', 'cognome_acquirente')
+        .distinct()
+        .annotate(count=Count('ordine__utente__stato'))
+        .order_by('-count')[:5]
+    )
+
+    # sesso dei partecipanti
+    sesso_partecipanti = (
+        BigliettoAcquistato.objects
+        .filter(biglietto__evento=evento)
+        .values('ordine__utente__sesso', 'nome_acquirente', 'cognome_acquirente')
+        .distinct()
+        .annotate(count=Count('ordine__utente__sesso'))
+    )
+
+    # biglietti venduti per ogni tipologia
+    biglietti_acquistati = BigliettoAcquistato.objects.filter(biglietto__evento=evento)
+    
+    vendite_per_tipologia = {}
+    for biglietto_acquistato in biglietti_acquistati:
+        tipologia = biglietto_acquistato.biglietto.tipologia
+        if tipologia not in vendite_per_tipologia:
+            vendite_per_tipologia[tipologia] = 0
+        vendite_per_tipologia[tipologia] += 1
+
+    # vendite giornaliere
+    vendite_per_giorno = (
+        BigliettoAcquistato.objects.filter(biglietto__evento=evento)
+        .annotate(giorno=TruncDay('data_acquisto'))
+        .values('giorno')
+        .annotate(count=Count('id'))
+        .order_by('giorno')
+    )
+    # dati fittizi per il test
+    test_data = [
+        {'giorno': timezone.datetime(2024, 7, 1, 0, 0), 'count': 10},
+        {'giorno': timezone.datetime(2024, 7, 8, 0, 0), 'count': 15},
+        {'giorno': timezone.datetime(2024, 8, 22, 0, 0), 'count': 25},
+        {'giorno': timezone.datetime(2024, 9, 25, 0, 0), 'count': 5},
+    ]
+    vendite_per_giorno = list(vendite_per_giorno) + test_data
+
+    context = {
+        'evento': evento,
+        'visualizzazioni_evento': visualizzazioni_evento,
+        'biglietti_venduti': biglietti_venduti,
+        'revenue_totale': revenue_totale,
+        'fasce_eta': fasce_eta,
+        'nazionalita_partecipanti': nazionalita_partecipanti,
+        'sesso_partecipanti': sesso_partecipanti,
+        'vendite_per_tipologia': vendite_per_tipologia,
+        'vendite_per_giorno': vendite_per_giorno,
+    }
+
+    return render(request, 'products/event_statistics.html', context)

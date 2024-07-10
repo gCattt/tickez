@@ -24,6 +24,7 @@ class Evento(models.Model):
     descrizione = models.TextField(null=True, blank=True, default='')
     data_ora = models.DateTimeField(null=False, blank=False, default=timezone.now)
     locandina = models.ImageField(blank=True, upload_to="images/events")
+    visualizzazioni = models.IntegerField(default=0)
 
     organizzatore = models.ForeignKey(to='users.Organizzatore', on_delete=models.CASCADE, null=False, blank=False, related_name='eventi_organizzati')
     luogo = models.ForeignKey(to='common.Luogo', on_delete=models.CASCADE, null=False, blank=False, related_name='eventi_programmati')

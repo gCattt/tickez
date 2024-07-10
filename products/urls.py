@@ -17,4 +17,6 @@ urlpatterns = [
     path('create-ticket/<slug:event_slug>-<int:event_pk>/', views.create_ticket, name="create-ticket"),
     path('update-ticket/<slug:event_slug>-<int:event_pk>/<slug:ticket_slug>-<int:ticket_pk>/', views.UpdateTicketView.as_view(), name="update-ticket"),
     path('delete-ticket/<slug:event_slug>-<int:event_pk>/<slug:ticket_slug>-<int:ticket_pk>/', views.DeleteTicketView.as_view(), name="delete-ticket"),
+
+    path('statistics/<slug:slug>-<int:pk>/', views.event_statistics, name="event-statistics"),
 ]

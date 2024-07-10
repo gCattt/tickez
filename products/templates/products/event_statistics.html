@@ -1,0 +1,280 @@
+{% extends "products/base_products.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Statistiche {{evento}} | Tickez{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Statistiche: "{{evento.organizzatore}} - {{ evento.nome }}"</h2>
+
+    <p>Visualizzazioni evento: {{ visualizzazioni_evento }}</p>
+    <p>Numero di biglietti venduti: {{ biglietti_venduti }}</p>
+    <p>Revenue totale: {{ revenue_totale }}</p>
+
+    {% if biglietti_venduti > 0 %}
+        <canvas id="grafico_eta" width="100" height="20"></canvas>
+        <canvas id="grafico_nazionalita" width="100" height="30"></canvas>
+        <canvas id="grafico_sesso" width="100" height="30"></canvas>
+        <canvas id="tipologia_biglietti_venduti" width="100" height="50"></canvas>
+        <canvas id="vendite_giornaliere" width="800" height="400"></canvas>
+    {% else %}
+        <p>Dati insufficienti per visualizzare i grafici.</p>
+    {% endif %}
+</div>
+
+<script>
+    {% if biglietti_venduti > 0 %}
+    // grafico età dei partecipanti, divisa per fasce
+    var ctxEta = document.getElementById('grafico_eta').getContext('2d');
+    var graficoEta = new Chart(ctxEta, {
+        type: 'bar',
+        data: {
+            labels: ['0-18', '19-35', '36-50', '50+'],
+            datasets: [{
+                label: 'Numero di partecipanti divisi per fasce d\'età',
+                data: [
+                    {{ fasce_eta.0_18 }},
+                    {{ fasce_eta.19_35 }},
+                    {{ fasce_eta.36_50 }},
+                    {{ fasce_eta.50_plus }}
+                ],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: 'Numero di partecipanti divisi per fasce d\'età'
+                }
+            }
+        }
+    });
+
+    // grafico nazionalità dei partecipanti
+    var ctxNazionalita = document.getElementById('grafico_nazionalita').getContext('2d');
+    var graficoNazionalita = new Chart(ctxNazionalita, {
+        type: 'pie',
+        data: {
+            labels: [
+                {% for nazionalita in nazionalita_partecipanti %}
+                    "{{ nazionalita.ordine__utente__stato }}",
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Nazionalità dei partecipanti',
+                data: [
+                    {% for nazionalita in nazionalita_partecipanti %}
+                        {{ nazionalita.count }},
+                    {% endfor %}
+                ],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    position: 'right'
+                },
+                title: {
+                    display: true,
+                    text: 'Nazionalità dei partecipanti'
+                }
+            }
+        }
+    });
+    
+
+    // grafico sesso dei partecipanti
+    var ctxSesso = document.getElementById('grafico_sesso').getContext('2d');
+    var graficoSesso = new Chart(ctxSesso, {
+        type: 'pie',
+        data: {
+            labels: [
+                'Femmine',
+                'Maschi',
+                'Altro',
+            ],
+            datasets: [{
+                label: 'Sesso dei partecipanti',
+                data: [
+                    {% for sesso in sesso_partecipanti %}
+                        {{ sesso.count }},
+                    {% endfor %}
+                ],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    position: 'right'
+                },
+                title: {
+                    display: true,
+                    text: 'Sesso dei partecipanti'
+                }
+            }
+        }
+    });
+    
+
+    var venditePerTipologia = {{ vendite_per_tipologia|safe }};
+    var labels = Object.keys(venditePerTipologia);
+    var data = Object.values(venditePerTipologia);
+    
+    var ctxTipologia = document.getElementById('tipologia_biglietti_venduti').getContext('2d');
+    var bigliettiVendutiChart = new Chart(ctxTipologia, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Biglietti Venduti per Tipologia',
+                data: data,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    position: 'right'
+                },
+                title: {
+                    display: true,
+                    text: 'Biglietti Venduti per Tipologia'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(tooltipItem) {
+                            var label = tooltipItem.label || '';
+                            var value = tooltipItem.raw || 0;
+                            return label + ': ' + value;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    
+    // grafico vendite giornaliere
+    document.addEventListener('DOMContentLoaded', function () {
+        var ctxLineChart = document.getElementById('vendite_giornaliere').getContext('2d');
+        var lineChart = new Chart(ctxLineChart, {
+            type: 'line',
+            data: {
+                labels: [
+                    {% for vendita in vendite_per_giorno %}
+                        "{{ vendita.giorno|date:"Y-m-d" }}",
+                    {% endfor %}
+                ],
+                datasets: [{
+                    label: 'Vendite Giornaliere',
+                    data: [
+                        {% for vendita in vendite_per_giorno %}
+                            {{ vendita.count }},
+                        {% endfor %}
+                    ],
+                    fill: false,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Days'
+                        }
+                    },
+                    y: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Tickets'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Vendite Giornaliere'
+                    }
+                }
+            }
+        });
+    });
+    {% endif %}
+</script>
+{% endblock %}
