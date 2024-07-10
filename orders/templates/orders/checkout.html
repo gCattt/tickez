@@ -10,15 +10,16 @@
     <hr>
     <h4>Riepilogo Ordine</h4>
     <ul>
-        {% for item in selected_tickets %}
-        <li>{{ item.biglietto.tipologia }} - {{ item.biglietto.prezzo }}€ x {{ item.quantita }}</li>
+        {% for t in selected_tickets %}
+        <li>
+            {{ t.tipologia }} - {{ t.prezzo }}€
+        </li>
         {% endfor %}
     </ul>
-    <p>Totale: {{ totale }}€</p>
+    <p>Totale: {{ total }}€</p>
 
     <h4>Dati di Pagamento</h4>
-    <form method="POST" action="{% url 'orders:process-payment' %}">
-        {% csrf_token %}
+    <form method="POST" action="{% url 'orders:process-payment' %}"> {% csrf_token %}
         {% crispy form %}
     </form>
 </div>

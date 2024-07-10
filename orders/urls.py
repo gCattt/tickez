@@ -7,6 +7,9 @@ app_name = 'orders'
 urlpatterns = [
     path('admin/', admin.site.urls),
     re_path(r"^$|^\/$", views.orders, name=app_name),
+
     path('checkout/', views.checkout, name="checkout"),
     path('process-payment/', views.process_payment, name='process-payment'),
+
+    path('edit-purchase/<slug:slug>-<int:pk>/', views.UpdatePurchaseView.as_view(), name="edit-purchase"),
 ]

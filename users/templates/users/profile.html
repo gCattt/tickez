@@ -43,8 +43,14 @@
               <div>
                   <h5>Ordine N. {{ o.id }}</h5>
                   <ul>
-                      {% for biglietto in o.biglietti.all %}
-                      <li>{{ biglietto.tipologia }} - {{ biglietto.prezzo }}€</li>
+                      {% for biglietto_acquistato in o.biglietti_acquistati.all %}
+                      <li>
+                        {{ biglietto_acquistato.biglietto.tipologia }} - {{ biglietto_acquistato.biglietto.prezzo }}€
+                        ({{ biglietto_acquistato.nome_acquirente }} {{ biglietto_acquistato.cognome_acquirente }})
+                        {% if biglietto_acquistato.can_edit %}
+                          <a href="{% url 'orders:edit-purchase' biglietto_acquistato.biglietto.slug biglietto_acquistato.id %}" class="btn btn-secondary">Modifica Nominativo</a>
+                        {% endif %}
+                    </li>
                       {% endfor %}
                   </ul>
                   <p>Totale: {{ o.totale }}€</p>
