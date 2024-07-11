@@ -9,13 +9,13 @@ class UtenteInline(admin.StackedInline):
     model = Utente
     can_delete = False
     verbose_name = 'Additional information'
-    readonly_fields = ('nome', 'cognome', 'email', 'data_nascita', 'sesso', 'stato', 'indirizzo', 'telefono', 'carta_credito', 'cvv', 'scadenza_carta', 'notifiche')
+    readonly_fields = ('nome', 'cognome', 'email', 'data_nascita', 'sesso', 'stato', 'indirizzo', 'telefono', 'carta_credito', 'cvv', 'scadenza_carta')
 
 class OrganizzatoreInline(admin.StackedInline):
     model = Organizzatore
     can_delete = False
     verbose_name = 'Additional Information'
-    readonly_fields = ('nome', 'slug', 'descrizione', 'notifiche', 'followers')
+    readonly_fields = ('nome', 'slug', 'descrizione', 'followers')
 
 class CustomUserAdmin(UserAdmin):
     readonly_fields = ('first_name', 'last_name', 'email')
@@ -53,7 +53,7 @@ class UtenteAdmin(admin.ModelAdmin):
             'fields': ('user',)
         }),
         ('Personal info', {
-            'fields': ('nome', 'cognome', 'email', 'data_nascita', 'sesso', 'notifiche')
+            'fields': ('nome', 'cognome', 'email', 'data_nascita', 'sesso')
         }),
         ('Contacts', {
             'fields': ('stato', 'indirizzo', 'telefono')
@@ -75,7 +75,7 @@ class OrganizzatoreAdmin(admin.ModelAdmin):
             'fields': ('user',)
         }),
         ('Personal info', {
-            'fields': ('nome', 'slug', 'email', 'descrizione', 'notifiche', 'followers')
+            'fields': ('nome', 'slug', 'email', 'descrizione', 'followers')
         }),
     )
 
