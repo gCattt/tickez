@@ -13,15 +13,64 @@ from django.views.generic import CreateView
 from products.models import Evento
 from users.models import Organizzatore
 from common.models import Luogo
+from orders.models import BigliettoAcquistato
 
 from .forms import *
+
+from sklearn.metrics.pairwise import cosine_similarity
+import pandas as pd
 
 
 def home_page(request):
     home_page_events = Evento.objects.order_by('data_ora')[:5]
-
     templ = "common/home_page.html"
     ctx = {"object_list": home_page_events}
+
+    # Mostra i consigliati solo se l'utente è autenticato
+    if request.user.is_authenticated:
+        # Dati degli acquisti dei biglietti
+        biglietti_acquistati = BigliettoAcquistato.objects.all()
+
+        # Creazione del dataframe con le informazioni rilevanti
+        data = {
+            'utente_id': [biglietto.ordine.utente.id for biglietto in biglietti_acquistati],
+            'evento_id': [biglietto.biglietto.evento.id for biglietto in biglietti_acquistati]
+        }
+        df = pd.DataFrame(data)
+
+        # Matrice utente-evento
+        user_event_matrix = df.pivot_table(index='utente_id', columns='evento_id', aggfunc='size', fill_value=0)
+
+        # Similarità del coseno tra gli utenti
+        user_similarity = cosine_similarity(user_event_matrix)
+        user_similarity_df = pd.DataFrame(user_similarity, index=user_event_matrix.index, columns=user_event_matrix.index)
+
+        def get_user_recommendations(utente_id, user_event_matrix, user_similarity_df, top_n=5):
+            # Trova gli utenti più simili (escluso se stesso)
+            similar_users = user_similarity_df[utente_id].sort_values(ascending=False).index[1:]
+
+            # Trova gli eventi acquistati dagli utenti simili
+            similar_users_events = user_event_matrix.loc[similar_users]
+
+            # Somma le interazioni degli utenti simili per ottenere un punteggio di raccomandazione
+            recommendations = similar_users_events.sum(axis=0).sort_values(ascending=False)
+
+            # Rimuovi gli eventi che l'utente ha già acquistato
+            user_events = user_event_matrix.loc[utente_id]
+            recommendations = recommendations[user_events == 0]
+
+            return recommendations.head(top_n).index
+        
+
+        # ID dell'utente loggato
+        utente_id = request.user.utente.id  
+
+        # Ottieni gli ID degli eventi consigliati per l'utente
+        recommended_event_ids = get_user_recommendations(utente_id, user_event_matrix, user_similarity_df)
+        # Filtra gli eventi consigliati dal database degli eventi
+        recommended_events = Evento.objects.filter(id__in=recommended_event_ids)
+
+        ctx['recommended_events'] = recommended_events
 
     return render(request, template_name=templ, context=ctx)
 

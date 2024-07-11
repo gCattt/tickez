@@ -29,8 +29,6 @@ class BigliettoAcquistato(models.Model):
         return f'{self.nome_acquirente} {self.cognome_acquirente} - {self.biglietto.tipologia}'
     
     def can_edit(self):
-        print(timezone.now())
-        print(self.biglietto.evento.data_ora)
         return timezone.now() <= (self.biglietto.evento.data_ora - timedelta(days=30))
     
     class Meta:
