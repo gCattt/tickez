@@ -1,8 +1,9 @@
 from django import forms
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Submit
 
-from .models import Evento, Biglietto
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Row, Column, Submit, Reset
+
+from products.models import Evento, Biglietto
 
 import os
 
@@ -11,6 +12,16 @@ class AdminEventCrispyForm(forms.ModelForm):
     class Meta:
         model = Evento
         fields = ('organizzatore', 'categoria', 'nome', 'luogo', 'data_ora', 'descrizione', 'locandina')
+        labels = {
+            'nome': 'Nome dell\'evento',
+            'data_ora': 'Data e Ora',
+        }
+        widgets = {
+            'nome': forms.TextInput(attrs={'maxlength': 100}),
+            'data_ora': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'locandina': forms.ClearableFileInput(),
+        }
+
 
     def __init__(self, *args, **kwargs):
         action = kwargs.pop('action', 'Crea Evento')
@@ -19,6 +30,20 @@ class AdminEventCrispyForm(forms.ModelForm):
         self.helper.form_id = 'event-crispy-form'
         self.helper.form_method = 'POST'
         self.helper.add_input(Submit('submit', action, css_class="btn-dark mt-3"))
+        self.helper.add_input(Reset('reset', 'Ripristina', css_class="btn-secondary mt-3"))
+
+        self.helper.layout = Layout(
+            'organizzatore',
+            'nome',
+            'luogo',
+            Row(
+                Column('categoria', css_class='form-group col-md-6 mb-0'),
+                Column('data_ora', css_class='form-group col-md-6 mb-0'),
+                css_class='form-row'
+            ),
+            'locandina',
+            'descrizione'
+        )
 
 class EventCrispyForm(forms.ModelForm):
     # aggiorna locandina senza mostrare il percorso del file attualmente caricato
@@ -28,6 +53,15 @@ class EventCrispyForm(forms.ModelForm):
     class Meta:
         model = Evento
         fields = ('categoria', 'nome', 'luogo', 'data_ora', 'descrizione', 'locandina', 'remove_locandina')
+        labels = {
+            'nome': 'Nome dell\'evento',
+            'data_ora': 'Data e Ora',
+        }
+        widgets = {
+            'nome': forms.TextInput(attrs={'maxlength': 100}),
+            'data_ora': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+        }
+
 
     def __init__(self, *args, **kwargs):
         action = kwargs.pop('action', 'Crea Evento')
@@ -35,7 +69,21 @@ class EventCrispyForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_id = 'event-crispy-form'
         self.helper.form_method = 'POST'
-        self.helper.add_input(Submit('submit', action, css_class="btn-dark"))
+        self.helper.add_input(Submit('submit', action, css_class="btn-dark mt-3"))
+        self.helper.add_input(Reset('reset', 'Ripristina', css_class="btn-secondary mt-3"))
+
+        self.helper.layout = Layout(
+            'nome',
+            'luogo',
+            Row(
+                Column('categoria', css_class='form-group col-md-6 mb-0'),
+                Column('data_ora', css_class='form-group col-md-6 mb-0'),
+                css_class='form-row'
+            ),
+            'locandina',
+            'remove_locandina'
+            'descrizione'
+        )
 
     def save(self, commit=True):
         instance = super().save(commit=False)
@@ -58,6 +106,17 @@ class TicketCrispyForm(forms.ModelForm):
     class Meta:
         model = Biglietto
         fields = ('tipologia', 'prezzo', 'quantita', 'descrizione')
+        labels = {
+            'tipologia': 'Tipologia di biglietto',
+            'prezzo': 'Prezzo (EUR)',
+            'quantita': 'Quantità disponibile',
+            'descrizione': 'Descrizione del biglietto',
+        }
+        widgets = {
+            'tipologia': forms.TextInput(attrs={'pattern': '^[A-Za-zÀ-ÿ ]{1,100}$'}),
+            'prezzo': forms.NumberInput(attrs={'step': '0.01'}),
+        }
+
 
     def __init__(self, *args, **kwargs):
         action = kwargs.pop('action', 'Crea Biglietto')
@@ -65,4 +124,15 @@ class TicketCrispyForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_id = 'ticket-crispy-form'
         self.helper.form_method = 'POST'
-        self.helper.add_input(Submit('submit', action, css_class="btn-dark"))
+        self.helper.add_input(Submit('submit', action, css_class="btn-dark mt-3"))
+        self.helper.add_input(Reset('reset', 'Ripristina', css_class="btn-secondary mt-3"))
+
+        self.helper.layout = Layout(
+            'tipologia',
+            Row(
+                Column('prezzo', css_class='form-group col-md-6 mb-0'),
+                Column('quantita', css_class='form-group col-md-6 mb-0'),
+                css_class='form-row'
+            ),
+            'descrizione'
+        )

@@ -23,8 +23,9 @@ class Luogo(models.Model):
     followers = models.ManyToManyField(to='users.Utente', blank=True, default=None, related_name='luoghi_preferiti')
     affittuari = models.ManyToManyField(to='users.Organizzatore', blank=True, default=None, related_name='luoghi_affittati')
     
+
     def __str__(self):
-        return self.nome
+        return f"{self.nome} - {self.indirizzo} ({self.citta})"
     
     # django tratta il valore di default di un ImageField come un file media, cercandolo nella directory MEDIA_ROOT
     @property # trasforma un metodo di una classe in un attributo di sola lettura
@@ -45,6 +46,7 @@ class Luogo(models.Model):
     class Meta:
         verbose_name_plural = 'Luoghi'
 
+
 class Notifica(models.Model):
     testo = models.CharField(max_length=50, null=False, blank=False)
     data_ora = models.DateTimeField(null=False, blank=False, default=timezone.now)
@@ -55,7 +57,9 @@ class Notifica(models.Model):
     organizzatore = models.ForeignKey(to='users.Organizzatore', on_delete=models.CASCADE, null=True, blank=True, related_name='notifiche_organizzatore')
     luogo = models.ForeignKey(Luogo, on_delete=models.CASCADE, null=True, blank=True, related_name='notifiche_luogo')
     
-    # def __str__(self):
+
+    def __str__(self):
+        return f"{self.testo}"
 
     class Meta:
         verbose_name_plural = 'Notifiche'

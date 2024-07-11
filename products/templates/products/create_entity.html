@@ -5,9 +5,11 @@
 {% block title %}Crea {{entity}} | Tickez{% endblock %}
 
 {% block content %}
-    <div class="container">
-        <form method="POST" enctype="multipart/form-data"> {% csrf_token %}
-            {% crispy form %}
-        </form>
-    </div>
+<div class="container">
+    <h1 class="mb-5">Crea {{entity}}</h1>
+
+    <form method="POST" enctype="multipart/form-data"> {% csrf_token %}
+        {% crispy form %}
+    </form>
+</div>
 {% endblock %}

@@ -1,37 +1,33 @@
 from django.db import models
 
-from django.conf import settings
-
-from os.path import join
 from django.urls import reverse
 
 from django.template.defaultfilters import slugify
 
 from django.utils import timezone
 
+from django.conf import settings
+from os.path import join
+
 
 class Evento(models.Model):
-    
-    CATEGORY_CHOICES = [
-        ('Concerti', 'Concerti'),
-        ('Festival', 'Festival'),
-        ('Teatro', 'Teatro')
-    ]
+    CATEGORY_CHOICES = [('Concerti', 'Concerti'), ('Festival', 'Festival'), ('Teatro', 'Teatro')]
         
     nome = models.CharField(max_length=100, null=False, blank=False)
     slug = models.SlugField(max_length=200, null=False, unique=True, blank=True)
     categoria = models.CharField(max_length=100, choices=CATEGORY_CHOICES, null=False, blank=False)
-    descrizione = models.TextField(null=True, blank=True, default='')
     data_ora = models.DateTimeField(null=False, blank=False, default=timezone.now)
     locandina = models.ImageField(blank=True, upload_to="images/events")
-    visualizzazioni = models.IntegerField(default=0)
+    descrizione = models.TextField(null=True, blank=True, default='')
+    visualizzazioni = models.IntegerField(null=True, blank=True, default=0)
 
     organizzatore = models.ForeignKey(to='users.Organizzatore', on_delete=models.CASCADE, null=False, blank=False, related_name='eventi_organizzati')
     luogo = models.ForeignKey(to='common.Luogo', on_delete=models.CASCADE, null=False, blank=False, related_name='eventi_programmati')
     followers = models.ManyToManyField(to='users.Utente', blank=True, default=None, related_name='eventi_preferiti')
     
+
     def __str__(self):
-        return self.nome
+        return f"{self.nome} - {self.organizzatore}"
     
     # django tratta il valore di default di un ImageField come un file media, cercandolo nella directory MEDIA_ROOT
     @property # trasforma un metodo di una classe in un attributo di sola lettura
@@ -52,18 +48,21 @@ class Evento(models.Model):
     class Meta:
         verbose_name_plural = 'Eventi'
 
+
 class Biglietto(models.Model):
-    tipologia = models.CharField(max_length=100, null=True, blank=True, default='')
+    tipologia = models.CharField(max_length=100, null=False, blank=False)
     slug = models.SlugField(max_length=200, null=False, unique=True, blank=True)
-    prezzo = models.FloatField(null=True, blank=True, default=0.00)
+    prezzo = models.FloatField(null=False, blank=False, default=0.00)
+    quantita = models.IntegerField(null=False, blank=False, default=0)
     descrizione = models.TextField(null=True, blank=True, default='')
-    quantita = models.IntegerField(default=0)
     
-    organizzatore = models.ForeignKey(to='users.Organizzatore', on_delete=models.CASCADE, null=True, blank=True, related_name='biglietti_generati')
     evento = models.ForeignKey(Evento, on_delete=models.CASCADE, null=True, blank=True, related_name='biglietti_disponibili')
+    organizzatore = models.ForeignKey(to='users.Organizzatore', on_delete=models.CASCADE, null=True, blank=True, related_name='biglietti_generati')
     ordine = models.ManyToManyField(to='orders.Ordine', blank=True, default=None, related_name='biglietti_ordinati')
 
-    # def __str__(self):
+
+    def __str__(self):
+        return f"{self.tipologia} - {self.evento}"
 
     def get_absolute_url(self):
         return self.evento.get_absolute_url()

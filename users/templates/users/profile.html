@@ -5,84 +5,81 @@
 {% block title %}Profilo | Tickez{% endblock %}
 
 {% block content %}
-    <div class="container">
-        
-        <h2>
-          <img src="{{ immagine_profilo }}" style="width: 100px; height: 100px; object-fit: cover">
-          Bentornato <strong>{{user}}</strong>
-        </h2>
+<div class="container">
+    <h1 class="mb-5">
+      <img src="{{ immagine_profilo }}" style="width: 100px; height: 100px; object-fit: cover">
+      Bentornato <strong>{{user}}</strong>
+    </h1>
 
-        <hr>
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="data-tab" data-bs-toggle="tab" data-bs-target="#data" type="button" role="tab" aria-controls="data" aria-selected="true">Dati personali</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="orders-tab" data-bs-toggle="tab" data-bs-target="#orders" type="button" role="tab" aria-controls="orders" aria-selected="true">Ordini</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="events-tab" data-bs-toggle="tab" data-bs-target="#events" type="button" role="tab" aria-controls="events" aria-selected="false">Eventi preferiti</button>
+          </li>
+        <li class="nav-item" role="presentation">
+        <button class="nav-link" id="artists-tab" data-bs-toggle="tab" data-bs-target="#artists" type="button" role="tab" aria-controls="artists" aria-selected="false">Artisti preferiti</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="locations-tab" data-bs-toggle="tab" data-bs-target="#locations" type="button" role="tab" aria-controls="locations" aria-selected="false">Luoghi preferiti</button>
+        </li>
+    </ul>
 
-        <ul class="nav nav-tabs" id="myTab" role="tablist">
-            <li class="nav-item" role="presentation">
-              <button class="nav-link active" id="data-tab" data-bs-toggle="tab" data-bs-target="#data" type="button" role="tab" aria-controls="data" aria-selected="true">Dati personali</button>
-            </li>
-            <li class="nav-item" role="presentation">
-              <button class="nav-link" id="orders-tab" data-bs-toggle="tab" data-bs-target="#orders" type="button" role="tab" aria-controls="orders" aria-selected="true">Ordini</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="events-tab" data-bs-toggle="tab" data-bs-target="#events" type="button" role="tab" aria-controls="events" aria-selected="false">Eventi preferiti</button>
-              </li>
-            <li class="nav-item" role="presentation">
-            <button class="nav-link" id="artists-tab" data-bs-toggle="tab" data-bs-target="#artists" type="button" role="tab" aria-controls="artists" aria-selected="false">Artisti preferiti</button>
-            </li>
-            <li class="nav-item" role="presentation">
-              <button class="nav-link" id="locations-tab" data-bs-toggle="tab" data-bs-target="#locations" type="button" role="tab" aria-controls="locations" aria-selected="false">Luoghi preferiti</button>
-            </li>
-        </ul>
-
-        <div class="tab-content">
-            <div class="tab-pane mt-3 active" id="data" role="tabpanel" aria-labelledby="data-tab">
-                <form method="POST" enctype="multipart/form-data"> {% csrf_token %}
-                    {% crispy form %}
-                </form>
-            </div>
-            <div class="tab-pane" id="orders" role="tabpanel" aria-labelledby="orders-tab">
-              {% for o in orders %}
-              <div>
-                  <h5>Ordine N. {{ o.id }}</h5>
-                  <ul>
-                      {% for biglietto_acquistato in o.biglietti_acquistati.all %}
-                      <li>
-                        {{ biglietto_acquistato.biglietto.tipologia }} - {{ biglietto_acquistato.biglietto.prezzo }}€
-                        ({{ biglietto_acquistato.nome_acquirente }} {{ biglietto_acquistato.cognome_acquirente }})
-                        {% if biglietto_acquistato.can_edit %}
-                          <a href="{% url 'orders:edit-purchase' biglietto_acquistato.biglietto.slug biglietto_acquistato.id %}" class="btn btn-secondary">Modifica Nominativo</a>
-                        {% endif %}
-                    </li>
-                      {% endfor %}
-                  </ul>
-                  <p>Totale: {{ o.totale }}€</p>
-                  <p>Data: {{ o.data_ora }}</p>
-              </div>
-              {% endfor %}
-            </div>
-            <div class="tab-pane mt-3" id="events" role="tabpanel" aria-labelledby="events-tab">
-                {% for e in starred_events %}
-                  <p>{{e.nome}}</p>
-                {% endfor %}
-            </div>
-            <div class="tab-pane mt-3" id="artists" role="tabpanel" aria-labelledby="artists-tab">
-                {% for a in starred_artists %}
-                  <p>{{a.nome}}</p>
-                {% endfor %}
-            </div>
-            <div class="tab-pane mt-3" id="locations" role="tabpanel" aria-labelledby="locations-tab">
-                {% for l in starred_locations %}
-                  <p>{{l.nome}}</p>
-                {% endfor %}
-            </div>
+    <div class="tab-content">
+        <div class="tab-pane mt-3 active" id="data" role="tabpanel" aria-labelledby="data-tab">
+            <form method="POST" enctype="multipart/form-data"> {% csrf_token %}
+                {% crispy form %}
+            </form>
+        </div>
+        <div class="tab-pane" id="orders" role="tabpanel" aria-labelledby="orders-tab">
+          {% for o in orders %}
+          <div>
+              <h5>Ordine N. {{ o.id }}</h5>
+              <ul>
+                  {% for biglietto_acquistato in o.biglietti_acquistati.all %}
+                  <li>
+                    {{ biglietto_acquistato.biglietto.tipologia }} - {{ biglietto_acquistato.biglietto.prezzo }}€
+                    ({{ biglietto_acquistato.nome_acquirente }} {{ biglietto_acquistato.cognome_acquirente }})
+                    {% if biglietto_acquistato.can_edit %}
+                      <a href="{% url 'orders:edit-purchase' biglietto_acquistato.biglietto.slug biglietto_acquistato.id %}" class="btn btn-secondary">Modifica Nominativo</a>
+                    {% endif %}
+                </li>
+                  {% endfor %}
+              </ul>
+              <p>Totale: {{ o.totale }}€</p>
+              <p>Data: {{ o.data_ora }}</p>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="tab-pane mt-3" id="events" role="tabpanel" aria-labelledby="events-tab">
+            {% for e in starred_events %}
+              <p>{{e.nome}}</p>
+            {% endfor %}
+        </div>
+        <div class="tab-pane mt-3" id="artists" role="tabpanel" aria-labelledby="artists-tab">
+            {% for a in starred_artists %}
+              <p>{{a.nome}}</p>
+            {% endfor %}
+        </div>
+        <div class="tab-pane mt-3" id="locations" role="tabpanel" aria-labelledby="locations-tab">
+            {% for l in starred_locations %}
+              <p>{{l.nome}}</p>
+            {% endfor %}
         </div>
     </div>
+</div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // rimuove l'autofocus dagli elementi di input (form nel primo tab)
-            document.querySelectorAll('input').forEach(input => {
-                input.setAttribute('autocomplete', 'off');
-                input.setAttribute('autofocus', 'off');
-            });
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // rimuove l'autofocus dagli elementi di input (form nel primo tab)
+        document.querySelectorAll('input').forEach(input => {
+            input.setAttribute('autocomplete', 'off');
+            input.setAttribute('autofocus', 'off');
         });
-    </script>
+    });
+</script>
 {% endblock %}

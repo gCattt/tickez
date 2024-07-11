@@ -9,7 +9,7 @@ class UtenteInline(admin.StackedInline):
     model = Utente
     can_delete = False
     verbose_name = 'Additional information'
-    readonly_fields = ('nome', 'cognome', 'email', 'data_nascita', 'sesso', 'stato', 'indirizzo', 'telefono', 'carta_credito', 'cvv', 'scadenza_carta')
+    readonly_fields = ('nome', 'cognome', 'email', 'data_nascita', 'sesso', 'stato', 'telefono')
 
 class OrganizzatoreInline(admin.StackedInline):
     model = Organizzatore
@@ -56,15 +56,12 @@ class UtenteAdmin(admin.ModelAdmin):
             'fields': ('nome', 'cognome', 'email', 'data_nascita', 'sesso')
         }),
         ('Contacts', {
-            'fields': ('stato', 'indirizzo', 'telefono')
-        }),
-        ('Card info', {
-            'fields': ('carta_credito', 'cvv', 'scadenza_carta')
-        }),
+            'fields': ('stato', 'telefono')
+        })
     )
 
-    list_display = ('user', 'email', 'nome', 'cognome', 'data_nascita', 'sesso', 'stato', 'indirizzo', 'telefono')
-    search_fields = ('user', 'email', 'nome', 'cognome', 'data_nascita', 'sesso', 'stato', 'indirizzo', 'telefono')
+    list_display = ('user', 'email', 'nome', 'cognome', 'data_nascita', 'sesso', 'stato', 'telefono')
+    search_fields = ('user', 'email', 'nome', 'cognome', 'data_nascita', 'sesso', 'stato', 'telefono')
 
 class OrganizzatoreAdmin(admin.ModelAdmin):
     model = Organizzatore
