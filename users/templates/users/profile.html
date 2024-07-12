@@ -18,6 +18,11 @@
         <li class="nav-item" role="presentation">
           <button class="nav-link" id="orders-tab" data-bs-toggle="tab" data-bs-target="#orders" type="button" role="tab" aria-controls="orders" aria-selected="true">Ordini</button>
         </li>
+        {% if is_organizer %}
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="manage-tab" data-bs-toggle="tab" data-bs-target="#manage" type="button" role="tab" aria-controls="manage" aria-selected="false">Gestisci eventi</button>
+        </li>
+        {% else %}
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="events-tab" data-bs-toggle="tab" data-bs-target="#events" type="button" role="tab" aria-controls="events" aria-selected="false">Eventi preferiti</button>
           </li>
@@ -27,6 +32,7 @@
         <li class="nav-item" role="presentation">
           <button class="nav-link" id="locations-tab" data-bs-toggle="tab" data-bs-target="#locations" type="button" role="tab" aria-controls="locations" aria-selected="false">Luoghi preferiti</button>
         </li>
+        {% endif %}
     </ul>
 
     <div class="tab-content">
@@ -44,7 +50,7 @@
                   <li>
                     {{ biglietto_acquistato.biglietto.tipologia }} - {{ biglietto_acquistato.biglietto.prezzo }}€
                     ({{ biglietto_acquistato.nome_acquirente }} {{ biglietto_acquistato.cognome_acquirente }})
-                    {% if biglietto_acquistato.can_edit %}
+                    {% if not is_organizer and biglietto_acquistato.can_edit %}
                       <a href="{% url 'orders:edit-purchase' biglietto_acquistato.biglietto.slug biglietto_acquistato.id %}" class="btn btn-secondary">Modifica Nominativo</a>
                     {% endif %}
                 </li>
@@ -55,6 +61,19 @@
           </div>
           {% endfor %}
         </div>
+        {% if is_organizer %}
+        <div class="tab-pane mt-3" id="manage" role="tabpanel" aria-labelledby="manage-tab">
+            {% for e in events %}
+              <div>
+                <h5>{{ e.nome }}</h5>
+                <a href="{% url 'products:update-event' e.slug e.pk %}" class="btn btn-dark">Modifica</a>
+                <form action="{% url 'products:delete-event' e.slug e.pk %}" method="GET" style="display:inline;"> {% csrf_token %}
+                  <button type="submit" class="btn btn-danger">Elimina</button>
+                </form>
+              </div>
+            {% endfor %}
+        </div>
+        {% else %}
         <div class="tab-pane mt-3" id="events" role="tabpanel" aria-labelledby="events-tab">
             {% for e in starred_events %}
               <p>{{e.nome}}</p>
@@ -70,6 +89,7 @@
               <p>{{l.nome}}</p>
             {% endfor %}
         </div>
+        {% endif %}
     </div>
 </div>
 

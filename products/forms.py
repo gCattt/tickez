@@ -113,7 +113,7 @@ class TicketCrispyForm(forms.ModelForm):
             'descrizione': 'Descrizione del biglietto',
         }
         widgets = {
-            'tipologia': forms.TextInput(attrs={'pattern': '^[A-Za-zÀ-ÿ ]{1,100}$'}),
+            'tipologia': forms.TextInput(attrs={'pattern': '^[A-Za-zÀ-ÿ0-9.@+- ]{1,100}$'}),
             'prezzo': forms.NumberInput(attrs={'step': '0.01'}),
         }
 

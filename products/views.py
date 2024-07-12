@@ -100,7 +100,6 @@ class EventDetailView(DetailView):
 
         evento.visualizzazioni += 1
         evento.save()
-        print(evento.visualizzazioni)
 
         if self.request.user.is_authenticated:
             try:
@@ -219,7 +218,8 @@ class UpdateEventView(OrganizerOrSuperuserRequiredMixin, UpdateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['entity'] = 'Evento'+self.object.nome
+        context['entity'] = 'Evento'
+        context['name'] = self.object.nome
         return context
     
 class UpdateTicketView(OrganizerOrSuperuserRequiredMixin, UpdateView):
@@ -247,6 +247,7 @@ class UpdateTicketView(OrganizerOrSuperuserRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['entity'] = 'Biglietto'
+        context['name'] = self.object.tipologia
         return context
     
 class DeleteEventView(OrganizerOrSuperuserRequiredMixin, DeleteView):

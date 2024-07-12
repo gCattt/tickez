@@ -1,0 +1,20 @@
+{% extends "users/base_users.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Admin Area | Tickez{% endblock %}
+
+{% block content %}
+{% if user.is_superuser %}
+    <div class="container">
+        <h1 class="mb-5">Admin Area</h1>
+
+        <div class="d-flex justify-content-center mb-5">
+            <a href="{% url 'admin:index' %}" class="btn btn-success">Accedi al Portale di Amministrazione</a>
+        </div>
+        <div class="d-flex justify-content-center mb-3">
+            <a href="{% url 'register-organizer' %}" class="btn btn-dark">Registra Organizzatore</a>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

@@ -8,6 +8,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     re_path(r"^$|^\/$", views.users, name=app_name),
 
+    path('admin-profile/', views.AdminProfileView.as_view(), name="admin-profile"),
     path('profile/', views.ProfileView.as_view(), name="profile"),
 
     path('artists/', views.ArtistsListView.as_view(), name="artists"),

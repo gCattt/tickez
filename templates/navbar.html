@@ -54,7 +54,7 @@
                 </ul>
             </div>
 
-            <a href="{% url 'users:profile' %}" class="btn btn-dark me-2">
+            <a href={% if user.is_superuser%}"{% url 'users:admin-profile' %}"{% else %}"{% url 'users:profile' %}"{% endif %} class="btn btn-dark me-2">
                 <span style="margin-right: 5px;">{{ user }}</span>
                 <i class="fas fa-user-circle fa-lg"></i>
             </a>
