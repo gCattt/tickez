@@ -2,10 +2,31 @@ body {
   font-family: 'Helvetica', 'Arial', sans-serif;
 }
 
-.card:hover {
-  background-color: #f3f3f3;
+/* paginator */
+.page-link{
+  background-color: #ffffff;
+  color: #000000;
+  border-color:#e7e7e7;
+}
+.page-item .page-link:hover{
+  background-color:#f3f3f3;
+  border-color:#e7e7e7;
+}
+.page-item.active .page-link{
+  background-color: #000000;
+  color: #ffffff;
+  border-color:#e7e7e7;
 }
 
+/* navigation tabs */
+.nav-link {
+  color: #7b7b7b;
+}
+.nav-link:hover {
+  color: #000000;
+}
+
+/* horizontal scroll container */
 .scroll-container {
   overflow-x: auto;
   white-space: nowrap;
@@ -30,6 +51,7 @@ body {
   margin-right: 20px;
 }
 
+/* footer */
 .site-footer
 {
   background-color:#ffffff;

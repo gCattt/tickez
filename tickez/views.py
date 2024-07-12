@@ -119,7 +119,7 @@ class OrganizerCreateView(PermissionRequiredMixin, CreateView):
     success_url = reverse_lazy("homepage")
 
     def form_valid(self, form):
-        #user = form.save()
+        user = form.save()
         login(self.request, self.request.user)
         messages.success(self.request, "Account Organizzatore creato con successo!")
         return redirect(self.success_url)

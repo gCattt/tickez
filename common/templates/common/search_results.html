@@ -1,82 +1,198 @@
 {% extends "common/base_common.html" %}
 {% load static %}
 {% load crispy_forms_tags %}
+{% load tz %}
 
 {% block title %}Ricerca | Tickez{% endblock %}
 
 {% block content %}
-    <div class="container">
-        <ul class="nav nav-tabs" id="myTab" role="tablist">
-          <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="events-tab" data-bs-toggle="tab" data-bs-target="#events" type="button" role="tab" aria-controls="events" aria-selected="true">Eventi</button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" id="venues-tab" data-bs-toggle="tab" data-bs-target="#venues" type="button" role="tab" aria-controls="venues" aria-selected="false">Luoghi</button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" id="artists-tab" data-bs-toggle="tab" data-bs-target="#artists" type="button" role="tab" aria-controls="artists" aria-selected="false">Artisti</button>
-          </li>
-        </ul>
+<div class="container">
+    <h1 class="mb-5">Ricerca: <span style="font-size: 0.7em;">"{{request.GET.keywords}}"</span>
+        <a href="{% url 'homepage' %}" class="text-decoration-none text-dark ms-2"><i class="fas fa-times" style="font-size: 0.7em;"></i></a>
+    </h1>
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="events-tab" data-bs-toggle="tab" data-bs-target="#events" type="button" role="tab" aria-controls="events" aria-selected="true">Eventi</button>
+        </li>
+        <li class="nav-item" role="presentation">
+        <button class="nav-link" id="artists-tab" data-bs-toggle="tab" data-bs-target="#artists" type="button" role="tab" aria-controls="artists" aria-selected="false">Artisti</button>
+        </li>
+        <li class="nav-item" role="presentation">
+        <button class="nav-link" id="venues-tab" data-bs-toggle="tab" data-bs-target="#venues" type="button" role="tab" aria-controls="venues" aria-selected="false">Luoghi</button>
+        </li>
+    </ul>
 
-        <div class="tab-content">
-            <div class="tab-pane fade show active" id="events" role="tabpanel" aria-labelledby="events-tab">
-                <p>{{events.count}} risultati {% if keywords %} per "{{keywords}}" &nbsp;
-                    
-                    <a href="{% url 'common:search-results' %}" class="text-decoration-none text-dark"><strong>X</strong></a>
-                    {% endif %}
-                </p>
-                
-                {% if events %}
-                <ul>
-                    {% for e in events %}
-                        <a href="{{ e.get_absolute_url }}" style="text-decoration: none; color: inherit;">
-                            <li>{{ e.nome }}</li>
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="events" role="tabpanel" aria-labelledby="events-tab">
+            <h5 class="mt-3 mb-3">Risultati: {{total_events}}</h5>
+            {% if events %}
+            {% for e in events %}
+            <div class="card mb-3">
+                <div class="row g-0">
+                    <div class="col-4" style="max-width: 256px;">
+                        <img src="{{ e.locandina_url }}" class="img-fluid rounded-start" alt="{{ e.nome }}" style="width: 256px; height:166px;">
+                    </div>
+                    <div class="col-7">
+                        <div class="card-body">
+                            <h5 class="card-title mt-1 mb-2" style="font-weight:600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ e.nome }}</h5>
+                            <p></p>
+                            <p class="card-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ e.luogo.nome }}<br>{{e.luogo.indirizzo}}, {{e.luogo.citta}}</p>
+                            <p class="card-text">{{e.data_ora|date:"d/m/Y, l"|slice:":15"}} {{e.data_ora|time:"H:i"}}</p>
+                        </div>
+                    </div>
+                    <div class="card-body col-1 d-flex align-items-center justify-content-end">
+                            <a href="{{ e.get_absolute_url }}" class="btn btn-dark">Biglietti <i class="fa fa-angle-double-right" aria-hidden="true"></i></a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            <!-- paginazione -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination pagination-sm justify-content-center">
+                    <li class="page-item">
+                    {% if events.has_previous %}
+                        <a class="page-link" href="?keywords={{ request.GET.keywords }}&page_events={{ events.previous_page_number }}"aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
                         </a>
-                    {% endfor %}
-                </ul>
-                {% else %}
-                    <p>Prova un'altra scheda sopra o digita un testo di ricerca diverso</p>
-                {% endif %}
-            </div>
-        
-            <div class="tab-pane fade" id="venues" role="tabpanel" aria-labelledby="venues-tab">
-                <p>{{venues.count}} risultati {% if keywords %} per "{{keywords}}" &nbsp;
-                    
-                    <a href="{% url 'common:search-results' %}" class="text-decoration-none text-dark"><strong>X</strong></a>
                     {% endif %}
-                </p>
-                {% if venues %}
-                <ul>
-                    {% for v in venues %}
-                    <a href="{{ v.get_absolute_url }}" style="text-decoration: none; color: inherit;">
-                        <li>{{ v.nome }}</li>
-                    </a>
+                    </li>
+    
+                    <!-- link di paginazione per pagina corrente e adiacenti -->
+                    {% for num in events.paginator.page_range %}
+                        {% if events.number == num %}
+                            <li class="page-item active" aria-current="page">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > events.number|add:'-2' and num < events.number|add:'2' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?keywords={{ request.GET.keywords }}&page_events={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
                     {% endfor %}
+    
+                    <li class="page-item">
+                    {% if events.has_next %}
+                        <a class="page-link" href="?keywords={{ request.GET.keywords }}&page_events={{ events.next_page_number }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    {% endif %}
+                    </li>
                 </ul>
-                {% else %}
-                    <p>Prova un'altra scheda sopra o digita un testo di ricerca diverso</p>
-                {% endif %}
+            </nav>
+            {% else %}
+                <p>Cambia scheda o digita un testo di ricerca diverso.</p>
+            {% endif %}
+        </div>
+    
+        <div class="tab-pane fade" id="artists" role="tabpanel" aria-labelledby="artist-tab">
+            <h5 class="mt-3 mb-3">Risultati: {{total_artists}}</h5>
+            {% if artists %}
+            <div class="row row-cols-1 row-cols-4 g-3">
+            {% for a in artists %}
+                <div class="col">
+                    <div class="card" style="height:275px;">
+                        <img src="{{ a.immagine_profilo_url }}" class="card-img-top h-100" alt="{{ a.nome }}" style="max-height:225px; object-fit: cover; object-position: center;">
+                        <div class="card-body d-flex flex-column">
+                            <p class="card-title" style="font-weight:600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ a.nome }}</p>
+                            <p></p>
+                            <a href="{{ a.get_absolute_url }}" class="btn btn-dark btn-sm mt-auto">Dettagli</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
             </div>
+            <!-- paginazione -->
+            <nav class="mt-3" aria-label="Page navigation">
+                <ul class="pagination pagination-sm justify-content-center">
+                    <li class="page-item">
+                    {% if artists.has_previous %}
+                        <a class="page-link" href="?keywords={{ request.GET.keywords }}&page_artists={{ artists.previous_page_number }}"aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    {% endif %}
+                    </li>
+    
+                    <!-- link di paginazione per pagina corrente e adiacenti -->
+                    {% for num in artists.paginator.page_range %}
+                        {% if artists.number == num %}
+                            <li class="page-item active" aria-current="page">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > artists.number|add:'-2' and num < artists.number|add:'2' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?keywords={{ request.GET.keywords }}&page_artists={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+    
+                    <li class="page-item">
+                    {% if artists.has_next %}
+                        <a class="page-link" href="?keywords={{ request.GET.keywords }}&page_artists={{ artists.next_page_number }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    {% endif %}
+                    </li>
+                </ul>
+            </nav>
+            {% else %}
+                <p>Cambia scheda o digita un testo di ricerca diverso.</p>
+            {% endif %}
+        </div>
 
-            <div class="tab-pane fade" id="artists" role="tabpanel" aria-labelledby="artist-tab">
-                <p>{{artists.count}} risultati {% if keywords %} per "{{keywords}}" &nbsp;
-                    
-                    <a href="{% url 'common:search-results' %}" class="text-decoration-none text-dark"><strong>X</strong></a>
-                    {% endif %}
-                </p>
-                {% if artists %}
-                <ul>
-                    {% for a in artists %}
-                    <a href="{{ a.get_absolute_url }}" style="text-decoration: none; color: inherit;">
-                        <li>{{ a.nome }}</li>
-                    </a>
-                    {% endfor %}
-                </ul>
-                {% else %}
-                    <p>Prova un'altra scheda sopra o digita un testo di ricerca diverso</p>
-                {% endif %}
+        <div class="tab-pane fade" id="venues" role="tabpanel" aria-labelledby="venues-tab">
+            <h5 class="mt-3 mb-3">Risultati: {{total_venues}}</h5>
+            {% if venues %}
+            <div class="row row-cols-1 row-cols-4 g-3">
+            {% for v in venues %}
+            <div class="col">
+                <div class="card" style="height:275px;">
+                    <img src="{{ v.immagine_url }}" class="card-img-top h-100" alt="{{ v.nome }}" style="max-height:225px; object-fit: cover; object-position: center;">
+                    <div class="card-body d-flex flex-column">
+                        <p class="card-title" style="font-weight:600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ v.nome }}</p>
+                        <p></p>
+                        <a href="{{ v.get_absolute_url }}" class="btn btn-dark btn-sm mt-auto">Dettagli</a>
+                    </div>
+                </div>
             </div>
-            
+            {% endfor %}
+            </div>
+            <!-- paginazione -->
+            <nav class="mt-3" aria-label="Page navigation">
+                <ul class="pagination pagination-sm justify-content-center">
+                    <li class="page-item">
+                    {% if venues.has_previous %}
+                        <a class="page-link" href="?keywords={{ request.GET.keywords }}&page_venues={{ venues.previous_page_number }}"aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    {% endif %}
+                    </li>
+    
+                    <!-- link di paginazione per pagina corrente e adiacenti -->
+                    {% for num in venues.paginator.page_range %}
+                        {% if venues.number == num %}
+                            <li class="page-item active" aria-current="page">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > venues.number|add:'-2' and num < venues.number|add:'2' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?keywords={{ request.GET.keywords }}&page_venues={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+    
+                    <li class="page-item">
+                    {% if venues.has_next %}
+                        <a class="page-link" href="?keywords={{ request.GET.keywords }}&page_venues={{ venues.next_page_number }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    {% endif %}
+                    </li>
+                </ul>
+            </nav>
+            {% else %}
+                <p>Cambia scheda o digita un testo di ricerca diverso.</p>
+            {% endif %}
         </div>
     </div>
+</div>
 {% endblock %}

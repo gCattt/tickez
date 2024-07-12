@@ -8,7 +8,7 @@
             </a>
 
             <div class="dropdown d-inline ms-4" style="margin-bottom: 7px;">
-                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <a style="color: black;" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     Eventi
                 </a>
                 <ul class="dropdown-menu" style="min-width: max-content;">
@@ -22,7 +22,7 @@
         </div>
 
         <div>
-            <form class="d-flex w-100 ms-3 me-3" method="GET" action="{% url 'common:search-results' %}">
+            <form id="searchFormNavbar" class="d-flex w-100 ms-3 me-3" method="GET" action="{% url 'common:search-results' %}">
                 <input class="form-control me-2" type="search" name="keywords" placeholder="Evento, Artista o Luogo" aria-label="Search" style="width: 320px;">
                 <button class="btn btn-dark" type="submit"><i class="fas fa-search"></i></button>
             </form>
@@ -76,4 +76,14 @@
             {% endif %}
         </div>
     </div>
+
+    <!-- previene l'invio del form se il campo keywords è vuoto -->
+    <script>
+        document.getElementById("searchFormNavbar").addEventListener("submit", function(event) {
+            var keywords = document.querySelector("#searchFormNavbar input[name='keywords']").value.trim();
+            if (keywords === "") {
+                event.preventDefault();
+            }
+        });
+    </script>
 </nav>

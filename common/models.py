@@ -14,10 +14,8 @@ class Luogo(models.Model):
     nome = models.CharField(max_length=50, null=False, blank=False)
     slug = models.SlugField(max_length=200, null=False, unique=True, blank=True)
     indirizzo = models.CharField(max_length=255)
-    capienza_persone = models.PositiveIntegerField()
     citta = models.CharField(max_length=100)
-    stato = models.CharField(max_length=100)
-    codice_postale = models.CharField(max_length=30)
+    capienza_persone = models.PositiveIntegerField()
     immagine = models.ImageField(blank=True, upload_to="images/venues", default=join('static', 'images', 'defaults', 'default_venue.jpg'))
 
     followers = models.ManyToManyField(to='users.Utente', blank=True, default=None, related_name='luoghi_preferiti')
