@@ -8,7 +8,7 @@
 {% block content %}
 <div class="container">
     <h1 class="mb-5">Ricerca: <span style="font-size: 0.7em;">"{{request.GET.keywords}}"</span>
-        <a href="{% url 'homepage' %}" class="text-decoration-none text-dark ms-2"><i class="fas fa-times" style="font-size: 0.7em;"></i></a>
+        <a href="{% url 'homepage' %}" class="text-decoration-none text-dark ms-2"><i class="fas fa-times" style="font-size: 1.7rem;"></i></a>
     </h1>
     <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item" role="presentation">
@@ -36,7 +36,7 @@
                         <div class="card-body">
                             <h5 class="card-title mt-1 mb-2" style="font-weight:600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ e.nome }}</h5>
                             <p></p>
-                            <p class="card-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ e.luogo.nome }}<br>{{e.luogo.indirizzo}}, {{e.luogo.citta}}</p>
+                            <p class="card-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{e.organizzatore}}<br>{{ e.luogo}}</p>
                             <p class="card-text">{{e.data_ora|date:"d/m/Y, l"|slice:":15"}} {{e.data_ora|time:"H:i"}}</p>
                         </div>
                     </div>

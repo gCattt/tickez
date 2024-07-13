@@ -145,3 +145,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = "/login/?auth=notok" # in caso di tentato accesso ad una view protetta, senza i permessi adatti, reindirizza al login
 LOGIN_REDIRECT_URL = "/?login=ok"  # in caso di login corretto reindirizza alla home
 LOGOUT_REDIRECT_URL = "/?logout=ok"  # in caso di logout corretto reindirizza alla home
+
+# Django-filter settings
+FILTERS_EMPTY_CHOICE_LABEL = None

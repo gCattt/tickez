@@ -12,8 +12,8 @@
         <img src="{{ object.immagine_url }}" style="width: 100%; height: 100%; object-fit: cover;">
     </div>
 
-    <div>
-        <h1 class="mb-3"><strong>{{ object.nome }}</strong></h1>
+    <div style="flex-grow: 1; max-width: calc(100% - 220px);">
+        <h1 class="mb-3" style="font-weight:600; word-break: break-word;">{{ object.nome }}</h1>
 
         <p><strong>Informazioni:</strong><br>- {{object.indirizzo}}, {{object.citta}}<br>- Capienza: {{object.capienza_persone}} persone</p>
 

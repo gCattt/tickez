@@ -1,77 +1,125 @@
 {% extends "products/base_products.html" %}
 {% load static %}
 {% load crispy_forms_tags %}
+{% load tz %}
 
 {% block title %}Eventi | Tickez{% endblock %}
 
 {% block content %}
-    <div class="container">
-        <form method="GET">
-            <select name="sort" id="sort" onchange="this.form.submit()">
-                <option value="data_ora" {% if current_sort == 'data_ora' %} selected {% endif %}>Ordina per data</option>
-                <option value="nome" {% if current_sort == 'nome' %} selected {% endif %}>Ordina per nome</option>
-            </select>
+<div class="container">
+    <h1>Eventi</h1>
+    <h5 class="mt-3 mb-5">Risultati: {{view.get_queryset.count}}</h5>
 
-            <select name="city" id="city" onchange="this.form.submit()">
-                <option value="" selected disabled hidden>Città</option>
-                {% for c in cities %}
-                    <option value={{ c }} {% if current_city == c %} selected {% endif %}>{{ c }}</option>
-                {% endfor %}
-            </select>
-            {% if request.GET.city %}
-                <a href="?{% for key, value in request.GET.items %}{% if key != 'city' %}{{ key }}={{ value }}{% if not forloop.last %}&{% endif %}{% endif %}{% endfor %}">Rimuovi filtro città</a>
-            {% endif %}
+    <form id="filterForm"  method="GET" class="mb-5">
+        <div class="row">
+            <div class="col-md-10 d-flex justify-content-start">
+                <div class="form-group me-3">
+                    {{ filter.form.category }}
+                    {% if request.GET.category %}
+                    <a  class="text-decoration-none text-dark ms-2" 
+                        href="?{% for key, value in request.GET.items %}{% if key != 'category' %}{{ key }}={{ value }}{% if not forloop.last %}&{% endif %}{% endif %}{% endfor %}">
+                        <i class="fas fa-times" style="font-size: 0.8rem;"></i>
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="form-group me-3">
+                    {{ filter.form.city }}
+                    {% if request.GET.city %}
+                    <a  class="text-decoration-none text-dark ms-2" 
+                        href="?{% for key, value in request.GET.items %}{% if key != 'city' %}{{ key }}={{ value }}{% if not forloop.last %}&{% endif %}{% endif %}{% endfor %}">
+                        <i class="fas fa-times" style="font-size: 0.8rem;"></i>
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="form-group me-3">
+                    {{ filter.form.from_date.label_tag }}
+                    {{ filter.form.from_date }}
+                </div>
+                <div class="form-group">
+                    {{ filter.form.until_date.label_tag }}
+                    {{ filter.form.until_date }}
+                    {% if request.GET.from_date or request.GET.until_date %}
+                    <a  class="text-decoration-none text-dark ms-2" 
+                        href="?{% for key, value in request.GET.items %}{% if key != 'from_date' and key != 'until_date' %}{{ key }}={{ value }}{% if not forloop.last %}&{% endif %}{% endif %}{% endfor %}">
+                        <i class="fas fa-times" style="font-size: 0.8rem;"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-md-2 d-flex justify-content-end">
+                <div class="form-group">
+                    {{ filter.form.sort }}
+                </div>
+            </div>
+        </div>
+    </form>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('filterForm');
+    
+            form.addEventListener('change', function () {
+                form.submit();
+            });
+        });
+    </script>
 
-            <select name="category" id="category" onchange="this.form.submit()">
-                <option value="" selected disabled hidden>Categoria</option>
-                {% for c in categories %}
-                    <option value={{ c }} {% if current_category == c %} selected {% endif %}>{{ c }}</option>
-                {% endfor %}
-            </select>
-            {% if request.GET.category %}
-                <a href="?{% for key, value in request.GET.items %}{% if key != 'category' %}{{ key }}={{ value }}{% if not forloop.last %}&{% endif %}{% endif %}{% endfor %}">Rimuovi filtro categoria</a>
-            {% endif %}
-            
-            <div>
-                <input type="text" placeholder="Da" {% if request.GET.from_date %} value="{{ request.GET.from_date }}" {% endif %} id="from_date" name="from_date" class="datepicker" readonly onchange="this.form.submit()">
-            </div>
-            <div>
-                <input type="text" placeholder="A" {% if request.GET.until_date %} value="{{ request.GET.until_date }}" {% endif %} id="until_date" name="until_date" class="datepicker" readonly onchange="this.form.submit()">
-            </div>
-            {% if request.GET.from_date or request.GET.until_date %}
-                <a href="?{% for key, value in request.GET.items %}{% if key != 'from_date' and key != 'until_date' %}{{ key }}={{ value }}{% if not forloop.last %}&{% endif %}{% endif %}{% endfor %}">Rimuovi filtro data</a>
-            {% endif %}
-        </form>
-        
-        <p>{{view.get_queryset.count}} risultati</p>
+    {% if page_obj %}
         {% for e in page_obj %}
-            <a href="{{ e.get_absolute_url }}" style="text-decoration: none; color: inherit;">
-                <p>{{e.nome}}, {{e.categoria}}, {{e.data_ora}}, {{e.luogo.citta}}</p>
-            </a>
+        <div class="card mb-3">
+            <div class="row g-0">
+                <div class="col-4" style="max-width: 256px;">
+                    <img src="{{ e.locandina_url }}" class="img-fluid rounded-start" alt="{{ e.nome }}" style="width: 256px; height:166px;">
+                </div>
+                <div class="col-7">
+                    <div class="card-body">
+                        <h5 class="card-title mt-1 mb-2" style="font-weight:600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ e.nome }}</h5>
+                        <p></p>
+                        <p class="card-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{e.organizzatore}}<br>{{ e.luogo}}</p>
+                        <p class="card-text">{{e.data_ora|date:"d/m/Y, l"|slice:":15"}} {{e.data_ora|time:"H:i"}}</p>
+                    </div>
+                </div>
+                <div class="card-body col-1 d-flex align-items-center justify-content-end">
+                        <a href="{{ e.get_absolute_url }}" class="btn btn-dark">Biglietti <i class="fa fa-angle-double-right" aria-hidden="true"></i></a>
+                </div>
+            </div>
+        </div>
         {% endfor %}
-        <nav aria-label="Page navigation">
-            <ul class="pagination pagination-sm justify-content-center">
-              <li class="page-item">
-                {% if page_obj.has_previous %}
-                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                {% endif %}
-              </li>
+    {% else %}
+        <p>Nessun evento disponibile.</p>
+    {% endif %}
 
-              {% for p in paginator.page_range %}
-                <li class="page-item {% if request.GET.page|stringformat:"s" == p|stringformat:"s" %} active {% endif %}">
-                    <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ p }}">{{ p }}</a></li>
-              {% endfor %}
-
-              <li class="page-item">
-                {% if page_obj.has_next %}
-                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
+    <!-- paginazione -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination pagination-sm justify-content-center">
+            <li class="page-item">
+            {% if page_obj.has_previous %}
+                <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            {% endif %}
+            </li>
+            
+            <!-- link di paginazione per pagina corrente e adiacenti -->
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active" aria-current="page">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                {% elif num > page_obj.number|add:'-2' and num < page_obj.number|add:'2' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{key}}={{value}}&{% endif %}{% endfor %}page={{ num }}">{{ num }}</a>
+                    </li>
                 {% endif %}
-              </li>
-            </ul>
-        </nav>
-    </div>
+            {% endfor %}
+
+            <li class="page-item">
+            {% if page_obj.has_next %}
+                <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            {% endif %}
+            </li>
+        </ul>
+    </nav>
+</div>
 {% endblock %}

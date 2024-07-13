@@ -23,7 +23,7 @@ class Luogo(models.Model):
     
 
     def __str__(self):
-        return f"{self.nome} - {self.indirizzo} ({self.citta})"
+        return f"{self.nome} - {self.indirizzo}, {self.citta}"
     
     # django tratta il valore di default di un ImageField come un file media, cercandolo nella directory MEDIA_ROOT
     @property # trasforma un metodo di una classe in un attributo di sola lettura

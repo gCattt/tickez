@@ -1,106 +1,98 @@
 {% extends "products/base_products.html" %}
 {% load static %}
 {% load crispy_forms_tags %}
+{% load tz %}
 
 {% block title %}{{title}} | Tickez{% endblock %}
 
 {% block content %}
-    <div class="container">
-        <p>{{object.nome}}</p>
-        <p>{{object.luogo.nome}}</p>
-        <p>{{object.data_ora}}</p>
-
-        <form method="POST" action="{% url 'toggle-follow' entity_type='evento' entity_pk=object.id %}"> {% csrf_token %}
-          <input type="hidden" name="action" value="{% if request.user.utente in object.followers.all %}unfollow{% else %}follow{% endif %}">
-          <button type="submit" class="btn {% if request.user.utente in object.followers.all %}btn-secondary{% else %}btn-dark{% endif %}">
-            {% if request.user.utente in object.followers.all %}
-              <i class="fas fa-heart me-1"></i> Seguito
-            {% else %}
-              <i class="far fa-heart me-1"></i> Segui
-            {% endif %}
-          </button>
-        </form>
-
-        <hr>
-
-        <ul class="nav nav-tabs" id="myTab" role="tablist">
-          <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="tickets-tab" data-bs-toggle="tab" data-bs-target="#tickets" type="button" role="tab" aria-controls="tickets" aria-selected="true">Biglietti</button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab" aria-controls="description" aria-selected="true">Descrizione</button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" id="location-tab" data-bs-toggle="tab" data-bs-target="#location" type="button" role="tab" aria-controls="location" aria-selected="false">Info Location</button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" id="artist-tab" data-bs-toggle="tab" data-bs-target="#artist" type="button" role="tab" aria-controls="artist" aria-selected="false">Artista</button>
-          </li>
-        </ul>
-
-        <div class="tab-content">
-          <div class="tab-pane active" id="tickets" role="tabpanel" aria-labelledby="tickets-tab">
-            {% if tickets %}
-              <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
-                <symbol id="info-fill" fill="currentColor" viewBox="0 0 16 16">
-                  <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
-                </symbol>
-              </svg>
-              <div class="alert alert-warning d-flex align-items-center mt-3" role="alert" style="padding: 0.25rem 0.5rem; font-size: 0.8rem; border-radius: 0.25rem;">
-                <svg class="bi flex-shrink-0 me-2" width="16" height="16" role="img" aria-label="Warning:"><use xlink:href="#info-fill"/></svg>
-                <div style="display: flex; flex-direction: column; justify-content: center;">
-                  <p style="margin: 0;"><u>Il numero massimo di biglietti acquistabili è 5</u>. La disponibilità dei posti è limitata.</p>
-                  <p style="margin: 0;">Per questo evento sarà consentito eseguire la procedura di <u>cambio nominativo fino al {{ name_change|date:"d/m/Y" }}</u></p>
-                </div>
-              </div>
-            {% endif %}
-            <form method="POST" action="{% url 'orders:checkout' %}"> {% csrf_token %}
-              {% for t in tickets %}
-                <div class="ticket-row d-flex justify-content-between align-items-center mb-3">
-                    <div class="col-md-8">
-                        <strong class="{% if t.quantita == 0 %}text-muted{% endif %}">{{ t.tipologia }}</strong>
-                        <p class="{% if t.quantita == 0 %}text-muted{% endif %}" style="overflow-wrap: break-word;">{{ t.descrizione }}</p>
-                    </div>
-                    <div class="col-md-4 d-flex justify-content-end">
-                        {% if t.quantita == 0 %}
-                            <div class="text-muted">
-                                <span>Non disponibile</span>
-                            </div>
-                        {% else %}
-                            <div class="d-flex align-items-center">
-                                <span class="me-3">{{ t.prezzo }} €</span>
-                                <select class="form-select" name="quantita_{{ t.id }}" style="width: auto;">
-                                    {% for i in range_dropdown %}
-                                        <option value="{{ i }}">{{ i }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-              {% empty %}
-                <p class="mt-3 text-muted">Nessun biglietto disponibile.</p>
-              {% endfor %}
-              {% if tickets %}
-                <div class="d-flex justify-content-center">
-                  <button type="submit" class="btn btn-dark">Compra</button>
-                </div>
+<div class="container">
+    <div class="d-flex flex-wrap align-items-center mb-5">
+      <div class="me-3" style="width: 200px; height: 200px; flex-shrink: 0;">
+          <img src="{{ object.locandina_url }}" style="width: 100%; height: 100%; object-fit: cover;">
+      </div>
+  
+      <div style="flex-grow: 1; max-width: calc(100% - 220px);">
+          <h1 style="font-weight:600; word-break: break-word;">{{ object.nome }}</h1>
+          <p><a href="{% url 'users:artist-details' object.organizzatore.slug object.organizzatore.pk %}" style="text-decoration: underline; color: black;">{{object.organizzatore}}</a><br>
+              <a href="{% url 'common:venue-details' object.luogo.slug object.luogo.pk %}" style="text-decoration: underline; color: black;">{{object.luogo}}</a></p>
+          <p>{{object.data_ora}}</p>
+          
+          <form method="POST" action="{% url 'toggle-follow' entity_type='evento' entity_pk=object.id %}"> {% csrf_token %}
+            <input type="hidden" name="action" value="{% if request.user.utente in object.followers.all %}unfollow{% else %}follow{% endif %}">
+            {% if request.user.utente %}
+            <button type="submit" class="btn {% if request.user.utente in object.followers.all %}btn-secondary{% else %}btn-dark{% endif %}">
+              {% if request.user.utente in object.followers.all %}
+                <i class="fas fa-heart me-1"></i> Seguito
+              {% else %}
+                <i class="far fa-heart me-1"></i> Segui
               {% endif %}
-            </form>
-          </div>
-          <div class="tab-pane mt-3" id="description" role="tabpanel" aria-labelledby="description-tab">
-            {{object.descrizione}}
-          </div>
-          <div class="tab-pane mt-3" id="location" role="tabpanel" aria-labelledby="location-tab">
-            <a href="{{ object.luogo.get_absolute_url }}" style="text-decoration: none; color: inherit;">
-              {{object.luogo.nome}}, {{object.luogo.indirizzo}}
-            </a>
-          </div>
-          <div class="tab-pane mt-3" id="artist" role="tabpanel" aria-labelledby="artist-tab">
-            <a href="{{ object.organizzatore.get_absolute_url }}" style="text-decoration: none; color: inherit;">
-              {{object.organizzatore.nome}}
-            </a>
-          </div>
-        </div>
+            </button>
+            {% endif %}
+          </form>
+      </div>
     </div>
+
+
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="tickets-tab" data-bs-toggle="tab" data-bs-target="#tickets" type="button" role="tab" aria-controls="tickets" aria-selected="true">Biglietti</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab" aria-controls="description" aria-selected="true">Descrizione</button>
+      </li>
+    </ul>
+
+    <div class="tab-content">
+      <div class="tab-pane active" id="tickets" role="tabpanel" aria-labelledby="tickets-tab">
+        {% if tickets %}
+          <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+            <symbol id="info-fill" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+            </symbol>
+          </svg>
+          <div class="alert alert-warning d-flex align-items-center mt-3" role="alert" style="padding: 0.25rem 0.5rem; font-size: 0.8rem; border-radius: 0.25rem;">
+            <svg class="bi flex-shrink-0 me-2" width="16" height="16" role="img" aria-label="Warning:"><use xlink:href="#info-fill"/></svg>
+            <p style="margin: 0; flex-grow: 1;">Per questo evento sarà consentito eseguire la procedura di <u>cambio nominativo fino al {{ name_change|date:"d/m/Y" }}</u></p>
+          </div>
+        {% endif %}
+        <form method="POST" action="{% url 'orders:checkout' %}"> {% csrf_token %}
+          {% for t in tickets %}
+            <div class="ticket-row d-flex justify-content-between align-items-center mb-3">
+                <div class="col-md-8">
+                    <strong class="{% if t.quantita == 0 %}text-muted{% endif %}">{{ t.tipologia }}</strong>
+                    <p class="{% if t.quantita == 0 %}text-muted{% endif %}" style="overflow-wrap: break-word;">{{ t.descrizione }}</p>
+                </div>
+                <div class="col-md-4 d-flex justify-content-end">
+                    {% if t.quantita == 0 %}
+                        <div class="text-muted">
+                            <span>Non disponibile</span>
+                        </div>
+                    {% else %}
+                        <div class="d-flex align-items-center">
+                            <span class="me-3">{{ t.prezzo }} €</span>
+                            <select class="form-select" name="quantita_{{ t.id }}" style="width: auto;">
+                                {% for i in range_dropdown %}
+                                    <option value="{{ i }}">{{ i }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+          {% empty %}
+            <p class="mt-3 text-muted">Nessun biglietto disponibile.</p>
+          {% endfor %}
+          {% if tickets %}
+            <div class="d-flex justify-content-center">
+              <button type="submit" class="btn btn-dark">Compra</button>
+            </div>
+          {% endif %}
+        </form>
+      </div>
+      <div class="tab-pane mt-3" id="description" role="tabpanel" aria-labelledby="description-tab">
+        {{object.descrizione}}
+      </div>
+    </div>
+</div>
 {% endblock %}

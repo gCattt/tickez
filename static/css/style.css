@@ -9,6 +9,7 @@ body {
   border-color:#e7e7e7;
 }
 .page-item .page-link:hover{
+  color: black;
   background-color:#f3f3f3;
   border-color:#e7e7e7;
 }

@@ -1,25 +1,76 @@
 {% extends "products/base_products.html" %}
 {% load static %}
 {% load crispy_forms_tags %}
+{% load tz %}
 
 {% block title %}Statistiche {{evento}} | Tickez{% endblock %}
 
 {% block content %}
 <div class="container">
-    <h1>Statistiche: "{{evento.organizzatore}} - {{ evento.nome }}"</h2>
+    <h1 class="mb-5">Statistiche</h1>
 
-    <p>Visualizzazioni evento: {{ visualizzazioni_evento }}</p>
-    <p>Numero di biglietti venduti: {{ biglietti_venduti }}</p>
-    <p>Revenue totale: {{ revenue_totale }}</p>
+    <h2 class="mb-4" style="font-weight:600; word-break: break-word;">
+        <a href="{% url 'products:event-details' evento.slug evento.pk %}" style="text-decoration: underline; color: black;">
+            {{ evento.nome }}
+        </a>
+    </h2> 
+
+    <div class="row flex-wrap justify-content-between">
+        <div class="col-4">
+            <div class="card border border-dark">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Visualizzazioni evento</h5>
+                    <p class="card-text fw-bold">{{ visualizzazioni_evento }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="card border border-dark">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Numero di biglietti venduti</h5>
+                    <p class="card-text fw-bold">{{ biglietti_venduti }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="card border border-dark">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Ricavi</h5>
+                    <p class="card-text fw-bold">{{ revenue_totale }} €</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     {% if biglietti_venduti > 0 %}
-        <canvas id="grafico_eta" width="100" height="20"></canvas>
-        <canvas id="grafico_nazionalita" width="100" height="30"></canvas>
-        <canvas id="grafico_sesso" width="100" height="30"></canvas>
-        <canvas id="tipologia_biglietti_venduti" width="100" height="50"></canvas>
-        <canvas id="vendite_giornaliere" width="800" height="400"></canvas>
+    <h5 class="mt-5 mb-3 fw-bold">Dettagli partecipanti:</h5>
+    <div class="row">
+        <div class="col-6 d-flex align-items-center justify-content-center">
+            <canvas id="grafico_eta"></canvas>
+        </div>
+        
+        <div class="col-3 d-flex align-items-center justify-content-center">
+            <canvas id="grafico_nazionalita"></canvas>
+        </div>
+        
+        <div class="col-3 d-flex align-items-center justify-content-center">
+            <canvas id="grafico_sesso"></canvas>
+        </div>
+    </div>
+
+
+    <h5 class="mt-5 mb-3 fw-bold">Dettagli biglietti:</h5>
+    <div class="row">
+        <div class="col-md-4 d-flex align-items-center justify-content-center">
+            <canvas id="tipologia_biglietti_venduti" width="100" height="50"></canvas>
+        </div>
+        <div class="col-md-8 d-flex align-items-center justify-content-center">
+            <canvas id="vendite_giornaliere" width="800" height="400"></canvas>
+        </div>
+    </div>
     {% else %}
-        <p>Dati insufficienti per visualizzare i grafici.</p>
+    <h5 class="mt-5 d-flex align-items-center justify-content-center">Dati insufficienti per visualizzare i grafici.</h5>
     {% endif %}
 </div>
 
@@ -247,14 +298,14 @@
                         display: true,
                         title: {
                             display: true,
-                            text: 'Days'
+                            text: 'Giorni'
                         }
                     },
                     y: {
                         display: true,
                         title: {
                             display: true,
-                            text: 'Tickets'
+                            text: 'Biglietti'
                         }
                     }
                 },
