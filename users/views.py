@@ -51,6 +51,13 @@ class CustomerCreateView(CreateView):
     template_name = "users/registration/user_create.html"
     success_url = reverse_lazy("homepage")
 
+    # aggiunge logica eseguita prima di ogni richiesta
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            messages.error(request, "Effettua il logout per poter registrare un nuovo profilo.")
+            return redirect("homepage")
+        return super().dispatch(request, *args, **kwargs)
+
     def form_valid(self, form):
         user = form.save()
         login(self.request, user)
