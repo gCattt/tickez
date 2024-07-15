@@ -18,9 +18,9 @@
               <a href="{% url 'common:venue-details' object.luogo.slug object.luogo.pk %}" style="text-decoration: underline; color: black;">{{object.luogo}}</a></p>
           <p>{{object.data_ora}}</p>
           
+          {% if request.user.utente %}
           <form method="POST" action="{% url 'toggle-follow' entity_type='evento' entity_pk=object.id %}"> {% csrf_token %}
             <input type="hidden" name="action" value="{% if request.user.utente in object.followers.all %}unfollow{% else %}follow{% endif %}">
-            {% if request.user.utente %}
             <button type="submit" class="btn {% if request.user.utente in object.followers.all %}btn-secondary{% else %}btn-dark{% endif %}">
               {% if request.user.utente in object.followers.all %}
                 <i class="fas fa-heart me-1"></i> Seguito
@@ -28,8 +28,12 @@
                 <i class="far fa-heart me-1"></i> Segui
               {% endif %}
             </button>
-            {% endif %}
           </form>
+          {% elif request.user.organizzatore and request.user.organizzatore == object.organizzatore %}
+            <a href="{% url 'products:event-statistics' object.slug object.pk %}" class="btn btn-dark me-2"><i class="fa fa-line-chart" aria-hidden="true"></i></a>
+            <a href="{% url 'products:update-event' object.slug object.pk %}" class="btn btn-dark me-2"><i class="fa-regular fa-pen-to-square" aria-hidden="true"></i></a>
+            <a href="{% url 'products:delete-event' object.slug object.pk %}" class="btn btn-danger me-2"><i class="fa fa-trash" aria-hidden="true"></i></a>
+          {% endif %}
       </div>
     </div>
 
@@ -39,7 +43,7 @@
         <button class="nav-link active" id="tickets-tab" data-bs-toggle="tab" data-bs-target="#tickets" type="button" role="tab" aria-controls="tickets" aria-selected="true">Biglietti</button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab" aria-controls="description" aria-selected="true">Descrizione</button>
+        <button class="nav-link" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab" aria-controls="description" aria-selected="false">Descrizione</button>
       </li>
     </ul>
 
@@ -67,20 +71,19 @@
                     {% if t.quantita == 0 %}
                         <div class="d-flex align-items-center">
                             <span class="text-muted me-3">Non disponibile</span>
-                            {% if is_organizer %}
+                            {% if request.user.organizzatore and request.user.organizzatore == object.organizzatore %}
                               <a href="{% url 'products:update-ticket' object.slug object.pk t.slug t.pk %}" class="btn btn-dark me-2">
                                   <i class="fa-regular fa-pen-to-square" aria-hidden="true"></i>
                               </a>
-                              <form action="{% url 'products:delete-ticket' object.slug object.pk t.slug t.pk %}" method="GET" style="display:inline;">
-                                  {% csrf_token %}
-                                  <button type="submit" class="btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i></button>
-                              </form>
+                              <a href="{% url 'products:delete-ticket' object.slug object.pk t.slug t.pk %}" class="btn btn-danger me-2">
+                                <i class="fa fa-trash" aria-hidden="true"></i>
+                              </a>
                             {% endif %}
                         </div>
                     {% else %}
                         <div class="d-flex align-items-center">
                           <span class="me-3">{{ t.prezzo }} €</span>
-                          {% if is_organizer %}
+                          {% if request.user.organizzatore and request.user.organizzatore == object.organizzatore %}
                               <a href="{% url 'products:update-ticket' object.slug object.pk t.slug t.pk %}" class="btn btn-dark me-2">
                                   <i class="fa-regular fa-pen-to-square" aria-hidden="true"></i>
                               </a>
@@ -88,7 +91,7 @@
                                 <i class="fa fa-trash" aria-hidden="true"></i>
                               </a>
                           {% else %}
-                            {% if not request.user.is_superuser %}
+                            {% if request.user.utente %}
                               <select class="form-select" name="quantita_{{ t.id }}" style="width: auto;">
                                   {% for i in range_dropdown %}
                                       <option value="{{ i }}">{{ i }}</option>
@@ -103,11 +106,11 @@
           {% empty %}
             <p class="mt-3 text-muted">Nessun biglietto disponibile.</p>
           {% endfor %}
-          {% if is_organizer %}
+          {% if request.user.organizzatore and request.user.organizzatore == object.organizzatore  %}
               <div class="d-flex justify-content-center">
                   <a href="{% url 'products:create-ticket' object.slug object.pk %}" class="btn btn-dark">Aggiungi biglietto</a>
               </div>
-          {% else %}
+          {% elif request.user.utente %}
             {% if tickets %}
               <div class="d-flex justify-content-center">
                 {% if not request.user.is_superuser %}

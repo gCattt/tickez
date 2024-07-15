@@ -18,7 +18,7 @@ from django.views.generic import ListView, DetailView, UpdateView, DeleteView
 
 from .forms import *
 
-from .filters import EventoFilter
+from products.filters import EventoFilter
 
 from datetime import datetime, timedelta
 from django.utils import timezone
@@ -70,8 +70,6 @@ class EventDetailView(DetailView):
         context['tickets'] = self.get_object().biglietti_disponibili.all()
         context['range_dropdown'] = range(0, 6)
         context['name_change'] = self.get_object().data_ora - timedelta(days=15)
-
-        context['is_organizer'] = self.request.user.groups.filter(name='Organizzatori').exists()
 
         return context
     

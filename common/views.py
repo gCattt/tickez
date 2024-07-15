@@ -9,6 +9,8 @@ from users.models import Organizzatore
 
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
+from products.filters import EventoFilter
+
 
 def common(request):
     return render(request, template_name="common/base_common.html")
@@ -69,6 +71,9 @@ def search_results(request):
             artists = artists.filter(nome__icontains=term)
             venues = venues.filter(nome__icontains=term)
 
+    evento_filter = EventoFilter(request.GET, queryset=events)
+    events = evento_filter.qs
+
     total_events = events.count()
     total_artists = artists.count()
     total_venues = venues.count()
@@ -78,30 +83,10 @@ def search_results(request):
     artists_paginator = Paginator(artists.order_by('nome'), 8)
     venues_paginator = Paginator(venues.order_by('nome'), 8)
 
-    page_events = request.GET.get('page_events')
-    page_artists = request.GET.get('page_artists')
-    page_venues = request.GET.get('page_venues')
-
-    try:
-        events = events_paginator.page(page_events)
-    except PageNotAnInteger:
-        events = events_paginator.page(1)
-    except EmptyPage:
-        events = events_paginator.page(events_paginator.num_pages)
-
-    try:
-        artists = artists_paginator.page(page_artists)
-    except PageNotAnInteger:
-        artists = artists_paginator.page(1)
-    except EmptyPage:
-        artists = artists_paginator.page(artists_paginator.num_pages)
-
-    try:
-        venues = venues_paginator.page(page_venues)
-    except PageNotAnInteger:
-        venues = venues_paginator.page(1)
-    except EmptyPage:
-        venues = venues_paginator.page(venues_paginator.num_pages)
+    # con get_page django gestisce internamente le eccezioni e garantisce che venga sempre restituita una pagina valida.
+    events = events_paginator.get_page(request.GET.get('page_events'))
+    artists = artists_paginator.get_page(request.GET.get('page_artists'))
+    venues = venues_paginator.get_page(request.GET.get('page_venues'))
 
     return render(request, 'common/search_results.html', {
         'events': events, 
@@ -111,4 +96,5 @@ def search_results(request):
         'total_events': total_events,
         'total_artists': total_artists,
         'total_venues': total_venues,
+        'filter': evento_filter,
     })

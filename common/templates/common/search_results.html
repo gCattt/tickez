@@ -10,6 +10,7 @@
     <h1 class="mb-5">Ricerca: <span style="font-size: 0.7em;">"{{request.GET.keywords}}"</span>
         <a href="{% url 'homepage' %}" class="text-decoration-none text-dark ms-2"><i class="fas fa-times" style="font-size: 1.7rem;"></i></a>
     </h1>
+    
     <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item" role="presentation">
         <button class="nav-link {% if request.GET.page_events or not request.GET.page_artists and not request.GET.page_venues %}active{% endif %}" id="events-tab" data-bs-toggle="tab" data-bs-target="#events" type="button" role="tab" aria-controls="events" aria-selected="true">Eventi</button>
@@ -25,6 +26,62 @@
     <div class="tab-content">
         <div class="tab-pane fade {% if request.GET.page_events or not request.GET.page_artists and not request.GET.page_venues %}show active{% endif %}" id="events" role="tabpanel" aria-labelledby="events-tab">
             <h5 class="mt-3 mb-3">Risultati: {{total_events}}</h5>
+            
+            <form id="filterForm" method="GET" class="mb-5">
+                <!-- in questo modo, il valore di keywords sarà mantenuto nella query string anche quando vengono applicati altri filtri -->
+                <input type="hidden" name="keywords" value="{{ request.GET.keywords }}">
+                <div class="row">
+                    <div class="col-md-10 d-flex justify-content-start">
+                        <div class="form-group me-3">
+                            {{ filter.form.category }}
+                            {% if request.GET.category %}
+                            <a  class="text-decoration-none text-dark ms-2" 
+                                href="?{% for key, value in request.GET.items %}{% if key != 'category' %}{{ key }}={{ value }}{% if not forloop.last %}&{% endif %}{% endif %}{% endfor %}">
+                                <i class="fas fa-times" style="font-size: 0.8rem;"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                        <div class="form-group me-3">
+                            {{ filter.form.city }}
+                            {% if request.GET.city %}
+                            <a  class="text-decoration-none text-dark ms-2" 
+                                href="?{% for key, value in request.GET.items %}{% if key != 'city' %}{{ key }}={{ value }}{% if not forloop.last %}&{% endif %}{% endif %}{% endfor %}">
+                                <i class="fas fa-times" style="font-size: 0.8rem;"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                        <div class="form-group me-3">
+                            {{ filter.form.from_date.label_tag }}
+                            {{ filter.form.from_date }}
+                        </div>
+                        <div class="form-group">
+                            {{ filter.form.until_date.label_tag }}
+                            {{ filter.form.until_date }}
+                            {% if request.GET.from_date or request.GET.until_date %}
+                            <a  class="text-decoration-none text-dark ms-2" 
+                                href="?{% for key, value in request.GET.items %}{% if key != 'from_date' and key != 'until_date' %}{{ key }}={{ value }}{% if not forloop.last %}&{% endif %}{% endif %}{% endfor %}">
+                                <i class="fas fa-times" style="font-size: 0.8rem;"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-2 d-flex justify-content-end">
+                        <div class="form-group">
+                            {{ filter.form.sort }}
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const form = document.getElementById('filterForm');
+            
+                    form.addEventListener('change', function () {
+                        form.submit();
+                    });
+                });
+            </script>
+
             {% if events %}
             {% for e in events %}
             <div class="card mb-3">
@@ -51,7 +108,7 @@
                 <ul class="pagination pagination-sm justify-content-center">
                     <li class="page-item">
                     {% if events.has_previous %}
-                        <a class="page-link" href="?keywords={{ request.GET.keywords }}&page_events={{ events.previous_page_number }}"aria-label="Previous">
+                        <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page_events' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page_events={{ events.previous_page_number }}" aria-label="Previous">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     {% endif %}
@@ -65,14 +122,14 @@
                             </li>
                         {% elif num > events.number|add:'-2' and num < events.number|add:'2' %}
                             <li class="page-item">
-                                <a class="page-link" href="?keywords={{ request.GET.keywords }}&page_events={{ num }}">{{ num }}</a>
+                                <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page_events' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page_events={{ num }}">{{ num }}</a>
                             </li>
                         {% endif %}
                     {% endfor %}
     
                     <li class="page-item">
                     {% if events.has_next %}
-                        <a class="page-link" href="?keywords={{ request.GET.keywords }}&page_events={{ events.next_page_number }}" aria-label="Next">
+                        <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page_events' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page_events={{ events.next_page_number }}" aria-label="Next">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     {% endif %}

@@ -76,7 +76,7 @@ def home_page(request):
 
 def login_user(request):
     if request.method == "POST":
-        username = request.POST["username"]
+        username = request.POST["username"].strip()
         password = request.POST["password"]
         # verifica se l'utente esiste nel sistema e se le credenziali fornite sono corrette
         user = authenticate(request, username=username, password=password)

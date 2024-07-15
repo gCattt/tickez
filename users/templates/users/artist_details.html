@@ -1,6 +1,7 @@
 {% extends "users/base_users.html" %}
 {% load static %}
 {% load crispy_forms_tags %}
+{% load tz %}
 
 {% block title %}{{title}} | Tickez{% endblock %}
 
@@ -14,10 +15,9 @@
     <div style="flex-grow: 1; max-width: calc(100% - 220px);">
         <h1 class="mb-3" style="font-weight:600; word-break: break-word;">{{ object.nome }}</h1>
 
-        <form method="POST" action="{% url 'toggle-follow' entity_type='luogo' entity_pk=object.id %}">
-            {% csrf_token %}
+        {% if request.user.utente %}
+        <form method="POST" action="{% url 'toggle-follow' entity_type='organizzatore' entity_pk=object.id %}"> {% csrf_token %}
             <input type="hidden" name="action" value="{% if request.user.utente in object.followers.all %}unfollow{% else %}follow{% endif %}">
-            {% if request.user.utente %}
             <button type="submit" class="btn {% if request.user.utente in object.followers.all %}btn-secondary{% else %}btn-dark{% endif %} mt-2">
                 {% if request.user.utente in object.followers.all %}
                     <i class="fas fa-heart me-1"></i> Seguito
@@ -25,8 +25,8 @@
                     <i class="far fa-heart me-1"></i> Segui
                 {% endif %}
             </button>
-            {% endif %}
         </form>
+        {% endif %}
     </div>
   </div>
 
