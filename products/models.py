@@ -14,10 +14,10 @@ class Evento(models.Model):
     CATEGORY_CHOICES = [('Concerti', 'Concerti'), ('Festival', 'Festival'), ('Teatro', 'Teatro')]
         
     nome = models.CharField(max_length=100, null=False, blank=False)
-    slug = models.SlugField(max_length=200, null=False, unique=True, blank=True)
+    slug = models.SlugField(max_length=200, null=False,  blank=True, unique=True)
     categoria = models.CharField(max_length=100, choices=CATEGORY_CHOICES, null=False, blank=False)
     data_ora = models.DateTimeField(null=False, blank=False, default=timezone.now)
-    locandina = models.ImageField(blank=True, upload_to="images/events")
+    locandina = models.ImageField(null=True, blank=True, upload_to="images/events")
     descrizione = models.TextField(null=True, blank=True, default='')
     visualizzazioni = models.IntegerField(null=True, blank=True, default=0)
 
@@ -51,14 +51,13 @@ class Evento(models.Model):
 
 class Biglietto(models.Model):
     tipologia = models.CharField(max_length=100, null=False, blank=False)
-    slug = models.SlugField(max_length=200, null=False, unique=True, blank=True)
+    slug = models.SlugField(max_length=200, null=False, blank=True)
     prezzo = models.FloatField(null=False, blank=False, default=0.00)
     quantita = models.IntegerField(null=False, blank=False, default=0)
     descrizione = models.TextField(null=True, blank=True, default='')
     
     evento = models.ForeignKey(Evento, on_delete=models.CASCADE, null=True, blank=True, related_name='biglietti_disponibili')
     organizzatore = models.ForeignKey(to='users.Organizzatore', on_delete=models.CASCADE, null=True, blank=True, related_name='biglietti_generati')
-    ordine = models.ManyToManyField(to='orders.Ordine', blank=True, default=None, related_name='biglietti_ordinati')
 
 
     def __str__(self):

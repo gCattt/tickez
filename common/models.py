@@ -12,11 +12,11 @@ from django.utils import timezone
 
 class Luogo(models.Model):
     nome = models.CharField(max_length=50, null=False, blank=False)
-    slug = models.SlugField(max_length=200, null=False, unique=True, blank=True)
-    indirizzo = models.CharField(max_length=255)
-    citta = models.CharField(max_length=100)
-    capienza_persone = models.PositiveIntegerField()
-    immagine = models.ImageField(blank=True, upload_to="images/venues")
+    slug = models.SlugField(max_length=200, null=False, blank=True, unique=True)
+    indirizzo = models.CharField(max_length=255, null=False, blank=False)
+    citta = models.CharField(max_length=100, null=False, blank=False)
+    capienza_persone = models.PositiveIntegerField(null=False, blank=False)
+    immagine = models.ImageField(null=True, blank=True, upload_to="images/venues")
 
     followers = models.ManyToManyField(to='users.Utente', blank=True, default=None, related_name='luoghi_preferiti')
     affittuari = models.ManyToManyField(to='users.Organizzatore', blank=True, default=None, related_name='luoghi_affittati')

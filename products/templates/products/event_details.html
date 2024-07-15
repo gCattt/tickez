@@ -84,10 +84,9 @@
                               <a href="{% url 'products:update-ticket' object.slug object.pk t.slug t.pk %}" class="btn btn-dark me-2">
                                   <i class="fa-regular fa-pen-to-square" aria-hidden="true"></i>
                               </a>
-                              <form action="{% url 'products:delete-ticket' object.slug object.pk t.slug t.pk %}" method="GET" style="display:inline;">
-                                  {% csrf_token %}
-                                  <button type="submit" class="btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i></button>
-                              </form>
+                              <a href="{% url 'products:delete-ticket' object.slug object.pk t.slug t.pk %}" class="btn btn-danger me-2">
+                                <i class="fa fa-trash" aria-hidden="true"></i>
+                              </a>
                           {% else %}
                             {% if not request.user.is_superuser %}
                               <select class="form-select" name="quantita_{{ t.id }}" style="width: auto;">

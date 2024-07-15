@@ -21,8 +21,12 @@ class Utente(models.Model):
     sesso = models.CharField(max_length=10, choices=GENDER_CHOICES, null=True, blank=True, default='Altro')
     stato = models.CharField(max_length=50, null=True, blank=True)
     telefono = models.CharField(max_length=20, null=True, blank=True, default=None)
-    immagine_profilo = models.ImageField(blank=True, upload_to="images/customers")
+    immagine_profilo = models.ImageField(null=True, blank=True, upload_to="images/customers")
 
+    '''
+    l'eliminazione non è bidirezionale per impostazione predefinita per motivi di sicurezza e integrità dei dati.
+    l'oggetto User, quindi, persiste anche se l'oggetto Utente viene eliminato
+    '''
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
 
@@ -51,10 +55,10 @@ class Utente(models.Model):
 
 class Organizzatore(models.Model):
     nome = models.CharField(max_length=50, null=False, blank=False)
-    slug = models.SlugField(max_length=100, null=False, unique=True, blank=True)
+    slug = models.SlugField(max_length=100, null=False, blank=True, unique=True)
     email = models.EmailField(max_length=255, null=False, blank=False, unique=True)
     descrizione = models.TextField(null=True, blank=True, default='')
-    immagine_profilo = models.ImageField(blank=True, upload_to="images/organizers")
+    immagine_profilo = models.ImageField(null=True, blank=True, upload_to="images/organizers")
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     followers = models.ManyToManyField(Utente, blank=True, default=None, related_name='organizzatori_preferiti')

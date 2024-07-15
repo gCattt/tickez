@@ -138,9 +138,7 @@
                     <div class="card-body col-1 d-flex align-items-center justify-content-end">
                       <a href="{% url 'products:event-statistics' e.slug e.pk %}" class="btn btn-dark me-2"><i class="fa fa-line-chart" aria-hidden="true"></i></a>
                       <a href="{% url 'products:update-event' e.slug e.pk %}" class="btn btn-dark me-2"><i class="fa-regular fa-pen-to-square" aria-hidden="true"></i></a>
-                      <form action="{% url 'products:delete-event' e.slug e.pk %}" method="GET" style="display:inline;">
-                          <button type="submit" class="btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i></button>
-                      </form>   
+                      <a href="{% url 'products:delete-event' e.slug e.pk %}" class="btn btn-danger me-2"><i class="fa fa-trash" aria-hidden="true"></i></a>
                     </div>
                 </div>
             </div>

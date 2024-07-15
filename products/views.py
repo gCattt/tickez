@@ -187,8 +187,8 @@ class UpdateTicketView(OrganizerOrSuperuserRequiredMixin, UpdateView):
     def get_object(self, queryset=None):
         self.event = get_object_or_404(Evento, slug=self.kwargs.get('event_slug'), pk=self.kwargs.get('event_pk'))
 
-        queryset = self.event.biglietti_disponibili.all()
-        ticket = get_object_or_404(queryset, slug=self.kwargs.get('ticket_slug'), pk=self.kwargs.get('ticket_pk'))
+        queryset = self.event.biglietti_disponibili.filter(slug=self.kwargs.get('ticket_slug'))
+        ticket = get_object_or_404(queryset, pk=self.kwargs.get('ticket_pk'))
 
         return ticket
 
@@ -224,8 +224,8 @@ class DeleteTicketView(OrganizerOrSuperuserRequiredMixin, DeleteView):
     def get_object(self, queryset=None):
         self.event = get_object_or_404(Evento, slug=self.kwargs.get('event_slug'), pk=self.kwargs.get('event_pk'))
 
-        queryset = self.event.biglietti_disponibili.all()
-        ticket = get_object_or_404(queryset, slug=self.kwargs.get('ticket_slug'), pk=self.kwargs.get('ticket_pk'))
+        queryset = self.event.biglietti_disponibili.filter(slug=self.kwargs.get('ticket_slug'))
+        ticket = get_object_or_404(queryset, pk=self.kwargs.get('ticket_pk'))
 
         return ticket
 
