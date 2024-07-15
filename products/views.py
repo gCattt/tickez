@@ -71,6 +71,8 @@ class EventDetailView(DetailView):
         context['range_dropdown'] = range(0, 6)
         context['name_change'] = self.get_object().data_ora - timedelta(days=15)
 
+        context['is_organizer'] = self.request.user.groups.filter(name='Organizzatori').exists()
+
         return context
     
 # funzione di test per gestire l'autenticazione di admin ed organizzatori

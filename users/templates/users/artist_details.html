@@ -6,48 +6,100 @@
 
 {% block content %}
 <div class="container">
-    <h1 class="mb-5">
-      <img src="{{ object.immagine_profilo_url }}" style="width: 100px; height: 100px; object-fit: cover">
-      {{object.nome}}
-    </h1>
+  <div class="d-flex align-items-center mb-5">
+    <div class="me-3" style="width: 200px; height: 200px;">
+        <img src="{{ object.immagine_profilo_url }}" style="width: 100%; height: 100%; object-fit: cover;">
+    </div>
 
-    <form method="POST" action="{% url 'toggle-follow' entity_type='organizzatore' entity_pk=object.id %}"> {% csrf_token %}
-      <input type="hidden" name="action" value="{% if request.user.utente in object.followers.all %}unfollow{% else %}follow{% endif %}">
-      <button type="submit" class="btn {% if request.user.utente in object.followers.all %}btn-secondary{% else %}btn-dark{% endif %}">
-        {% if request.user.utente in object.followers.all %}
-          <i class="fas fa-heart me-1"></i> Seguito
-        {% else %}
-          <i class="far fa-heart me-1"></i> Segui
-        {% endif %}
-      </button>
-    </form>
+    <div style="flex-grow: 1; max-width: calc(100% - 220px);">
+        <h1 class="mb-3" style="font-weight:600; word-break: break-word;">{{ object.nome }}</h1>
 
-    <hr>
+        <form method="POST" action="{% url 'toggle-follow' entity_type='luogo' entity_pk=object.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="{% if request.user.utente in object.followers.all %}unfollow{% else %}follow{% endif %}">
+            {% if request.user.utente %}
+            <button type="submit" class="btn {% if request.user.utente in object.followers.all %}btn-secondary{% else %}btn-dark{% endif %} mt-2">
+                {% if request.user.utente in object.followers.all %}
+                    <i class="fas fa-heart me-1"></i> Seguito
+                {% else %}
+                    <i class="far fa-heart me-1"></i> Segui
+                {% endif %}
+            </button>
+            {% endif %}
+        </form>
+    </div>
+  </div>
 
     <ul class="nav nav-tabs" id="myTab" role="tablist">
       <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab" aria-controls="description" aria-selected="true">Informazioni</button>
+        <button class="nav-link active" id="events-tab" data-bs-toggle="tab" data-bs-target="#events" type="button" role="tab" aria-controls="events" aria-selected="false">Eventi organizzati</button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link" id="events-tab" data-bs-toggle="tab" data-bs-target="#events" type="button" role="tab" aria-controls="events" aria-selected="false">Eventi programmati</button>
+        <button class="nav-link" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab" aria-controls="description" aria-selected="true">Descrizione</button>
       </li>
     </ul>
 
     <div class="tab-content">
-      <div class="tab-pane active" id="description" role="tabpanel" aria-labelledby="description-tab">{{object.descrizione}}</div>
-      <div class="tab-pane" id="events" role="tabpanel" aria-labelledby="events-tab">
+      <div class="tab-pane mt-3 active" id="events" role="tabpanel" aria-labelledby="events-tab">
         {% if planned_events %}
-        <ul>
-            {% for e in planned_events %}
-              <a href="{{ e.get_absolute_url }}" style="text-decoration: none; color: inherit;">
-                  <li>{{ e.nome }} - {{ e.data_ora }}</li>
-              </a>
-            {% endfor %}
-        </ul>
+        {% for e in planned_events %}
+        <div class="card mb-3">
+            <div class="row g-0">
+                <div class="col-4" style="max-width: 256px;">
+                    <img src="{{ e.locandina_url }}" class="img-fluid rounded-start" alt="{{ e.nome }}" style="width: 256px; height:166px;">
+                </div>
+                <div class="col-7">
+                    <div class="card-body">
+                        <h5 class="card-title mt-1 mb-2" style="font-weight:600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ e.nome }}</h5>
+                        <p></p>
+                        <p class="card-text">{{ e.luogo.nome }}<br>{{e.luogo.indirizzo}}, {{e.luogo.citta}}</p>
+                        <p class="card-text">{{e.data_ora|date:"d/m/Y, l"|slice:":15"}} {{e.data_ora|time:"H:i"}}</p>
+                    </div>
+                </div>
+                <div class="card-body col-1 d-flex align-items-center justify-content-end">
+                        <a href="{{ e.get_absolute_url }}" class="btn btn-dark">Biglietti <i class="fa fa-angle-double-right" aria-hidden="true"></i></a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        <!-- paginazione -->
+        <nav aria-label="Page navigation">
+            <ul class="pagination pagination-sm justify-content-center">
+                <li class="page-item">
+                    {% if planned_events.has_previous %}
+                        <a class="page-link" href="?page={{ planned_events.previous_page_number }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    {% endif %}
+                </li>
+
+                <!-- link di paginazione per pagina corrente e adiacenti -->
+                {% for num in planned_events.paginator.page_range %}
+                    {% if planned_events.number == num %}
+                        <li class="page-item active" aria-current="page">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                    {% elif num > planned_events.number|add:'-2' and num < planned_events.number|add:'2' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                <li class="page-item">
+                    {% if planned_events.has_next %}
+                        <a class="page-link" href="?page={{ planned_events.next_page_number }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    {% endif %}
+                </li>
+            </ul>
+        </nav>
         {% else %}
-            <p>Nessun evento programmato.</p>
+            <p>Nessun evento organizzato.</p>
         {% endif %}
       </div>
+      <div class="tab-pane mt-3" id="description" role="tabpanel" aria-labelledby="description-tab">{{object.descrizione}}</div>
     </div>
 </div>
 {% endblock %}

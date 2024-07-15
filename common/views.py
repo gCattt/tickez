@@ -16,7 +16,7 @@ def common(request):
 class VenuesListView(ListView):
     model = Luogo
     template_name = 'common/venues.html' 
-    paginate_by = 3
+    paginate_by = 8
 
     def get_queryset(self):
         venue_list = super().get_queryset()
@@ -31,14 +31,14 @@ class VenuesListView(ListView):
 class VenueDetailView(DetailView):
     model = Luogo
     template_name = "common/venue_details.html"
-    paginate_by = 3
+    paginate_by = 4
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         context['title'] = self.get_object().nome
 
-        events = self.get_object().eventi_programmati.all()
+        events = self.get_object().eventi_programmati.order_by('data_ora')
         paginator = Paginator(events, self.paginate_by)
 
         page = self.request.GET.get('page')
@@ -75,8 +75,8 @@ def search_results(request):
     
     # paginazione dei risultati
     events_paginator = Paginator(events.order_by('data_ora'), 5)
-    artists_paginator = Paginator(artists.order_by('nome'), 10)
-    venues_paginator = Paginator(venues.order_by('nome'), 10)
+    artists_paginator = Paginator(artists.order_by('nome'), 8)
+    venues_paginator = Paginator(venues.order_by('nome'), 8)
 
     page_events = request.GET.get('page_events')
     page_artists = request.GET.get('page_artists')

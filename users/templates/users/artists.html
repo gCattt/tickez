@@ -6,15 +6,26 @@
 
 {% block content %}
 <div class="container">
-    <h1 class="mb-5">Artisti</h1>
+    <h1>Artisti</h1>
+    <h5 class="mt-3 mb-5">Risultati: {{view.get_queryset.count}}</h5>
 
-    <p>Risultati: {{view.get_queryset.count}}</p>
-    {% for a in page_obj %}
-        <a href="{{ a.get_absolute_url }}" style="text-decoration: none; color: inherit;">
-            <p>{{a.nome}}</p>
-        </a>
-    {% endfor %}
-    <nav aria-label="Page navigation">
+    <div class="row row-cols-1 row-cols-4 g-3">
+        {% for a in page_obj %}
+        <div class="col">
+            <div class="card" style="height:275px;">
+                <img src="{{ a.immagine_profilo_url }}" class="card-img-top h-100" alt="{{ a.nome }}" style="max-height:225px; object-fit: cover; object-position: center;">
+                <div class="card-body d-flex flex-column">
+                    <p class="card-title" style="font-weight:600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ a.nome }}</p>
+                    <p></p>
+                    <a href="{{ a.get_absolute_url }}" class="btn btn-dark btn-sm mt-auto">Dettagli</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- paginazione -->
+    <nav class="mt-3" aria-label="Page navigation">
         <ul class="pagination pagination-sm justify-content-center">
             <li class="page-item">
             {% if page_obj.has_previous %}
@@ -24,9 +35,17 @@
             {% endif %}
             </li>
 
-            {% for p in paginator.page_range %}
-            <li class="page-item {% if request.GET.page|stringformat:"s" == p|stringformat:"s" %} active {% endif %}">
-                <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ p }}">{{ p }}</a></li>
+            <!-- link di paginazione per pagina corrente e adiacenti -->
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active" aria-current="page">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                {% elif num > page_obj.number|add:'-2' and num < page_obj.number|add:'2' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                {% endif %}
             {% endfor %}
 
             <li class="page-item">

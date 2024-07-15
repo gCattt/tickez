@@ -16,7 +16,7 @@ class Luogo(models.Model):
     indirizzo = models.CharField(max_length=255)
     citta = models.CharField(max_length=100)
     capienza_persone = models.PositiveIntegerField()
-    immagine = models.ImageField(blank=True, upload_to="images/venues", default=join('static', 'images', 'defaults', 'default_venue.jpg'))
+    immagine = models.ImageField(blank=True, upload_to="images/venues")
 
     followers = models.ManyToManyField(to='users.Utente', blank=True, default=None, related_name='luoghi_preferiti')
     affittuari = models.ManyToManyField(to='users.Organizzatore', blank=True, default=None, related_name='luoghi_affittati')
