@@ -59,7 +59,7 @@
                 <i class="fas fa-user-circle fa-lg"></i>
             </a>
 
-            <form id="logout-form" method="POST" action="{% url 'logout' %}" style="display: inline;">
+            <form id="logout-form" method="POST" action="{% url 'users:logout' %}" style="display: inline;">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-dark">
                     <i class="fas fa-sign-out-alt"></i>
@@ -68,7 +68,7 @@
 
             {% else %}
 
-            <a href="{% url 'login' %}" class="btn btn-dark me-2">
+            <a href="{% url 'users:login' %}" class="btn btn-dark me-2">
                 <span style="margin-right: 5px;">Accedi</span>
                 <i class="fas fa-user-circle fa-lg"></i>
             </a>

@@ -15,7 +15,6 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.contrib.auth import views as auth_views
 
 from django.urls import path, re_path, include
 
@@ -38,14 +37,7 @@ urlpatterns = [
     path('users/', include('users.urls')),
     path('products/', include('products.urls')),
     path('orders/', include('orders.urls')),
-
-    path('register/', views.CustomerCreateView.as_view(), name='register-customer'),
-    path('register-organizer/', views.OrganizerCreateView.as_view(), name='register-organizer'),
-    path('login/', views.login_user, name='login'),
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
-
-    path('toggle-follow/<str:entity_type>/<int:entity_pk>/', views.toggle_follow, name='toggle-follow'),
-
+    
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 #erase_db()

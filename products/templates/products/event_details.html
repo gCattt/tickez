@@ -19,7 +19,7 @@
           <p>{{object.data_ora}}</p>
           
           {% if request.user.utente %}
-          <form method="POST" action="{% url 'toggle-follow' entity_type='evento' entity_pk=object.id %}"> {% csrf_token %}
+          <form method="POST" action="{% url 'users:toggle-follow' entity_type='evento' entity_pk=object.id %}"> {% csrf_token %}
             <input type="hidden" name="action" value="{% if request.user.utente in object.followers.all %}unfollow{% else %}follow{% endif %}">
             <button type="submit" class="btn {% if request.user.utente in object.followers.all %}btn-secondary{% else %}btn-dark{% endif %}">
               {% if request.user.utente in object.followers.all %}

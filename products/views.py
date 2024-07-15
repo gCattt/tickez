@@ -84,7 +84,7 @@ class OrganizerOrSuperuserRequiredMixin(UserPassesTestMixin):
         obj = self.get_object()
         return user.is_superuser or (user.groups.filter(name="Organizzatori").exists() and obj.organizzatore.user == user)
     
-    login_url = reverse_lazy('login')
+    login_url = reverse_lazy('users:login')
 
     # se l'utente è autenticato ma non ha i permessi, solleva PermissionDenied
     def handle_no_permission(self):

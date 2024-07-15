@@ -18,7 +18,7 @@
     </div>
     {% endif %}
     <h1>Registrazione {{entity}}</h1>
-    <p class="mb-5">Hai già un account? <strong><a href="{% url 'login' %}" style="color: black; text-decoration: none;">Accedi</a></strong></p>
+    <p class="mb-5">Hai già un account? <strong><a href="{% url 'users:login' %}" style="color: black; text-decoration: none;">Accedi</a></strong></p>
 
     <form method="POST" action="" enctype="multipart/form-data"> {% csrf_token %}
         {% crispy form %}
