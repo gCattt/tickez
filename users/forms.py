@@ -9,6 +9,8 @@ from users.models import Utente, Organizzatore
 
 import os
 
+from django.utils import timezone
+
 
 class CustomerCreationForm(UserCreationForm):
     # campi aggiuntivi del modello Utente
@@ -104,6 +106,52 @@ class CustomerCreationForm(UserCreationForm):
             # la gestione dei gruppi e delle autorizzazioni in Django è strettamente legata al modello User
             user.groups.add(group)
         return user
+    
+    # validazione lato server
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if User.objects.filter(username=username).exists():
+            raise forms.ValidationError(("Username già in uso."))
+        return username
+    
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError(("Indirizzo email già in uso."))
+        return email
+    
+    def clean_nome(self):
+        nome = self.cleaned_data['nome']
+        if any(char.isdigit() for char in nome):
+            raise forms.ValidationError("Il nome non può contenere numeri.")
+        return nome
+
+    def clean_cognome(self):
+        cognome = self.cleaned_data['cognome']
+        if any(char.isdigit() for char in cognome):
+            raise forms.ValidationError("Il cognome non può contenere numeri.")
+        return cognome
+
+    def clean_data_nascita(self):
+        data_nascita = self.cleaned_data.get('data_nascita')
+        if data_nascita >= timezone.now().date():
+            raise forms.ValidationError(("La data di nascita deve essere nel passato."))
+        return data_nascita
+
+    def clean_immagine_profilo(self):
+        immagine_profilo = self.cleaned_data.get('immagine_profilo')
+        if immagine_profilo:
+            # verifica l'estensione del file
+            file_name, file_extension = os.path.splitext(immagine_profilo.name)
+            if file_extension.lower() not in ['.png', '.jpeg', '.jpg']:
+                raise forms.ValidationError("L'estensione del file non è supportata. Utilizza file .png, .jpeg o .jpg.")
+        return immagine_profilo
+
+    def clean_telefono(self):
+        telefono = self.cleaned_data.get('telefono')
+        if telefono and not telefono.isdigit():
+            raise forms.ValidationError("Il numero di telefono deve contenere solo cifre.")
+        return telefono
 
 
 class OrganizerCreationForm(UserCreationForm):
@@ -165,6 +213,34 @@ class OrganizerCreationForm(UserCreationForm):
             # la gestione dei gruppi e delle autorizzazioni in Django è strettamente legata al modello User
             user.groups.add(group)
         return user
+    
+    # validazione lato server
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if User.objects.filter(username=username).exists():
+            raise forms.ValidationError(("Username già in uso."))
+        return username
+    
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError("Indirizzo email già in uso.")
+        return email
+
+    def clean_nome(self):
+        nome = self.cleaned_data['nome']
+        if any(char.isdigit() for char in nome):
+            raise forms.ValidationError("Il nome non può contenere numeri.")
+        return nome
+
+    def clean_immagine_profilo(self):
+        immagine_profilo = self.cleaned_data.get('immagine_profilo')
+        if immagine_profilo:
+            # verifica l'estensione del file
+            file_name, file_extension = os.path.splitext(immagine_profilo.name)
+            if file_extension.lower() not in ['.png', '.jpeg', '.jpg']:
+                raise forms.ValidationError("L'estensione del file non è supportata. Utilizza file .png, .jpeg o .jpg.")
+        return immagine_profilo
 
 
 class CustomerEditCrispyForm(forms.ModelForm):
@@ -195,7 +271,7 @@ class CustomerEditCrispyForm(forms.ModelForm):
             'email': forms.EmailInput(attrs={'maxlength': 255}),
             'nome': forms.TextInput(attrs={'maxlength': 50, 'pattern': '[A-Za-zÀ-ÿ -]{1,50}'}),
             'cognome': forms.TextInput(attrs={'maxlength': 50, 'pattern': '[A-Za-zÀ-ÿ -]{1,50}'}),
-            'data_nascita': forms.DateInput(attrs={'type': 'date'}),
+            'data_nascita': forms.DateInput(attrs={'type': 'date-local'}),
             'telefono': forms.TextInput(attrs={'type': 'tel', 'pattern': '[0-9]{7,20}'}),
         }
 
@@ -233,15 +309,6 @@ class CustomerEditCrispyForm(forms.ModelForm):
             'remove_immagine_profilo'
         )
 
-    def clean_username(self):
-        new_username = self.cleaned_data['username']
-        current_username = self.instance.user.username
-
-        if new_username != current_username and User.objects.filter(username=new_username).exists():
-            raise forms.ValidationError("Username già in uso.")
-
-        return new_username
-
     def save(self, commit=True):
         instance = super().save(commit=False)
         
@@ -260,6 +327,57 @@ class CustomerEditCrispyForm(forms.ModelForm):
             instance.save()
 
         return instance
+    
+    # validazione lato server
+    def clean_username(self):
+        new_username = self.cleaned_data['username']
+        current_username = self.instance.user.username
+
+        if new_username != current_username and User.objects.filter(username=new_username).exists():
+            raise forms.ValidationError("Username già in uso.")
+        return new_username
+    
+    def clean_email(self):
+        new_email = self.cleaned_data['email']
+        current_email = self.instance.user.email
+
+        if new_email != current_email and User.objects.filter(email=new_email).exists():
+            raise forms.ValidationError("Indirizzo email già in uso.")
+        return new_email
+    
+    def clean_nome(self):
+        nome = self.cleaned_data['nome']
+        if any(char.isdigit() for char in nome):
+            raise forms.ValidationError("Il nome non può contenere numeri.")
+        return nome
+
+    def clean_cognome(self):
+        cognome = self.cleaned_data['cognome']
+        if any(char.isdigit() for char in cognome):
+            raise forms.ValidationError("Il cognome non può contenere numeri.")
+        return cognome
+
+    def clean_data_nascita(self):
+        data_nascita = self.cleaned_data.get('data_nascita')
+        if data_nascita >= timezone.now().date():
+            raise forms.ValidationError(("La data di nascita deve essere nel passato."))
+        return data_nascita
+
+    def clean_immagine_profilo(self):
+        immagine_profilo = self.cleaned_data.get('immagine_profilo')
+        if immagine_profilo:
+            # verifica l'estensione del file
+            file_name, file_extension = os.path.splitext(immagine_profilo.name)
+            if file_extension.lower() not in ['.png', '.jpeg', '.jpg']:
+                raise forms.ValidationError("L'estensione del file non è supportata. Utilizza file .png, .jpeg o .jpg.")
+        return immagine_profilo
+
+    def clean_telefono(self):
+        telefono = self.cleaned_data.get('telefono')
+        if telefono and not telefono.isdigit():
+            raise forms.ValidationError("Il numero di telefono deve contenere solo cifre.")
+        return telefono
+
     
 class OrganizzatoreEditCrispyForm(forms.ModelForm):
     # campo aggiuntivo del modello User
@@ -303,15 +421,6 @@ class OrganizzatoreEditCrispyForm(forms.ModelForm):
             'remove_immagine_profilo'
         )
 
-    def clean_username(self):
-        new_username = self.cleaned_data['username']
-        current_username = self.instance.user.username
-
-        if new_username != current_username and User.objects.filter(username=new_username).exists():
-            raise forms.ValidationError("Username già in uso.")
-
-        return new_username
-
     def save(self, commit=True):
         instance = super().save(commit=False)
         
@@ -330,3 +439,35 @@ class OrganizzatoreEditCrispyForm(forms.ModelForm):
             instance.save()
 
         return instance
+    
+    # validazione lato server
+    def clean_username(self):
+        new_username = self.cleaned_data['username']
+        current_username = self.instance.user.username
+
+        if new_username != current_username and User.objects.filter(username=new_username).exists():
+            raise forms.ValidationError("Username già in uso.")
+        return new_username
+    
+    def clean_email(self):
+        new_email = self.cleaned_data['email']
+        current_email = self.instance.user.email
+
+        if new_email != current_email and User.objects.filter(email=new_email).exists():
+            raise forms.ValidationError("Indirizzo email già in uso.")
+        return new_email
+
+    def clean_nome(self):
+        nome = self.cleaned_data['nome']
+        if any(char.isdigit() for char in nome):
+            raise forms.ValidationError("Il nome non può contenere numeri.")
+        return nome
+
+    def clean_immagine_profilo(self):
+        immagine_profilo = self.cleaned_data.get('immagine_profilo')
+        if immagine_profilo:
+            # verifica l'estensione del file
+            file_name, file_extension = os.path.splitext(immagine_profilo.name)
+            if file_extension.lower() not in ['.png', '.jpeg', '.jpg']:
+                raise forms.ValidationError("L'estensione del file non è supportata. Utilizza file .png, .jpeg o .jpg.")
+        return immagine_profilo

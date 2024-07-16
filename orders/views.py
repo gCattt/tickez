@@ -8,7 +8,7 @@ from .forms import CheckoutCrispyForm, BigliettoAcquistatoCrispyForm
 
 from .models import Ordine, BigliettoAcquistato
 from products.models import Biglietto
-from users.models import Utente, Organizzatore
+from users.models import Utente
 
 from django.views.generic import UpdateView
 
@@ -53,49 +53,54 @@ def checkout(request):
 @login_required
 def process_payment(request):
     if request.method == 'POST':
-        selected_tickets = request.session.get('selected_tickets', [])
-        total = request.session.get('total', 0)
-        
-        # ottieni l'istanza di Utente associata all'utente autenticato
-        try:
-            utente = Utente.objects.get(user=request.user)
-        except Utente.DoesNotExist:
-            messages.error(request, 'Utente non trovato.')
-            return redirect('homepage')
-        
-        # ottieni l'organizzatore che ha creato i biglietti (basta il primo)
-        if selected_tickets:
-            organizzatore = Biglietto.objects.get(id=selected_tickets[0]).organizzatore
-        else:
-            messages.error(request, 'Nessun biglietto selezionato.')
-            return redirect('homepage')
-        
-        ordine = Ordine.objects.create(
-            utente=utente,
-            organizzatore=organizzatore,
-            totale=total,
-            data_ora=timezone.now()
-        )
-        
-        # aggiorna la quantità dei biglietti e associa i biglietti all'ordine appena creato
-        for ticket_id in selected_tickets:
-            biglietto = Biglietto.objects.get(id=ticket_id)
+        form = CheckoutCrispyForm(request.POST)
+        if form.is_valid():
+            selected_tickets = request.session.get('selected_tickets', [])
+            total = request.session.get('total', 0)
             
-            biglietto.quantita -= 1
-            biglietto.save()
-        
-            BigliettoAcquistato.objects.create(
-                biglietto=biglietto,
-                ordine=ordine,
-                nome_acquirente=utente.nome,
-                cognome_acquirente=utente.cognome,
-                data_acquisto=timezone.now()
+            # ottieni l'istanza di Utente associata all'utente autenticato
+            try:
+                utente = Utente.objects.get(user=request.user)
+            except Utente.DoesNotExist:
+                messages.error(request, 'Utente non trovato.')
+                return redirect('homepage')
+            
+            # ottieni l'organizzatore che ha creato i biglietti (basta il primo)
+            if selected_tickets:
+                organizzatore = Biglietto.objects.get(id=selected_tickets[0]).organizzatore
+            else:
+                messages.error(request, 'Nessun biglietto selezionato.')
+                return redirect('homepage')
+            
+            ordine = Ordine.objects.create(
+                utente=utente,
+                organizzatore=organizzatore,
+                totale=total,
+                data_ora=timezone.now()
             )
-        
-        messages.success(request, 'L\'ordine è stato effettuato con successo!')
-        return redirect('users:profile')
-    
-    return redirect('homepage')  # reindirizza alla homepage se non è un POST
+            
+            # aggiorna la quantità dei biglietti e associa i biglietti all'ordine appena creato
+            for ticket_id in selected_tickets:
+                biglietto = Biglietto.objects.get(id=ticket_id)
+                
+                biglietto.quantita -= 1
+                biglietto.save()
+            
+                BigliettoAcquistato.objects.create(
+                    biglietto=biglietto,
+                    ordine=ordine,
+                    nome_acquirente=utente.nome,
+                    cognome_acquirente=utente.cognome,
+                    data_acquisto=timezone.now()
+                )
+            
+            messages.success(request, 'L\'ordine è stato effettuato con successo!')
+            return redirect('users:profile')
+    else:
+        form = CheckoutCrispyForm()
+
+    # se il form non è valido, o non è un metodo POST, renderizza la pagina con il form e gli errori
+    return render(request, 'orders/checkout.html', {'form': form})
 
 
 class UpdatePurchaseView(LoginRequiredMixin, UpdateView):

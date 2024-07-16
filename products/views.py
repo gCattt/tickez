@@ -49,9 +49,7 @@ class EventDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-
         evento = self.get_object()
-
         evento.visualizzazioni += 1
         evento.save()
 
@@ -106,31 +104,23 @@ def notify(event):
 @user_passes_test(is_allowed)
 def create_event(request):
     entity = 'Evento'
+    form_class = AdminEventCrispyForm if request.user.is_superuser else EventCrispyForm
+
     if request.method == 'POST':
-        if request.user.is_superuser:
-            form = AdminEventCrispyForm(request.POST, request.FILES)
-            if form.is_valid():
-                event = form.save()
-
-                notify(event)
-
-                return redirect(event.get_absolute_url())
-        else:
-            form = EventCrispyForm(request.POST, request.FILES)
-            if form.is_valid():
-                event = form.save(commit=False)
-                organizzatore = Organizzatore.objects.get(user=request.user) # istanza di Organizzatore associata a User
+        form = form_class(request.POST, request.FILES)
+        if form.is_valid():
+            event = form.save(commit=False)
+            if request.user.is_superuser:
+                event.save()
+            else:
+                organizzatore = Organizzatore.objects.get(user=request.user)
                 event.organizzatore = organizzatore
                 event.save()
-
-                notify(event)
-
-                return redirect(event.get_absolute_url())
+            
+            notify(event)
+            return redirect(event.get_absolute_url())
     else:
-        if request.user.is_superuser:
-            form = AdminEventCrispyForm()
-        else:
-            form = EventCrispyForm()
+        form = form_class()
     
     return render(request, 'products/create_entity.html', {'form': form, 'entity': entity})
 
@@ -140,7 +130,7 @@ def create_ticket(request, event_slug, event_pk):
     event = get_object_or_404(Evento, slug=event_slug, pk=event_pk)
 
     if request.method == 'POST':
-        form = TicketCrispyForm(request.POST)
+        form = TicketCrispyForm(request.POST, evento=event)
         if form.is_valid():
             ticket = form.save(commit=False)
             ticket.evento = event
@@ -162,6 +152,7 @@ class UpdateEventView(OrganizerOrSuperuserRequiredMixin, UpdateView):
             return AdminEventCrispyForm
         return EventCrispyForm
     
+    # il metodo form_valid è già implementato per gestire il salvataggio dell'istanza del modello
     def get_success_url(self):
         return self.get_object().get_absolute_url()
     
@@ -190,11 +181,13 @@ class UpdateTicketView(OrganizerOrSuperuserRequiredMixin, UpdateView):
 
         return ticket
 
+    # il metodo form_valid è già implementato per gestire il salvataggio dell'istanza del modello
     def get_success_url(self):
         return self.event.get_absolute_url()
     
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
+        kwargs['evento'] = self.event
         kwargs['action'] = 'Salva Modifiche'
         return kwargs
     

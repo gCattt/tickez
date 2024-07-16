@@ -5,6 +5,8 @@ from crispy_forms.layout import Layout, Row, Column, Submit, Reset
 
 from orders.models import BigliettoAcquistato
 
+from django.utils import timezone
+
 
 class CheckoutCrispyForm(forms.Form):
     titolare_carta = forms.CharField(
@@ -47,6 +49,32 @@ class CheckoutCrispyForm(forms.Form):
             )
         )
 
+    # validazione lato server
+    def clean_titolare_carta(self):
+        titolare_carta = self.cleaned_data['titolare_carta']
+        if any(char.isdigit() for char in titolare_carta):
+            raise forms.ValidationError("Il titolare della carta non può contenere numeri.")
+        return titolare_carta
+    
+    def clean_numero_carta(self):
+        numero_carta = self.cleaned_data['numero_carta']
+        sanitized_number = numero_carta.replace(' ', '').replace('-', '')  # rimuovi spazi e trattini
+        if not sanitized_number.isdigit():
+            raise forms.ValidationError("Il numero della carta non è valido.")
+        return numero_carta
+    
+    def clean_scadenza_carta(self):
+        scadenza_carta = self.cleaned_data['scadenza_carta']
+        if scadenza_carta < timezone.now().date():
+            raise forms.ValidationError("La carta è scaduta.")
+        return scadenza_carta
+    
+    def clean_cvv(self):
+        cvv = self.cleaned_data['cvv']
+        if not cvv.isdigit() or len(cvv) != 3:
+            raise forms.ValidationError("Il CVV deve essere un numero di 3 cifre.")
+        return cvv
+
 
 class BigliettoAcquistatoCrispyForm(forms.ModelForm):
     class Meta:
@@ -77,3 +105,16 @@ class BigliettoAcquistatoCrispyForm(forms.ModelForm):
                 css_class='form-row'
             )
         )
+
+    # validazione lato server
+    def clean_nome_acquirente(self):
+        nome_acquirente = self.cleaned_data['nome_acquirente']
+        if any(char.isdigit() for char in nome_acquirente):
+            raise forms.ValidationError("Il nome non può contenere numeri.")
+        return nome_acquirente
+
+    def clean_cognome_acquirente(self):
+        cognome_acquirente = self.cleaned_data['cognome_acquirente']
+        if any(char.isdigit() for char in cognome_acquirente):
+            raise forms.ValidationError("Il cognome non può contenere numeri.")
+        return cognome_acquirente

@@ -4,8 +4,11 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column, Submit, Reset
 
 from products.models import Evento, Biglietto
+from django.db.models import Sum
 
 import os
+
+from django.utils import timezone
 
 
 class AdminEventCrispyForm(forms.ModelForm):
@@ -26,6 +29,9 @@ class AdminEventCrispyForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         action = kwargs.pop('action', 'Crea Evento')
         super(AdminEventCrispyForm, self).__init__(*args, **kwargs)
+
+        self.initial['data_ora'] = self.instance.data_ora.strftime('%Y-%m-%dT%H:%M')
+
         self.helper = FormHelper()
         self.helper.form_id = 'event-crispy-form'
         self.helper.form_method = 'POST'
@@ -45,6 +51,36 @@ class AdminEventCrispyForm(forms.ModelForm):
             'descrizione'
         )
 
+    # validazione lato server
+    def clean_nome(self):
+        nome = self.cleaned_data['nome']
+        instance = getattr(self, 'instance', None)
+        if instance and instance.pk:
+            # modifica
+            if Evento.objects.exclude(pk=instance.pk).filter(nome=nome).exists():
+                raise forms.ValidationError("Questo nome evento è già utilizzato.")
+        else:
+            # creazione
+            if Evento.objects.filter(nome=nome).exists():
+                raise forms.ValidationError("Questo nome evento è già utilizzato.")
+        return nome
+
+    def clean_data_ora(self):
+        data_ora = self.cleaned_data['data_ora']
+        if data_ora < timezone.now():
+            raise forms.ValidationError("La data e l'ora dell'evento non possono essere nel passato.")
+        return data_ora
+
+    def clean_locandina(self):
+        locandina = self.cleaned_data['locandina']
+        if locandina:
+            # verifica l'estensione del file
+            file_name, file_extension = os.path.splitext(locandina.name)
+            if file_extension.lower() not in ['.png', '.jpeg', '.jpg']:
+                raise forms.ValidationError("L'estensione del file non è supportata. Utilizza file .png, .jpeg o .jpg.")
+        return locandina
+
+
 class EventCrispyForm(forms.ModelForm):
     # aggiorna locandina senza mostrare il percorso del file attualmente caricato
     locandina = forms.ImageField(label=('Aggiorna locandina'), required=False, widget=forms.FileInput)
@@ -61,11 +97,14 @@ class EventCrispyForm(forms.ModelForm):
             'nome': forms.TextInput(attrs={'maxlength': 100}),
             'data_ora': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }
-
+    
 
     def __init__(self, *args, **kwargs):
         action = kwargs.pop('action', 'Crea Evento')
         super(EventCrispyForm, self).__init__(*args, **kwargs)
+
+        self.initial['data_ora'] = self.instance.data_ora.strftime('%Y-%m-%dT%H:%M')
+
         self.helper = FormHelper()
         self.helper.form_id = 'event-crispy-form'
         self.helper.form_method = 'POST'
@@ -81,7 +120,7 @@ class EventCrispyForm(forms.ModelForm):
                 css_class='form-row'
             ),
             'locandina',
-            'remove_locandina'
+            'remove_locandina',
             'descrizione'
         )
 
@@ -101,6 +140,35 @@ class EventCrispyForm(forms.ModelForm):
 
         return instance
     
+    # validazione lato server
+    def clean_nome(self):
+        nome = self.cleaned_data['nome']
+        instance = getattr(self, 'instance', None)
+        if instance and instance.pk:
+            # modifica
+            if Evento.objects.exclude(pk=instance.pk).filter(nome=nome).exists():
+                raise forms.ValidationError("Questo nome evento è già utilizzato.")
+        else:
+            # creazione
+            if Evento.objects.filter(nome=nome).exists():
+                raise forms.ValidationError("Questo nome evento è già utilizzato.")
+        return nome
+
+    def clean_data_ora(self):
+        data_ora = self.cleaned_data['data_ora']
+        if data_ora < timezone.now():
+            raise forms.ValidationError("La data e l'ora dell'evento non possono essere nel passato.")
+        return data_ora
+
+    def clean_locandina(self):
+        locandina = self.cleaned_data['locandina']
+        if locandina:
+            # verifica l'estensione del file
+            file_name, file_extension = os.path.splitext(locandina.name)
+            if file_extension.lower() not in ['.png', '.jpeg', '.jpg']:
+                raise forms.ValidationError("L'estensione del file non è supportata. Utilizza file .png, .jpeg o .jpg.")
+        return locandina
+    
 
 class TicketCrispyForm(forms.ModelForm):
     class Meta:
@@ -119,6 +187,7 @@ class TicketCrispyForm(forms.ModelForm):
 
 
     def __init__(self, *args, **kwargs):
+        self.evento = kwargs.pop('evento', None)
         action = kwargs.pop('action', 'Crea Biglietto')
         super(TicketCrispyForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
@@ -136,3 +205,23 @@ class TicketCrispyForm(forms.ModelForm):
             ),
             'descrizione'
         )
+
+    # validazione lato server
+    def clean_prezzo(self):
+        prezzo = self.cleaned_data['prezzo']
+        if prezzo <= 0:
+            raise forms.ValidationError("Il prezzo deve essere maggiore di zero.")
+        return prezzo
+
+    def clean_quantita(self):
+        quantita = self.cleaned_data['quantita']
+        if quantita < 0:
+            raise forms.ValidationError("La quantità disponibile non può essere negativa.")
+        print(self.evento)
+        if self.evento:
+            capienza = self.evento.luogo.capienza_persone
+            biglietti_esistenti = Biglietto.objects.filter(evento=self.evento).aggregate(total=Sum('quantita'))['total'] or 0
+            if biglietti_esistenti + quantita > capienza:
+                raise forms.ValidationError(f"La quantità totale dei biglietti supera la capienza del luogo ({biglietti_esistenti}/{capienza} biglietti già creati).")
+        
+        return quantita
