@@ -91,6 +91,9 @@ def process_payment(request):
                     ordine=ordine,
                     nome_acquirente=utente.nome,
                     cognome_acquirente=utente.cognome,
+                    data_nascita_acquirente=utente.data_nascita,
+                    sesso_acquirente=utente.sesso,
+                    stato_acquirente=utente.stato,
                     data_acquisto=timezone.now()
                 )
             
@@ -123,7 +126,7 @@ class UpdatePurchaseView(LoginRequiredMixin, UpdateView):
     def form_valid(self, form):
         ticket = form.instance
         if ticket.can_edit():
-            messages.success(self.request, f'{ticket.biglietto.tipologia} (ordine N.{ticket.ordine.id}) aggiornato con successo.')
+            messages.success(self.request, f'{ticket.biglietto.tipologia} aggiornato con successo (ordine N.{ticket.ordine.id} - {ticket.data_acquisto.strftime("%d/%m/%Y")}).')
             return super().form_valid(form)
         else:
             messages.error(self.request, 'Non è più possibile effettuare il cambio per questo biglietto.')

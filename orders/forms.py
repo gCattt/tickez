@@ -79,19 +79,25 @@ class CheckoutCrispyForm(forms.Form):
 class BigliettoAcquistatoCrispyForm(forms.ModelForm):
     class Meta:
         model = BigliettoAcquistato
-        fields = ('nome_acquirente', 'cognome_acquirente')
+        fields = ('nome_acquirente', 'cognome_acquirente', 'data_nascita_acquirente', 'sesso_acquirente', 'stato_acquirente')
         labels = {
             'nome_acquirente': 'Nome',
             'cognome_acquirente': 'Cognome',
+            'data_nascita_acquirente': 'Data di nascita',
+            'sesso_acquirente': 'Sesso',
+            'stato_acquirente': 'Cittadinanza',
         }
         widgets = {
             'nome_acquirente': forms.TextInput(attrs={'maxlength': 50, 'pattern': '^[A-Za-zÀ-ÿ -]{1,50}$'}),
             'cognome_acquirente': forms.TextInput(attrs={'maxlength': 50, 'pattern': '^[A-Za-zÀ-ÿ -]{1,50}$'}),
+            'data_nascita_acquirente': forms.DateInput(attrs={'type': 'date-local'}),
+            'sesso_acquirente': forms.Select(attrs={'choices': BigliettoAcquistato.GENDER_CHOICES}),
         }
 
 
     def __init__(self, *args, **kwargs):
         super(BigliettoAcquistatoCrispyForm, self).__init__(*args, **kwargs)
+
         self.helper = FormHelper()
         self.helper.form_id = 'biglietto-acquistato-crispy-form'
         self.helper.form_method = 'POST'
@@ -103,7 +109,13 @@ class BigliettoAcquistatoCrispyForm(forms.ModelForm):
                 Column('nome_acquirente', css_class='form-group col-md-6 mb-0'),
                 Column('cognome_acquirente', css_class='form-group col-md-6 mb-0'),
                 css_class='form-row'
-            )
+            ),
+            Row(
+                Column('data_nascita_acquirente', css_class='form-group col-md-4 mb-0'),
+                Column('sesso_acquirente', css_class='form-group col-md-4 mb-0'),
+                Column('stato_acquirente', css_class='form-group col-md-4 mb-0'),
+                css_class='form-row'
+            ),
         )
 
     # validazione lato server
@@ -118,3 +130,15 @@ class BigliettoAcquistatoCrispyForm(forms.ModelForm):
         if any(char.isdigit() for char in cognome_acquirente):
             raise forms.ValidationError("Il cognome non può contenere numeri.")
         return cognome_acquirente
+    
+    def clean_data_nascita_acquirente(self):
+        data_nascita_acquirente = self.cleaned_data.get('data_nascita_acquirente')
+        if data_nascita_acquirente >= timezone.now().date():
+            raise forms.ValidationError(("La data di nascita deve essere nel passato."))
+        return data_nascita_acquirente
+    
+    def clean_stato_acquirente(self):
+        stato_acquirente = self.cleaned_data['stato_acquirente']
+        if any(char.isdigit() for char in stato_acquirente):
+            raise forms.ValidationError("La cittadinanza non può contenere numeri.")
+        return stato_acquirente   

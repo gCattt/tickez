@@ -137,6 +137,12 @@ class CustomerCreationForm(UserCreationForm):
         if data_nascita >= timezone.now().date():
             raise forms.ValidationError(("La data di nascita deve essere nel passato."))
         return data_nascita
+    
+    def clean_stato(self):
+        stato = self.cleaned_data['stato']
+        if any(char.isdigit() for char in stato):
+            raise forms.ValidationError("La cittadinanza non può contenere numeri.")
+        return stato
 
     def clean_immagine_profilo(self):
         immagine_profilo = self.cleaned_data.get('immagine_profilo')
@@ -272,6 +278,7 @@ class CustomerEditCrispyForm(forms.ModelForm):
             'nome': forms.TextInput(attrs={'maxlength': 50, 'pattern': '[A-Za-zÀ-ÿ -]{1,50}'}),
             'cognome': forms.TextInput(attrs={'maxlength': 50, 'pattern': '[A-Za-zÀ-ÿ -]{1,50}'}),
             'data_nascita': forms.DateInput(attrs={'type': 'date-local'}),
+            'sesso': forms.Select(attrs={'choices': Utente.GENDER_CHOICES}),
             'telefono': forms.TextInput(attrs={'type': 'tel', 'pattern': '[0-9]{7,20}'}),
         }
 
@@ -362,6 +369,12 @@ class CustomerEditCrispyForm(forms.ModelForm):
         if data_nascita >= timezone.now().date():
             raise forms.ValidationError(("La data di nascita deve essere nel passato."))
         return data_nascita
+    
+    def clean_stato(self):
+        stato = self.cleaned_data['stato']
+        if any(char.isdigit() for char in stato):
+            raise forms.ValidationError("La cittadinanza non può contenere numeri.")
+        return stato
 
     def clean_immagine_profilo(self):
         immagine_profilo = self.cleaned_data.get('immagine_profilo')

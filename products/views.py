@@ -243,32 +243,31 @@ def event_statistics(request, slug, pk):
     fasce_eta = {
         '0_18': BigliettoAcquistato.objects.filter(
             biglietto__evento=evento,
-            ordine__utente__data_nascita__year__gte=current_year - 18
-        ).values('nome_acquirente', 'cognome_acquirente').distinct().count(),
+            data_nascita_acquirente__year__gte=current_year - 18
+        ).values('nome_acquirente', 'cognome_acquirente', 'data_nascita_acquirente', 'sesso_acquirente').count(),
 
         '19_35': BigliettoAcquistato.objects.filter(
             biglietto__evento=evento,
-            ordine__utente__data_nascita__year__range=[current_year - 35, current_year - 19]
-        ).values('nome_acquirente', 'cognome_acquirente').distinct().count(),
+            data_nascita_acquirente__year__range=[current_year - 35, current_year - 19]
+        ).values('nome_acquirente', 'cognome_acquirente', 'data_nascita_acquirente', 'sesso_acquirente').count(),
 
         '36_50': BigliettoAcquistato.objects.filter(
             biglietto__evento=evento,
-            ordine__utente__data_nascita__year__range=[current_year - 50, current_year - 36]
-        ).values('nome_acquirente', 'cognome_acquirente').distinct().count(),
+            data_nascita_acquirente__year__range=[current_year - 50, current_year - 36]
+        ).values('nome_acquirente', 'cognome_acquirente', 'data_nascita_acquirente', 'sesso_acquirente').count(),
 
         '50_plus': BigliettoAcquistato.objects.filter(
             biglietto__evento=evento,
-            ordine__utente__data_nascita__year__lt=current_year - 50
-        ).values('nome_acquirente', 'cognome_acquirente').distinct().count(),
+            data_nascita_acquirente__year__lt=current_year - 50
+        ).values('nome_acquirente', 'cognome_acquirente', 'data_nascita_acquirente', 'sesso_acquirente').count(),
     }
     
-    # nazionalità dei partecipanti (esempio con 5 nazionalità più comuni)
+    # nazionalità dei partecipanti (top 5)
     nazionalita_partecipanti = (
     BigliettoAcquistato.objects
         .filter(biglietto__evento=evento)
-        .values('ordine__utente__stato', 'nome_acquirente', 'cognome_acquirente')
-        .distinct()
-        .annotate(count=Count('ordine__utente__stato'))
+        .values('stato_acquirente')
+        .annotate(count=Count('stato_acquirente'))
         .order_by('-count')[:5]
     )
 
@@ -276,9 +275,8 @@ def event_statistics(request, slug, pk):
     sesso_partecipanti = (
         BigliettoAcquistato.objects
         .filter(biglietto__evento=evento)
-        .values('ordine__utente__sesso', 'nome_acquirente', 'cognome_acquirente')
-        .distinct()
-        .annotate(count=Count('ordine__utente__sesso'))
+        .values('sesso_acquirente')
+        .annotate(count=Count('sesso_acquirente'))
     )
 
     # biglietti venduti per ogni tipologia
