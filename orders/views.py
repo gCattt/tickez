@@ -44,6 +44,12 @@ def checkout(request):
                 except Http404:
                     return redirect('404')
                 quantity = int(value)
+                
+                if quantity > biglietto.quantita_vendibile:
+                    messages.error(request, f'La quantità richiesta per il biglietto "{biglietto.tipologia}" è maggiore della quantità attualmente disponibile ({biglietto.quantita_vendibile}).')
+                    event_url = request.POST.get('evento_url')
+                    return redirect(event_url)
+
                 for _ in range(quantity):
                     selected_tickets.append(biglietto)
                     total += biglietto.prezzo
@@ -102,7 +108,7 @@ def process_payment(request):
                 except Http404:
                     return redirect('404')
                 
-                biglietto.quantita -= 1
+                biglietto.quantita_vendibile -= 1
                 biglietto.save()
             
                 BigliettoAcquistato.objects.create(

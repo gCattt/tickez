@@ -54,6 +54,7 @@ class Biglietto(models.Model):
     slug = models.SlugField(max_length=200, null=False, blank=True)
     prezzo = models.FloatField(null=False, blank=False, default=0.00)
     quantita = models.IntegerField(null=False, blank=False, default=0)
+    quantita_vendibile = models.IntegerField(null=False, blank=False, default=0)
     descrizione = models.TextField(null=True, blank=True, default='')
     
     evento = models.ForeignKey(Evento, on_delete=models.CASCADE, null=True, blank=True, related_name='biglietti_disponibili')

@@ -220,7 +220,9 @@ class TicketCrispyForm(forms.ModelForm):
         print(self.evento)
         if self.evento:
             capienza = self.evento.luogo.capienza_persone
-            biglietti_esistenti = Biglietto.objects.filter(evento=self.evento).aggregate(total=Sum('quantita'))['total'] or 0
+
+            # calcola la quantità totale dei biglietti escludendo il biglietto attualmente in modifica
+            biglietti_esistenti = Biglietto.objects.filter(evento=self.evento).exclude(pk=self.instance.pk if self.instance else None).aggregate(total=Sum('quantita'))['total'] or 0
             if biglietti_esistenti + quantita > capienza:
                 raise forms.ValidationError(f"La quantità totale dei biglietti supera la capienza del luogo ({biglietti_esistenti}/{capienza} biglietti già creati).")
         

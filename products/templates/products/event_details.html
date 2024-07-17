@@ -64,11 +64,11 @@
           {% for t in tickets %}
             <div class="ticket-row d-flex justify-content-between align-items-center mb-3">
                 <div class="col-md-8">
-                    <strong class="{% if t.quantita == 0 %}text-muted{% endif %}">{{ t.tipologia }}</strong>
-                    <p class="{% if t.quantita == 0 %}text-muted{% endif %}" style="overflow-wrap: break-word;">{{ t.descrizione }}</p>
+                    <strong class="{% if t.quantita_vendibile == 0 %}text-muted{% endif %}">{{ t.tipologia }}</strong>
+                    <p class="{% if t.quantita_vendibile == 0 %}text-muted{% endif %}" style="overflow-wrap: break-word;">{{ t.descrizione }}</p>
                 </div>
                 <div class="col-md-4 d-flex justify-content-end">
-                    {% if t.quantita == 0 %}
+                    {% if t.quantita_vendibile == 0 %}
                         <div class="d-flex align-items-center">
                             <span class="text-muted me-3">Non disponibile</span>
                             {% if request.user.organizzatore and request.user.organizzatore == object.organizzatore %}

@@ -139,8 +139,6 @@ def create_event(request):
             
             notify(event)
             return redirect(event.get_absolute_url())
-        else:
-            messages.error(request, 'Si è verificato un errore durante la creazione dell\'evento. Riprova.')
     else:
         form = form_class()
     
@@ -161,11 +159,11 @@ def create_ticket(request, event_slug, event_pk):
             ticket = form.save(commit=False)
             ticket.evento = event
             ticket.organizzatore = event.organizzatore
+            ticket.quantita_vendibile = ticket.quantita
+
             ticket.save()
             messages.success(request, f'Biglietto "{ticket.tipologia}" creato con successo!')
             return redirect(ticket.get_absolute_url())
-        else:
-            messages.error(request, 'Si è verificato un errore durante la creazione del biglietto. Riprova.')
     else:
         form = TicketCrispyForm()
 
@@ -210,10 +208,6 @@ class UpdateEventView(OrganizerOrSuperuserRequiredMixin, UpdateView):
     def form_valid(self, form):
         messages.success(self.request, 'Modifiche salvate con successo!')
         return super().form_valid(form)
-
-    def form_invalid(self, form):
-        messages.error(self.request, 'Si è verificato un errore durante il salvataggio delle modifiche.')
-        return super().form_invalid(form)
     
 
 class UpdateTicketView(OrganizerOrSuperuserRequiredMixin, UpdateView):
@@ -252,12 +246,17 @@ class UpdateTicketView(OrganizerOrSuperuserRequiredMixin, UpdateView):
         return context
     
     def form_valid(self, form):
+        # aggiornamento e validazione di quantita_vendibile
+        biglietti_acquistati = self.object.biglietti_acquistati.count()
+        quantita = form.cleaned_data['quantita']
+        self.object.quantita_vendibile = quantita - biglietti_acquistati
+
+        if self.object.quantita_vendibile < 0:
+            messages.error(self.request, f'Sono già stati venduti {biglietti_acquistati} biglietti di questa tipologia.')
+            return self.form_invalid(form)
+        
         messages.success(self.request, 'Modifiche salvate con successo!')
         return super().form_valid(form)
-
-    def form_invalid(self, form):
-        messages.error(self.request, 'Si è verificato un errore durante il salvataggio delle modifiche.')
-        return super().form_invalid(form)
     
 
 class DeleteEventView(OrganizerOrSuperuserRequiredMixin, DeleteView):
