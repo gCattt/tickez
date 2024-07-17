@@ -142,7 +142,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-LOGIN_URL = "/login/?auth=notok" # in caso di tentato accesso ad una view protetta, senza i permessi adatti, reindirizza al login
+LOGIN_URL = "/users/login/?auth=notok" # in caso di tentato accesso ad una view protetta, senza i permessi adatti, reindirizza al login
 LOGIN_REDIRECT_URL = "/?login=ok"  # in caso di login corretto reindirizza alla home
 LOGOUT_REDIRECT_URL = "/?logout=ok"  # in caso di logout corretto reindirizza alla home
 

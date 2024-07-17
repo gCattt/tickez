@@ -1,8 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse_lazy
+from django.http import Http404
+from django.urls import reverse, reverse_lazy
 
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.mixins import UserPassesTestMixin
+from braces.views import GroupRequiredMixin
 
 from .forms import CheckoutCrispyForm, BigliettoAcquistatoCrispyForm
 
@@ -16,26 +18,41 @@ from django.contrib import messages
 
 from django.utils import timezone
 
+from django.conf import settings
+
 
 def orders(request):
-    return render(request, template_name="orders/base_orders.html")
+    return render(request, '404.html', status=404)
 
 
-@login_required
+def is_customer(user):
+    return user.groups.filter(name="Clienti").exists()
+
+@user_passes_test(is_customer)
 def checkout(request):
     if request.method == 'POST':
         selected_tickets = []
         total = 0
+        flag_tickets = False  # verifica se sono stati selezionati dei biglietti
 
         # recupera i biglietti selezionati
         for key, value in request.POST.items():
             if key.startswith("quantita_") and int(value) > 0:
                 ticket_id = key.split("_")[1]
-                biglietto = Biglietto.objects.get(id=ticket_id)
+                try:
+                    biglietto = get_object_or_404(Biglietto, id=ticket_id)
+                except Http404:
+                    return redirect('404')
                 quantity = int(value)
                 for _ in range(quantity):
                     selected_tickets.append(biglietto)
                     total += biglietto.prezzo
+                flag_tickets = True
+
+        if not flag_tickets:
+            messages.error(request, 'Seleziona almeno un biglietto.')
+            event_url = request.POST.get('evento_url')
+            return redirect(event_url)
 
         # memorizza i biglietti selezionati nella sessione (gli ID in quanto l'oggetto Biglietto non è serializzabile)
         request.session['selected_tickets'] = [t.id for t in selected_tickets]
@@ -50,7 +67,7 @@ def checkout(request):
 
     return redirect('homepage')
 
-@login_required
+@user_passes_test(is_customer)
 def process_payment(request):
     if request.method == 'POST':
         form = CheckoutCrispyForm(request.POST)
@@ -60,17 +77,16 @@ def process_payment(request):
             
             # ottieni l'istanza di Utente associata all'utente autenticato
             try:
-                utente = Utente.objects.get(user=request.user)
-            except Utente.DoesNotExist:
-                messages.error(request, 'Utente non trovato.')
-                return redirect('homepage')
+                utente = get_object_or_404(Utente, user=request.user)
+            except Http404:
+                return redirect('404')
             
             # ottieni l'organizzatore che ha creato i biglietti (basta il primo)
-            if selected_tickets:
-                organizzatore = Biglietto.objects.get(id=selected_tickets[0]).organizzatore
-            else:
-                messages.error(request, 'Nessun biglietto selezionato.')
-                return redirect('homepage')
+            try:
+                biglietto = get_object_or_404(Biglietto, id=selected_tickets[0])
+            except Http404:
+                return redirect('404')
+            organizzatore = biglietto.organizzatore
             
             ordine = Ordine.objects.create(
                 utente=utente,
@@ -81,7 +97,10 @@ def process_payment(request):
             
             # aggiorna la quantità dei biglietti e associa i biglietti all'ordine appena creato
             for ticket_id in selected_tickets:
-                biglietto = Biglietto.objects.get(id=ticket_id)
+                try:
+                    biglietto = get_object_or_404(Biglietto, id=ticket_id)
+                except Http404:
+                    return redirect('404')
                 
                 biglietto.quantita -= 1
                 biglietto.save()
@@ -98,7 +117,7 @@ def process_payment(request):
                 )
             
             messages.success(request, 'L\'ordine è stato effettuato con successo!')
-            return redirect('users:profile')
+            return redirect('homepage')
     else:
         form = CheckoutCrispyForm()
 
@@ -106,10 +125,18 @@ def process_payment(request):
     return render(request, 'orders/checkout.html', {'form': form})
 
 
-class UpdatePurchaseView(LoginRequiredMixin, UpdateView):
+class UpdatePurchaseView(GroupRequiredMixin, UserPassesTestMixin, UpdateView):
+    group_required = ['Clienti']
     model = BigliettoAcquistato
     form_class = BigliettoAcquistatoCrispyForm
     template_name = "orders/edit_purchase.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        # gestisce eventuali eccezioni Http404 che potrebbero essere sollevate durante il processo di elaborazione della richiesta
+        try:
+            return super().dispatch(request, *args, **kwargs)
+        except Http404:
+            return redirect('404')
 
     def get_object(self, queryset=None):
         queryset = self.get_queryset()
@@ -117,11 +144,25 @@ class UpdatePurchaseView(LoginRequiredMixin, UpdateView):
         pk = self.kwargs.get('pk')
 
         # trova l'oggetto utilizzando prima lo slug (tipologia del biglietto) e poi la pk (istanza del biglietto acquistato)
-        biglietto = get_object_or_404(Biglietto, slug=slug)
-        return get_object_or_404(queryset, pk=pk, biglietto=biglietto)
+        biglietto_acquistato = get_object_or_404(queryset, pk=pk, biglietto__slug=slug)
 
-    def get_success_url(self):
-        return reverse_lazy('users:profile')
+        return biglietto_acquistato
+    
+    def test_func(self):
+        user = self.request.user
+
+        # verifica l'appartenenza al gruppo 'Clienti'
+        if not user.groups.filter(name__in=self.group_required).exists():
+            return False
+
+        # verifica che l'utente corrente sia il proprietario del biglietto acquistato
+        biglietto_acquistato = self.get_object()
+        return biglietto_acquistato.ordine.utente == user.utente
+    
+    # se l'utente è autenticato ma non ha i permessi, solleva PermissionDenied
+    def handle_no_permission(self):
+        # in caso di tentato accesso ad una view protetta, senza i permessi adatti, reindirizza al login
+        return redirect(f'{settings.LOGIN_URL}&next={self.request.path}')
     
     def form_valid(self, form):
         ticket = form.instance
@@ -131,3 +172,6 @@ class UpdatePurchaseView(LoginRequiredMixin, UpdateView):
         else:
             messages.error(self.request, 'Non è più possibile effettuare il cambio per questo biglietto.')
             return redirect('users:profile')
+        
+    def get_success_url(self):
+        return reverse_lazy('users:profile')

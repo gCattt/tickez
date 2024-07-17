@@ -18,7 +18,7 @@
               <a href="{% url 'common:venue-details' object.luogo.slug object.luogo.pk %}" style="text-decoration: underline; color: black;">{{object.luogo}}</a></p>
           <p>{{object.data_ora}}</p>
           
-          {% if request.user.utente %}
+          {% if request.user.utente or request.user.is_superuser or not request.user.is_authenticated %}
           <form method="POST" action="{% url 'users:toggle-follow' entity_type='evento' entity_pk=object.id %}"> {% csrf_token %}
             <input type="hidden" name="action" value="{% if request.user.utente in object.followers.all %}unfollow{% else %}follow{% endif %}">
             <button type="submit" class="btn {% if request.user.utente in object.followers.all %}btn-secondary{% else %}btn-dark{% endif %}">
@@ -91,7 +91,7 @@
                                 <i class="fa fa-trash" aria-hidden="true"></i>
                               </a>
                           {% else %}
-                            {% if request.user.utente %}
+                            {% if request.user.utente or request.user.is_superuser or not request.user.is_authenticated %}
                               <select class="form-select" name="quantita_{{ t.id }}" style="width: auto;">
                                   {% for i in range_dropdown %}
                                       <option value="{{ i }}">{{ i }}</option>
@@ -110,12 +110,12 @@
               <div class="d-flex justify-content-center">
                   <a href="{% url 'products:create-ticket' object.slug object.pk %}" class="btn btn-dark">Aggiungi biglietto</a>
               </div>
-          {% elif request.user.utente %}
+          {% elif request.user.utente or request.user.is_superuser or not request.user.is_authenticated %}
             {% if tickets %}
               <div class="d-flex justify-content-center">
-                {% if not request.user.is_superuser %}
+                <!-- input per recuperare la pagina dell'evento in caso non venga selezionato alcun biglietto -->
+                <input type="hidden" name="evento_url" value="{{ object.get_absolute_url }}">
                 <button type="submit" class="btn btn-dark">Compra</button>
-                {% endif %}
               </div>
             {% endif %}
           {% endif %}

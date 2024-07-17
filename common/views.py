@@ -1,5 +1,6 @@
 from typing import Any
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import Http404
 
 from django.views.generic import ListView, DetailView
 
@@ -7,13 +8,14 @@ from common.models import Luogo
 from products.models import Evento
 from users.models import Organizzatore
 
-from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.core.paginator import Paginator
 
 from products.filters import EventoFilter
 
 
 def common(request):
-    return render(request, template_name="common/base_common.html")
+    return render(request, '404.html', status=404)
+
 
 class VenuesListView(ListView):
     model = Luogo
@@ -24,16 +26,25 @@ class VenuesListView(ListView):
         venue_list = super().get_queryset()
         
         return venue_list.order_by('nome')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        return context
+    
 
 class VenueDetailView(DetailView):
     model = Luogo
     template_name = "common/venue_details.html"
     paginate_by = 4
+
+    def dispatch(self, request, *args, **kwargs):
+        # gestisce eventuali eccezioni Http404 che potrebbero essere sollevate durante il processo di elaborazione della richiesta
+        try:
+            return super().dispatch(request, *args, **kwargs)
+        except Http404:
+            return redirect('404')
+
+    def get_object(self, queryset=None):
+        slug = self.kwargs.get('slug')
+        pk = self.kwargs.get('pk')
+        return get_object_or_404(Luogo, slug=slug, pk=pk)
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -42,20 +53,12 @@ class VenueDetailView(DetailView):
 
         events = self.get_object().eventi_programmati.order_by('data_ora')
         paginator = Paginator(events, self.paginate_by)
-
-        page = self.request.GET.get('page')
-        try:
-            events = paginator.page(page)
-        except PageNotAnInteger:
-            # se la pagina non è un numero intero, mostra la prima pagina
-            events = paginator.page(1)
-        except EmptyPage:
-            # se la pagina è vuota, mostra l'ultima pagina disponibile
-            events = paginator.page(paginator.num_pages)
+        events = paginator.get_page(self.request.GET.get('page'))
 
         context['planned_events'] = events
 
         return context
+    
     
 def search_results(request):
     events = Evento.objects.all()

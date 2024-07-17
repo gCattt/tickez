@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Pagina non trovata</title>
+    <style>
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            text-align: center;
+            padding: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="font-size: 3rem;">Errore 404</h1>
+        <p style="font-size: 1.2rem;">La pagina che stai cercando non esiste o è stata spostata.</p>
+        <a href="{% url 'homepage' %}">Torna alla Home</a>
+    </div>
+</body>
+</html>

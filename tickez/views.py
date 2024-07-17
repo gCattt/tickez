@@ -1,7 +1,6 @@
 from django.shortcuts import render
 
 from products.models import Evento
-
 from orders.models import Ordine, BigliettoAcquistato
 
 from sklearn.metrics.pairwise import cosine_similarity
@@ -59,3 +58,7 @@ def home_page(request):
             ctx['recommended_events'] = recommended_events
 
     return render(request, template_name=templ, context=ctx)
+
+
+def custom_404_view(request):
+    return render(request, '404.html', status=404)
