@@ -93,10 +93,12 @@ def process_payment(request):
             except Http404:
                 return redirect('404')
             organizzatore = biglietto.organizzatore
+            evento = biglietto.evento
             
             ordine = Ordine.objects.create(
                 utente=utente,
                 organizzatore=organizzatore,
+                evento=evento,
                 totale=total,
                 data_ora=timezone.now()
             )
@@ -119,7 +121,8 @@ def process_payment(request):
                     data_nascita_acquirente=utente.data_nascita,
                     sesso_acquirente=utente.sesso,
                     stato_acquirente=utente.stato,
-                    data_acquisto=timezone.now()
+                    data_acquisto=timezone.now(),
+                    prezzo_acquisto=biglietto.prezzo
                 )
             
             messages.success(request, 'L\'ordine è stato effettuato con successo!')

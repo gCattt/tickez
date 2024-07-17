@@ -326,7 +326,7 @@ def event_statistics(request, slug, pk):
 
         visualizzazioni_evento = evento.visualizzazioni
         biglietti_venduti = BigliettoAcquistato.objects.filter(biglietto__evento=evento).count()
-        revenue_totale = BigliettoAcquistato.objects.filter(biglietto__evento=evento).aggregate(Sum('biglietto__prezzo'))['biglietto__prezzo__sum'] or 0
+        revenue_totale = BigliettoAcquistato.objects.filter(biglietto__evento=evento).aggregate(Sum('prezzo_acquisto'))['prezzo_acquisto__sum'] or 0
         
         # calcolo delle fasce di età dei partecipanti
         current_year = datetime.now().year

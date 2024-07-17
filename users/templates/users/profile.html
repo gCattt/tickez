@@ -56,13 +56,13 @@
                   <span>Totale: {{ o.totale }} €</span>
               </div>
               <div class="card-body">
-                <h4>{{ o.biglietti_acquistati.first.biglietto.evento.nome }}</h4>
+                <h4>{{ o.evento.nome }}</h4>
                 <ul>
                   {% for biglietto_acquistato in o.biglietti_acquistati.all %}
                   <hr>
                   <li class="d-flex justify-content-between align-items-center">
                       <div>
-                          {{ biglietto_acquistato.biglietto.tipologia }} - {{ biglietto_acquistato.biglietto.prezzo }}€
+                          {{ biglietto_acquistato.biglietto.tipologia }} - {{ biglietto_acquistato.prezzo_acquisto }}€
                       </div>
                       <div>
                           <span class="me-3">Nominativo: {{ biglietto_acquistato.nome_acquirente }} {{ biglietto_acquistato.cognome_acquirente }}</span>

@@ -10,7 +10,7 @@ class Ordine(models.Model):
     
     utente = models.ForeignKey(to='users.Utente', on_delete=models.PROTECT, null=False, blank=False, related_name="ordini")
     organizzatore = models.ForeignKey(to='users.Organizzatore', on_delete=models.PROTECT, null=False, blank=False, related_name="ordini")
-
+    evento = models.ForeignKey(to='products.Evento', on_delete=models.CASCADE, null=False, blank=False, related_name="ordini")
 
     def __str__(self):
         return f"Ordine N. {self.pk} - {self.utente.nome} {self.utente.cognome}, {self.utente.email}"
@@ -28,6 +28,7 @@ class BigliettoAcquistato(models.Model):
     data_nascita_acquirente = models.DateField(null=False, blank=False, default=timezone.now)
     sesso_acquirente = models.CharField(max_length=10, choices=GENDER_CHOICES, null=False, blank=False, default='Altro')
     stato_acquirente = models.CharField(max_length=50, null=False, blank=False)
+    prezzo_acquisto = models.FloatField(null=False, blank=False, default=0.00)
 
     biglietto = models.ForeignKey(to='products.Biglietto', on_delete=models.CASCADE, null=False, blank=False, related_name='biglietti_acquistati')
     ordine = models.ForeignKey(Ordine, on_delete=models.CASCADE, null=False, blank=False, related_name='biglietti_acquistati')
