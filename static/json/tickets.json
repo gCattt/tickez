@@ -1,0 +1,191 @@
+[
+    {
+        "tipologia": "VIP Pass",
+        "prezzo": 150.00,
+        "quantita": 0,
+        "descrizione": "Accesso all'evento con il pacchetto VIP, comprensivo di posti premium, accesso privilegiato ai servizi e ingresso separato.",
+        "evento": "concerto-di-taylor-swift"
+    },
+    {
+        "tipologia": "PIT - Early Access",
+        "prezzo": 80.00,
+        "quantita": 50,
+        "descrizione": "Posti nella zona PIT con accesso anticipato al concerto, consentendo di avvicinarsi maggiormente al palco per una visione ottimale.",
+        "evento": "concerto-di-taylor-swift"
+    },
+    {
+        "tipologia": "Posto Unico",
+        "prezzo": 45.00,
+        "quantita": 150,
+        "descrizione": "Accesso generale all'area del concerto senza posti assegnati, permettendo una fruizione libera dell'evento.",
+        "evento": "concerto-di-taylor-swift"
+    },
+    {
+        "tipologia": "Posto Unico",
+        "prezzo": 50.00,
+        "quantita": 200,
+        "descrizione": "Accesso generale all'area del concerto senza posti assegnati, ideale per chi desidera vivere l'esperienza in modo dinamico.",
+        "evento": "ed-sheeran-live"
+    },
+    {
+        "tipologia": "Platea Numerata",
+        "prezzo": 80.00,
+        "quantita": 120,
+        "descrizione": "Posti numerati nella platea del teatro, garantendo una visione ottimale e un comfort elevato.",
+        "evento": "elisa-in-concerto"
+    },
+    {
+        "tipologia": "Poltronissima",
+        "prezzo": 100.00,
+        "quantita": 80,
+        "descrizione": "Posti in poltronissima, offrendo la migliore visibilita' e il massimo comfort durante lo spettacolo.",
+        "evento": "elisa-in-concerto"
+    },
+    {
+        "tipologia": "Posto Unico",
+        "prezzo": 50.00,
+        "quantita": 180,
+        "descrizione": "Accesso generale all'area del concerto senza posti assegnati, consentendo una partecipazione libera all'evento.",
+        "evento": "vasco-rossi-live"
+    },
+    {
+        "tipologia": "Platea Numerata",
+        "prezzo": 70.00,
+        "quantita": 120,
+        "descrizione": "Posti numerati nella platea del teatro, garantendo una visione ottimale e un comfort elevato.",
+        "evento": "ligabue-tour-2024"
+    },
+    {
+        "tipologia": "Poltronissima",
+        "prezzo": 100.00,
+        "quantita": 0,
+        "descrizione": "Posti in poltronissima, offrendo la migliore visibilita' e il massimo comfort durante lo spettacolo.",
+        "evento": "ligabue-tour-2024"
+    },
+    {
+        "tipologia": "VIP Pass",
+        "prezzo": 175.00,
+        "quantita": 80,
+        "descrizione": "Accesso all'evento con il pacchetto VIP, che include posti premium, accesso privilegiato ai servizi e ingresso separato.",
+        "evento": "billie-eilish-in-concert"
+    },
+    {
+        "tipologia": "Posto Unico",
+        "prezzo": 40.00,
+        "quantita": 0,
+        "descrizione": "Accesso generale all'area del concerto senza posti assegnati, permettendo una fruizione libera dell'evento.",
+        "evento": "billie-eilish-in-concert"
+    },
+    {
+        "tipologia": "Platea Numerata",
+        "prezzo": 80.00,
+        "quantita": 120,
+        "descrizione": "Posti numerati nella platea del teatro, garantendo una visione ottimale e un comfort elevato.",
+        "evento": "ariana-grande-world-tour"
+    },
+    {
+        "tipologia": "Poltronissima",
+        "prezzo": 100.00,
+        "quantita": 80,
+        "descrizione": "Posti in poltronissima, offrendo la migliore visibilita' e il massimo comfort durante lo spettacolo.",
+        "evento": "ariana-grande-world-tour"
+    },
+    {
+        "tipologia": "Platea Numerata",
+        "prezzo": 70.00,
+        "quantita": 200,
+        "descrizione": "Posti numerati nella platea del teatro, garantendo una visione ottimale e un comfort elevato.",
+        "evento": "eros-ramazzotti-in-concerto"
+    },
+    {
+        "tipologia": "Posto Unico",
+        "prezzo": 70.00,
+        "quantita": 150,
+        "descrizione": "Accesso generale all'area del festival senza posti assegnati, consentendo una partecipazione flessibile.",
+        "evento": "festa-della-musica-2024"
+    },
+    {
+        "tipologia": "Festival Pass",
+        "prezzo": 100.00,
+        "quantita": 0,
+        "descrizione": "Accesso completo a tutte le aree e performance del festival, per vivere l'intera esperienza senza limitazioni.",
+        "evento": "festa-della-musica-2024"
+    },
+    {
+        "tipologia": "Platea Numerata",
+        "prezzo": 60.00,
+        "quantita": 180,
+        "descrizione": "Posti numerati nella platea del teatro, garantendo una visione ottimale e un comfort elevato.",
+        "evento": "elisa-in-an-intimate-night"
+    },
+    {
+        "tipologia": "Poltronissima",
+        "prezzo": 80.00,
+        "quantita": 0,
+        "descrizione": "Posti in poltronissima, offrendo la migliore visibilita' e il massimo comfort durante lo spettacolo.",
+        "evento": "elisa-in-an-intimate-night"
+    },
+    {
+        "tipologia": "VIP Pass",
+        "prezzo": 150.00,
+        "quantita": 0,
+        "descrizione": "Accesso all'evento con il pacchetto VIP, comprensivo di posti premium, accesso privilegiato ai servizi e ingresso separato.",
+        "evento": "concerto-di-ligabue"
+    },
+    {
+        "tipologia": "PIT - Early Access",
+        "prezzo": 80.00,
+        "quantita": 50,
+        "descrizione": "Posti nella zona PIT con accesso anticipato al concerto, consentendo di avvicinarsi maggiormente al palco per una visione ottimale.",
+        "evento": "concerto-di-ligabue"
+    },
+    {
+        "tipologia": "Posto Unico",
+        "prezzo": 45.00,
+        "quantita": 150,
+        "descrizione": "Accesso generale all'area del concerto senza posti assegnati, permettendo una fruizione libera dell'evento.",
+        "evento": "concerto-di-ligabue"
+    },
+    {
+        "tipologia": "Posto Unico",
+        "prezzo": 60.00,
+        "quantita": 0,
+        "descrizione": "Accesso generale all'area del concerto senza posti assegnati, permettendo una fruizione libera dell'evento.",
+        "evento": "ariana-grande-live-in-milan"
+    },
+    {
+        "tipologia": "PIT",
+        "prezzo": 100.00,
+        "quantita": 50,
+        "descrizione": "Posti più vicini al palco, garantendo una visione ravvicinata dello spettacolo.",
+        "evento": "ariana-grande-live-in-milan"
+    },
+    {
+        "tipologia": "Posto Unico",
+        "prezzo": 80.00,
+        "quantita": 200,
+        "descrizione": "Accesso generale all'area del festival senza posti assegnati, permettendo una partecipazione flessibile.",
+        "evento": "festival-pop"
+    },
+    {
+        "tipologia": "Platea Numerata",
+        "prezzo": 70.00,
+        "quantita": 120,
+        "descrizione": "Posti numerati nella platea del teatro, garantendo una visione ottimale e un comfort elevato.",
+        "evento": "concerto-di-billie-eilish"
+    },
+    {
+        "tipologia": "Poltronissima",
+        "prezzo": 100.00,
+        "quantita": 80,
+        "descrizione": "Posti in poltronissima, offrendo la migliore visibilita' e il massimo comfort durante lo spettacolo.",
+        "evento": "concerto-di-billie-eilish"
+    },
+    {
+        "tipologia": "Poltronissima",
+        "prezzo": 100.00,
+        "quantita": 0,
+        "descrizione": "Posti in poltronissima, offrendo la migliore visibilita' e il massimo comfort durante lo spettacolo.",
+        "evento": "eros-ramazzotti-in-concerto"
+    }
+]

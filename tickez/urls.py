@@ -23,9 +23,6 @@ from django.conf import settings
 from . import views
 from django.views.generic.base import RedirectView
 
-from .initcmds import *
-
-
 urlpatterns = [
     path('admin/', admin.site.urls),
 
@@ -40,9 +37,6 @@ urlpatterns = [
     re_path(r"^404/$", views.custom_404_view, name="404"),
     
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-#erase_db()
-#init_db()
 
 admin.site.site_header = "Tickez Administration Page"
 admin.site.site_title = "Tickez"

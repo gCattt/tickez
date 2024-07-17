@@ -1,0 +1,37 @@
+[
+    {
+      "nome": "Mediolanum Forum",
+      "indirizzo": "Via Giuseppe di Vittorio 6",
+      "citta": "Assago",
+      "capienza_persone": 12000,
+      "immagine": "images/venues/mediolanum_forum.jpg"
+    },
+    {
+      "nome": "Arena di Verona",
+      "indirizzo": "Via Dietro Anfiteatro 6",
+      "citta": "Verona",
+      "capienza_persone": 15000,
+      "immagine": "images/venues/arena_di_verona.jpg"
+    },
+    {
+      "nome": "Teatro degli Arcimboldi",
+      "indirizzo": "Viale dell'Innovazione 20",
+      "citta": "Milano",
+      "capienza_persone": 2500,
+      "immagine": "images/venues/teatro_arcimboldi.jpg"
+    },
+    {
+      "nome": "Teatro alla Scala",
+      "indirizzo": "Via Filodrammatici 2",
+      "citta": "Milano",
+      "capienza_persone": 2000,
+      "immagine": "images/venues/teatro_alla_scala.jpg"
+    },
+    {
+      "nome": "Ippodromo Capannelle",
+      "indirizzo": "Via Appia Nuova 1245",
+      "citta": "Roma",
+      "capienza_persone": 30000,
+      "immagine": "images/venues/ippodromo_capannelle.jpg"
+    }
+]

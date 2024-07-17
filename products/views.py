@@ -81,7 +81,7 @@ class EventDetailView(DetailView):
                 utente = None
 
         context['title'] = f"{evento.organizzatore} - {evento.nome}"
-        context['tickets'] = evento.biglietti_disponibili.all()
+        context['tickets'] = evento.biglietti_disponibili.all().order_by('-prezzo')
         context['range_dropdown'] = range(0, 6)
         context['name_change'] = evento.data_ora - timedelta(days=15)
 

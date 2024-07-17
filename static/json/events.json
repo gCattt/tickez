@@ -1,0 +1,130 @@
+[
+    {
+        "nome": "Concerto di Taylor Swift",
+        "categoria": "Concerti",
+        "locandina": "images/events/concerto_taylor_swift.jpg",
+        "descrizione": "Un concerto indimenticabile con le hit di Taylor Swift. Unisciti a noi per una notte di musica straordinaria e spettacoli mozzafiato.",
+        "organizzatore": "taylor-swift",
+        "luogo": "mediolanum-forum"
+    },
+    {
+        "nome": "Ed Sheeran Live",
+        "categoria": "Concerti",
+        "locandina": "images/events/ed_sheeran_live.jpg",
+        "descrizione": "Ed Sheeran porta la sua musica popolare e il suo carisma sul palco. Preparati a cantare le tue canzoni preferite in una serata magica.",
+        "organizzatore": "ed-sheeran",
+        "luogo": "mediolanum-forum"
+    },
+    {
+        "nome": "Elisa in Concerto",
+        "categoria": "Teatro",
+        "locandina": "images/events/elisa_in_concerto.jpg",
+        "descrizione": "Una serata magica con le canzoni toccanti di Elisa. Un'esperienza emozionante che ti lascera' senza fiato.",
+        "organizzatore": "elisa",
+        "luogo": "teatro-degli-arcimboldi"
+    },
+    {
+        "nome": "Ligabue - Tour 2024",
+        "categoria": "Teatro",
+        "locandina": "images/events/ligabue_tour.jpg",
+        "descrizione": "Un tour emozionante con la musica intensa di Ligabue. Non perdere l'opportunita' di vivere un'esperienza live unica e coinvolgente.",
+        "organizzatore": "ligabue",
+        "luogo": "teatro-alla-scala"
+    },
+    {
+        "nome": "Ariana Grande World Tour",
+        "categoria": "Teatro",
+        "locandina": "images/events/ariana_grande_world_tour.jpg",
+        "descrizione": "Il tour mondiale di Ariana Grande con performance straordinarie. Una notte indimenticabile con una delle artiste piu' amate del momento.",
+        "organizzatore": "ariana-grande",
+        "luogo": "teatro-alla-scala"
+    },
+    {
+        "nome": "Vasco Rossi Live",
+        "categoria": "Concerti",
+        "locandina": "images/events/vasco_rossi_live.jpg",
+        "descrizione": "Un concerto epico con Vasco Rossi e la sua band. Preparati a una serata di rock puro ed emozioni forti.",
+        "organizzatore": "vasco-rossi",
+        "luogo": "ippodromo-capannelle"
+    },
+    {
+        "nome": "Billie Eilish in Concert",
+        "categoria": "Concerti",
+        "locandina": "images/events/billie_eilish_in_concert.jpg",
+        "descrizione": "Billie Eilish porta la sua musica rivoluzionaria e le sue performance energiche. Un evento da non perdere per tutti i fan.",
+        "organizzatore": "billie-eilish",
+        "luogo": "mediolanum-forum"
+    },
+    {
+        "nome": "Jovanotti - Jova Party",
+        "categoria": "Festival",
+        "locandina": "images/events/jovanotti_jova_party.jpg",
+        "descrizione": "Un evento imperdibile con Jovanotti. Divertimento assicurato con musica, danza e tanto altro.",
+        "organizzatore": "jovanotti",
+        "luogo": "ippodromo-capannelle"
+    },
+    {
+        "nome": "Dua Lipa Live",
+        "categoria": "Concerti",
+        "locandina": "images/events/dua_lipa_live.jpg",
+        "descrizione": "Dua Lipa porta il suo pop e la sua energia sul palco. Un'esperienza musicale travolgente e piena di ritmo.",
+        "organizzatore": "dua-lipa",
+        "luogo": "mediolanum-forum"
+    },
+    {
+        "nome": "Eros Ramazzotti in Concerto",
+        "categoria": "Teatro",
+        "locandina": "images/events/eros_ramazzotti_in_concerto.jpg",
+        "descrizione": "Una serata romantica con le canzoni di Eros Ramazzotti. Un viaggio emozionante tra i suoi piu' grandi successi.",
+        "organizzatore": "eros-ramazzotti",
+        "luogo": "teatro-alla-scala"
+    },
+    {
+        "nome": "Festa della Musica 2024",
+        "categoria": "Festival",
+        "locandina": "images/events/festa_della_musica.jpg",
+        "descrizione": "Un festival epico con una line-up eccezionale di artisti italiani e internazionali. Preparati a vivere un'esperienza musicale senza precedenti.",
+        "organizzatore": "ligabue",
+        "luogo": "ippodromo-capannelle"
+    },
+    {
+        "nome": "ELISA in An Intimate Night",
+        "categoria": "Teatro",
+        "locandina": "images/events/elisa_intimate_night.jpg",
+        "descrizione": "L'artista a grande richiesta ritorna nell'atmosfera intima del teatro, nuovo palcoscenico di An Intimate Night.",
+        "organizzatore": "elisa",
+        "luogo": "teatro-alla-scala"
+    },
+    {
+        "nome": "Concerto di Ligabue",
+        "categoria": "Concerti",
+        "locandina": "images/events/concerto_ligabue.jpg",
+        "descrizione": "Ligabue torna sul palco con le sue canzoni piu' amate. Una notte di rock italiano che rimarra' nei cuori di tutti i fan.",
+        "organizzatore": "ligabue",
+        "luogo": "ippodromo-capannelle"
+    },
+    {
+        "nome": "Ariana Grande Live in Milan",
+        "categoria": "Concerti",
+        "locandina": "images/events/ariana_grande_live.jpg",
+        "descrizione": "Ariana Grande porta il suo spettacolo emozionante in Italia. Una performance che promette di essere elettrizzante e indimenticabile.",
+        "organizzatore": "ariana-grande",
+        "luogo": "mediolanum-forum"
+    },
+    {
+        "nome": "Festival Pop",
+        "categoria": "Festival",
+        "locandina": "images/events/festival_pop.jpg",
+        "descrizione": "Un festival dedicato alla musica pop. Unisciti a noi per celebrare i piu' grandi successi pop con artisti eccezionali.",
+        "organizzatore": "taylor-swift",
+        "luogo": "ippodromo-capannelle"
+    },
+    {
+        "nome": "Concerto di Billie Eilish",
+        "categoria": "Teatro",
+        "locandina": "images/events/concerto_billie_eilish.jpg",
+        "descrizione": "Billie Eilish porta il suo album piu' recente dal vivo. Un'occasione unica per vedere questa giovane star in un'atmosfera intima.",
+        "organizzatore": "billie-eilish",
+        "luogo": "teatro-degli-arcimboldi"
+    }
+]

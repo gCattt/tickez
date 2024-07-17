@@ -1,93 +1,244 @@
 from common.models import Luogo, Notifica
 from users.models import Organizzatore, Utente
-from orders.models import Ordine
+from orders.models import Ordine, BigliettoAcquistato
 from products.models import Evento, Biglietto
+from django.contrib.auth.models import User, Group
+
+from django.conf import settings
+
+from django.db import connection
 
 from datetime import datetime, timedelta
-import random
-from django.contrib.auth.hashers import make_password
+from django.utils import timezone
+import sys, os, json, random
 
+ 
 def erase_db():
-    Luogo.objects.all().delete()
-    Notifica.objects.all().delete()
-    Utente.objects.all().delete()
-    Ordine.objects.all().delete()
-    Organizzatore.objects.all().delete()
-    Evento.objects.all().delete()
-    Biglietto.objects.all().delete()
-    print("DB cancellato.")
-
-def init_db():
-    if len(Evento.objects.all())!=0:
+    # salta l'inizializzazione se si stanno eseguendo i test
+    if 'test' in sys.argv:
         return
     
-    luoghi = [
-        {"nome": "Stadio Olimpico", "indirizzo": "Viale dei Gladiatori, Roma", "capienza_persone": 72698, "citta": "Roma", "stato": "Italia", "codice_postale": "00135"},
-        {"nome": "Mediolanum Forum", "indirizzo": "Via G. Di Vittorio, Assago", "capienza_persone": 12700, "citta": "Milano", "stato": "Italia", "codice_postale": "20090"},
-        {"nome": "Arena di Verona", "indirizzo": "Piazza Bra, Verona", "capienza_persone": 22000, "citta": "Verona", "stato": "Italia", "codice_postale": "37121"},
-        {"nome": "Teatro La Fenice", "indirizzo": "Campo San Fantin, Venezia", "capienza_persone": 1000, "citta": "Venezia", "stato": "Italia", "codice_postale": "30124"},
-        {"nome": "PalaAlpitour", "indirizzo": "Corso Sebastopoli, Torino", "capienza_persone": 15500, "citta": "Torino", "stato": "Italia", "codice_postale": "10134"}
-    ]
-    for luogo in luoghi:
-        l = Luogo(**luogo)
-        l.save()
+    Luogo.objects.all().delete()
+    Notifica.objects.all().delete()
+    Organizzatore.objects.all().delete()
+    Utente.objects.all().delete()
+    Ordine.objects.all().delete()
+    BigliettoAcquistato.objects.all().delete()
+    Evento.objects.all().delete()
+    Biglietto.objects.all().delete()
+    User.objects.all().delete()
+
+    print("DB cancellato correttamente.\n")
 
 
-    utenti = [
-        {"username": "mario", "nome": "Mario", "cognome": "Rossi", "email": "mario.rossi@example.com", "data_nascita": "1980-05-15", "sesso": "M", "stato": "Italia", "indirizzo": "Via Roma 1, Milano", "telefono": "3456789012", "carta_credito": "1234567812345678", "cvv": "123", "scadenza_carta": "2025-06-30", "notifiche": False},
-        {"username": "luigi", "nome": "Luigi", "cognome": "Verdi", "email": "luigi.verdi@example.com", "data_nascita": "1990-07-20", "sesso": "M", "stato": "Italia", "indirizzo": "Via Milano 2, Roma", "telefono": "3456789013", "carta_credito": "2345678923456789", "cvv": "234", "scadenza_carta": "2026-07-30", "notifiche": False},
-        {"username": "giulia", "nome": "Giulia", "cognome": "Bianchi", "email": "giulia.bianchi@example.com", "data_nascita": "1985-03-10", "sesso": "F", "stato": "Italia", "indirizzo": "Via Torino 3, Firenze", "telefono": "3456789014", "carta_credito": "3456789034567890", "cvv": "345", "scadenza_carta": "2027-08-30", "notifiche": False},
-        {"username": "francesca", "nome": "Francesca", "cognome": "Neri", "email": "francesca.neri@example.com", "data_nascita": "1995-12-25", "sesso": "F", "stato": "Italia", "indirizzo": "Via Napoli 4, Napoli", "telefono": "3456789015", "carta_credito": "4567890145678901", "cvv": "456", "scadenza_carta": "2028-09-30", "notifiche": False},
-        {"username": "alessandro", "nome": "Alessandro", "cognome": "Gialli", "email": "alessandro.gialli@example.com", "data_nascita": "1975-08-05", "sesso": "M", "stato": "Italia", "indirizzo": "Via Firenze 5, Bologna", "telefono": "3456789016", "carta_credito": "5678901256789012", "cvv": "567", "scadenza_carta": "2029-10-30", "notifiche": False}
-    ]
-    for utente in utenti:
-        password = make_password('default_password')
-        utente_obj = Utente(username=utente['username'], password=password, **utente)
-        utente_obj.save()
+# resetta l'id counter delle tabelle
+def reset_ids(tables):
+	for t in tables:
+		with connection.cursor() as cursor:
+			cursor.execute(f"DELETE FROM sqlite_sequence WHERE name = '{t}';")
 
+def init_users():
+    # superuser
+    admin = User.objects.create_superuser(username="admin", password="password")
+    admin.save()
+    # creazione dei gruppi
+    clienti_group, created = Group.objects.get_or_create(name='Clienti')
+    organizzatori_group, created = Group.objects.get_or_create(name='Organizzatori')
 
-    organizzatori = [
-        {"nome": "Adele", "descrizione": "Cantante britannica pop e soul", "notifiche": False},
-        {"nome": "Ed Sheeran", "descrizione": "Cantautore britannico pop", "notifiche": False},
-        {"nome": "Bruno Mars", "descrizione": "Cantautore e produttore statunitense", "notifiche": False},
-        {"nome": "Beyoncé", "descrizione": "Cantante e attrice statunitense", "notifiche": False},
-        {"nome": "Drake", "descrizione": "Rapper e cantante canadese", "notifiche": False}
-    ]
-    for organizzatore in organizzatori:
-        o = Organizzatore(**organizzatore)
-        o.save()
+    # clienti
+    clienti_file = os.path.join(settings.BASE_DIR, 'static', 'json', 'users.json')
+    with open(clienti_file, 'r', encoding='utf-8') as f:
+        clienti_data = json.load(f)
 
+        for cliente_data in clienti_data:
+            username = cliente_data['username']
+            password = cliente_data.get('password', 'utentepw')
+            utente = User.objects.create_user(username=username, password=password)
+            cliente = Utente.objects.create(
+                nome=cliente_data['nome'],
+                cognome=cliente_data['cognome'],
+                email=cliente_data['email'],
+                data_nascita=cliente_data['data_nascita'],
+                sesso=cliente_data['sesso'],
+                stato=cliente_data['stato'],
+                telefono=cliente_data.get('telefono', None),
+                user=utente
+            )
+            clienti_group.user_set.add(utente)
+            cliente.save()
 
-    luoghi = list(Luogo.objects.all())
-    organizzatori = list(Organizzatore.objects.all())
-    eventi = [
-        {"nome": "Concerto di Capodanno", "descrizione": "Concerto speciale per celebrare il nuovo anno.", "data_ora": datetime.now() + timedelta(days=30), "categoria": "Concerti"},
-        {"nome": "Festival Estivo", "descrizione": "Festival musicale estivo con vari artisti.", "data_ora": datetime.now() + timedelta(days=60), "categoria": "Festival"},
-        {"nome": "Jazz Night", "descrizione": "Serata dedicata alla musica jazz.", "data_ora": datetime.now() + timedelta(days=90), "categoria": "Concerti"},
-        {"nome": "Rock Fest", "descrizione": "Festival di musica rock con band internazionali.", "data_ora": datetime.now() + timedelta(days=120), "categoria": "Festival"},
-        {"nome": "Classica sotto le stelle", "descrizione": "Concerto di musica classica", "data_ora": datetime.now() + timedelta(days=150), "categoria": "Teatro"}
-    ]
-    for evento in eventi:
-        evento['luogo'] = random.choice(luoghi)
-        evento['organizzatore'] = random.choice(organizzatori)
-        e = Evento(**evento)
-        e.save()
+        # organizzatori
+        organizzatori_file = os.path.join(settings.BASE_DIR, 'static', 'json', 'organizers.json')
+        with open(organizzatori_file, 'r', encoding='utf-8') as f:
+            organizzatori_data = json.load(f)
 
+        for organizzatore_data in organizzatori_data:
+            username = organizzatore_data['username']
+            password = organizzatore_data.get('password', 'organizzatorepw')
+            utente = User.objects.create_user(username=username, password=password)
+            organizzatore = Organizzatore.objects.create(
+                nome=organizzatore_data['nome'],
+                email=organizzatore_data['email'],
+                descrizione=organizzatore_data.get('descrizione', ''),
+                immagine_profilo=organizzatore_data.get('immagine_profilo', ''),
+                user=utente
+            )
+            organizzatori_group.user_set.add(utente)
+            organizzatore.save()
 
-    eventi = list(Evento.objects.all())
-    biglietti = [
-        {"tipologia": "VIP", "prezzo": 150.00, "descrizione": "Biglietto VIP con accesso all'area riservata."},
-        {"tipologia": "Standard", "prezzo": 50.00, "descrizione": "Biglietto standard con posto a sedere."},
-        {"tipologia": "Economy", "prezzo": 30.00, "descrizione": "Biglietto economy con posto in piedi."},
-        {"tipologia": "Premium", "prezzo": 100.00, "descrizione": "Biglietto premium con posto a sedere vicino al palco."},
-        {"tipologia": "Backstage", "prezzo": 200.00, "descrizione": "Biglietto con accesso al backstage."}
-    ]
-    for biglietto in biglietti:
-        biglietto['evento'] = random.choice(eventi)
-        biglietto['organizzatore'] = random.choice(organizzatori)
-        biglietto['quantita'] = random.randint(0, 100)
-        b = Biglietto(**biglietto)
-        b.save()
+    print("Utenti creati con successo.\n")
 
+def init_venues():
+    venues_file = os.path.join(settings.BASE_DIR, 'static', 'json', 'venues.json')
 
-    print("DB popolato con successo.")
+    with open(venues_file, 'r', encoding='utf-8') as f:
+        venues_data = json.load(f)
+
+        for venue_data in venues_data:
+            nome = venue_data['nome']
+            indirizzo = venue_data['indirizzo']
+            citta = venue_data['citta']
+            capienza_persone = venue_data['capienza_persone']
+            immagine_path = venue_data['immagine']
+
+            # verifica se il luogo già esiste
+            if Luogo.objects.filter(nome=nome).exists():
+                continue
+
+            # Crea e salva il luogo
+            luogo = Luogo(
+                nome=nome,
+                indirizzo=indirizzo,
+                citta=citta,
+                capienza_persone=capienza_persone,
+                immagine=immagine_path
+            )
+            luogo.save()
+
+    print("Luoghi creati con successo.\n")
+
+def init_events():
+    events_file = os.path.join(settings.BASE_DIR, 'static', 'json', 'events.json')
+
+    with open(events_file, 'r', encoding='utf-8') as f:
+        events_data = json.load(f)
+
+        for event_data in events_data:
+            nome = event_data['nome']
+            categoria = event_data['categoria']
+            locandina = event_data['locandina']
+            descrizione = event_data['descrizione']
+            organizzatore = event_data['organizzatore']
+            luogo = event_data['luogo']
+
+            try:
+                organizzatore = Organizzatore.objects.get(slug=organizzatore)
+            except Organizzatore.DoesNotExist:
+                print(f"Organizzatore con slug '{organizzatore}' non trovato. Evento '{nome}' non creato.")
+                continue
+
+            try:
+                luogo = Luogo.objects.get(slug=luogo)
+            except Luogo.DoesNotExist:
+                print(f"Luogo con nome '{luogo}' non trovato. Evento '{nome}' non creato.")
+                continue
+
+            data_ora = timezone.now() + timedelta(seconds=random.randint(0, int(((timezone.now() + timedelta(days=2*365)) - timezone.now()).total_seconds())))
+            data_ora = data_ora.replace(hour=random.randint(18, 19), minute=00, second=0, microsecond=0)
+            evento = Evento.objects.create(
+                nome=nome,
+                categoria=categoria,
+                data_ora=data_ora,
+                locandina=locandina,
+                descrizione=descrizione,
+                visualizzazioni=random.randint(0, 500),
+                organizzatore=organizzatore,
+                luogo=luogo
+            )
+            evento.save()
+
+    print(f"Eventi creati con successo.\n")
+
+def init_tickets():
+    tickets_file = os.path.join(settings.BASE_DIR, 'static', 'json', 'tickets.json')
+
+    with open(tickets_file, 'r') as f:
+        tickets_data = json.load(f)
+        
+        for ticket_data in tickets_data:
+            tipologia = ticket_data['tipologia']
+            prezzo = ticket_data['prezzo']
+            quantita = ticket_data['quantita']
+            descrizione = ticket_data['descrizione']
+            evento = ticket_data['evento']
+            
+            try:
+                evento = Evento.objects.get(slug=evento)
+            except Evento.DoesNotExist:
+                print(f"Evento con slug '{evento}' non trovato. Biglietto '{tipologia}' non creato.")
+                continue
+
+            Biglietto.objects.create(
+                tipologia=tipologia,
+                prezzo=prezzo,
+                quantita=quantita,
+                quantita_vendibile=quantita,
+                descrizione=descrizione,
+                evento=evento,
+                organizzatore=evento.organizzatore
+            )
+        
+    print(f"Biglietti creati con successo.\n")
+
+def init_orders():
+    for _ in range(10):
+        utente = random.choice(Utente.objects.all())
+        biglietto = random.choice(Biglietto.objects.all())
+        evento = biglietto.evento
+        organizzatore = biglietto.organizzatore
+
+        total = biglietto.prezzo
+
+        random_datetime = timezone.now() + timedelta(hours=random.randint(1, 5))
+        # Crea l'ordine
+        ordine = Ordine.objects.create(
+            utente=utente,
+            organizzatore=organizzatore,
+            evento=evento,
+            totale=total,
+            data_ora=random_datetime
+        )
+
+        # Crea un BigliettoAcquistato per l'ordine
+        BigliettoAcquistato.objects.create(
+            biglietto=biglietto,
+            ordine=ordine,
+            nome_acquirente=utente.nome,
+            cognome_acquirente=utente.cognome,
+            data_nascita_acquirente=utente.data_nascita,
+            sesso_acquirente=utente.sesso,
+            stato_acquirente=utente.stato,
+            data_acquisto=random_datetime,
+            prezzo_acquisto=biglietto.prezzo
+        )
+
+    print(f"Ordini creati con successo.\n")
+
+def init_db():
+    # salta l'inizializzazione se si stanno eseguendo i test
+    if 'test' in sys.argv:
+        return
+    
+    tables=["auth_user","auth_user_groups","auth_group","users_organizzatore","users_utente","common_luogo","common_notifica","products_evento","products_biglietto","orders_ordine","orders_bigliettoacquistato"]
+    reset_ids(tables)
+
+    if Evento.objects.count()!= 0:
+        return
+    
+    init_users()
+    init_venues()
+    init_events()
+    init_tickets()
+    init_orders()
+
+    print("DB popolato correttamente.\n")

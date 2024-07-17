@@ -1,0 +1,82 @@
+[
+    {
+        "nome": "Taylor Swift",
+        "email": "taylor.swift@example.com",
+        "descrizione": "Taylor Swift è una cantautrice americana pluripremiata. Conosciuta per il suo stile pop e country, ha venduto milioni di album in tutto il mondo.",
+        "immagine_profilo": "images/organizers/taylor_swift.jpg",
+        "username": "taylorswift",
+        "password": "organizzatorepw"
+    },
+    {
+        "nome": "Ed Sheeran",
+        "email": "ed.sheeran@example.com",
+        "descrizione": "Ed Sheeran è un cantautore britannico noto per le sue canzoni pop e folk. Ha raggiunto la fama internazionale con hit come 'Shape of You' e 'Thinking Out Loud'.",
+        "immagine_profilo": "images/organizers/ed_sheeran.jpg",
+        "username": "edsheeran",
+        "password": "organizzatorepw"
+    },
+    {
+        "nome": "Elisa",
+        "email": "elisa@example.com",
+        "descrizione": "Elisa è una cantautrice italiana di grande successo. Con la sua voce potente e melodica, ha conquistato il pubblico italiano e internazionale.",
+        "immagine_profilo": "images/organizers/elisa.jpg",
+        "username": "elisa",
+        "password": "organizzatorepw"
+    },
+    {
+        "nome": "Ligabue",
+        "email": "ligabue@example.com",
+        "descrizione": "Ligabue è un cantautore e regista italiano, noto per le sue canzoni rock che esplorano temi come l'amore, la vita e la societa'. È uno degli artisti piu' amati in Italia.",
+        "immagine_profilo": "images/organizers/ligabue.jpg",
+        "username": "ligabue",
+        "password": "organizzatorepw"
+    },
+    {
+        "nome": "Ariana Grande",
+        "email": "ariana.grande@example.com",
+        "descrizione": "Ariana Grande è una pop star americana. Conosciuta per la sua voce potente e il suo talento nel cantare e ballare, ha dominato le classifiche con successi come 'Thank U, Next' e '7 Rings'.",
+        "immagine_profilo": "images/organizers/ariana_grande.jpg",
+        "username": "arianagrande",
+        "password": "organizzatorepw"
+    },
+    {
+        "nome": "Vasco Rossi",
+        "email": "vasco.rossi@example.com",
+        "descrizione": "Vasco Rossi è un'icona del rock italiano. Le sue canzoni, energiche e cariche di emozioni, hanno reso Vasco uno dei piu' grandi artisti della musica italiana.",
+        "immagine_profilo": "images/organizers/vasco_rossi.jpg",
+        "username": "vascorossi",
+        "password": "organizzatorepw"
+    },
+    {
+        "nome": "Billie Eilish",
+        "email": "billie.eilish@example.com",
+        "descrizione": "Billie Eilish è una cantautrice e produttrice discografica americana. Con il suo stile unico e le canzoni che affrontano temi profondi, ha guadagnato una vasta base di fan in tutto il mondo.",
+        "immagine_profilo": "images/organizers/billie_eilish.jpg",
+        "username": "billieeilish",
+        "password": "organizzatorepw"
+    },
+    {
+        "nome": "Jovanotti",
+        "email": "jovanotti@example.com",
+        "descrizione": "Jovanotti è un rapper, cantautore e disc jockey italiano. Con la sua musica che mescola rap, pop e influenze internazionali, ha conquistato un pubblico vasto e diversificato.",
+        "immagine_profilo": "images/organizers/jovanotti.jpg",
+        "username": "jovanotti",
+        "password": "organizzatorepw"
+    },
+    {
+        "nome": "Dua Lipa",
+        "email": "dua.lipa@example.com",
+        "descrizione": "Dua Lipa è una cantante britannica di origini albanesi. Conosciuta per il suo pop e dance music, ha raggiunto la fama globale con hit come 'New Rules' e 'Don't Start Now'.",
+        "immagine_profilo": "images/organizers/dua_lipa.jpg",
+        "username": "dualipa",
+        "password": "organizzatorepw"
+    },
+    {
+        "nome": "Eros Ramazzotti",
+        "email": "eros.ramazzotti@example.com",
+        "descrizione": "Eros Ramazzotti è un cantautore italiano celebre per le sue canzoni romantiche e pop. Ha venduto milioni di album in tutto il mondo e continua a essere un'icona della musica italiana.",
+        "immagine_profilo": "images/organizers/eros_ramazzotti.jpg",
+        "username": "erosramazzotti",
+        "password": "organizzatorepw"
+    }
+]
