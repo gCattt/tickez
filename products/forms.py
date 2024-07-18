@@ -67,8 +67,35 @@ class AdminEventCrispyForm(forms.ModelForm):
 
     def clean_data_ora(self):
         data_ora = self.cleaned_data['data_ora']
+        instance = getattr(self, 'instance', None)
+        
         if data_ora < timezone.now():
             raise forms.ValidationError("La data e l'ora dell'evento non possono essere nel passato.")
+        
+        # evita sovrapposizioni per lo stesso organizzatore
+        organizzatore = self.cleaned_data.get('organizzatore')
+        if organizzatore:
+            eventi_stesso_giorno = Evento.objects.filter(
+                organizzatore=organizzatore,
+                data_ora__date=data_ora.date()
+            )
+            if instance and instance.pk:
+                eventi_stesso_giorno = eventi_stesso_giorno.exclude(pk=instance.pk)
+            if eventi_stesso_giorno.exists():
+                raise forms.ValidationError("L'organizzatore ha già un altro evento programmato in questa data.")
+
+        # evita sovrapposizioni nello stesso luogo
+        luogo = self.cleaned_data.get('luogo')
+        if luogo:
+            eventi_stesso_luogo = Evento.objects.filter(
+                luogo=luogo,
+                data_ora__date=data_ora.date()
+            )
+            if instance and instance.pk:
+                eventi_stesso_luogo = eventi_stesso_luogo.exclude(pk=instance.pk)
+            if eventi_stesso_luogo.exists():
+                raise forms.ValidationError("Questo luogo ha già un altro evento programmato in questa data.")
+            
         return data_ora
 
     def clean_locandina(self):
@@ -156,8 +183,34 @@ class EventCrispyForm(forms.ModelForm):
 
     def clean_data_ora(self):
         data_ora = self.cleaned_data['data_ora']
+        instance = getattr(self, 'instance', None)
+        
         if data_ora < timezone.now():
             raise forms.ValidationError("La data e l'ora dell'evento non possono essere nel passato.")
+        
+        # evita sovrapposizioni per lo stesso organizzatore
+        if instance.organizzatore:
+            eventi_stesso_giorno = Evento.objects.filter(
+                organizzatore=instance.organizzatore,
+                data_ora__date=data_ora.date()
+            )
+            if instance and instance.pk:
+                eventi_stesso_giorno = eventi_stesso_giorno.exclude(pk=instance.pk)
+            if eventi_stesso_giorno.exists():
+                raise forms.ValidationError("L'organizzatore ha già un altro evento programmato in questa data.")
+
+        # evita sovrapposizioni nello stesso luogo
+        luogo = self.cleaned_data.get('luogo')
+        if luogo:
+            eventi_stesso_luogo = Evento.objects.filter(
+                luogo=luogo,
+                data_ora__date=data_ora.date()
+            )
+            if instance and instance.pk:
+                eventi_stesso_luogo = eventi_stesso_luogo.exclude(pk=instance.pk)
+            if eventi_stesso_luogo.exists():
+                raise forms.ValidationError("Questo luogo ha già un altro evento programmato in questa data.")
+
         return data_ora
 
     def clean_locandina(self):

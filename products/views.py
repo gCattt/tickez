@@ -31,6 +31,7 @@ from django.conf import settings
 def products(request):
     return render(request, '404.html', status=404)
 
+
 class EventsListView(ListView):
     model = Evento
     template_name = 'products/events.html' 
@@ -56,7 +57,7 @@ class EventDetailView(DetailView):
         try:
             return super().dispatch(request, *args, **kwargs)
         except Http404:
-            return redirect('404')
+            return render(request, '404.html', status=404)
 
     def get_object(self, queryset=None):
         slug = self.kwargs.get('slug')
@@ -135,7 +136,7 @@ def create_event(request):
                     event.save()
                     messages.success(request, f'Evento "{event.nome}" creato con successo!')
                 except Http404:
-                    return redirect('404')
+                    return render(request, '404.html', status=404)
             
             notify(event)
             return redirect(event.get_absolute_url())
@@ -151,7 +152,7 @@ def create_ticket(request, event_slug, event_pk):
     try:
         event = get_object_or_404(Evento, slug=event_slug, pk=event_pk)
     except Http404:
-        return redirect('404')
+        return render(request, '404.html', status=404)
 
     if request.method == 'POST':
         form = TicketCrispyForm(request.POST, evento=event)
@@ -179,7 +180,7 @@ class UpdateEventView(OrganizerOrSuperuserRequiredMixin, UpdateView):
         try:
             return super().dispatch(request, *args, **kwargs)
         except Http404:
-            return redirect('404')
+            return render(request, '404.html', status=404)
 
     def get_object(self, queryset=None):
         slug = self.kwargs.get('slug')
@@ -221,7 +222,7 @@ class UpdateTicketView(OrganizerOrSuperuserRequiredMixin, UpdateView):
         try:
             return super().dispatch(request, *args, **kwargs)
         except Http404:
-            return redirect('404')
+            return render(request, '404.html', status=404)
 
     def get_object(self, queryset=None):
         self.event = get_object_or_404(Evento, slug=self.kwargs.get('event_slug'), pk=self.kwargs.get('event_pk'))
@@ -269,7 +270,7 @@ class DeleteEventView(OrganizerOrSuperuserRequiredMixin, DeleteView):
         try:
             return super().dispatch(request, *args, **kwargs)
         except Http404:
-            return redirect('404')
+            return render(request, '404.html', status=404)
 
     def get_object(self, queryset=None):
         slug = self.kwargs.get('slug')
@@ -296,7 +297,7 @@ class DeleteTicketView(OrganizerOrSuperuserRequiredMixin, DeleteView):
         try:
             return super().dispatch(request, *args, **kwargs)
         except Http404:
-            return redirect('404')
+            return render(request, '404.html', status=404)
 
     def get_object(self, queryset=None):
         self.event = get_object_or_404(Evento, slug=self.kwargs.get('event_slug'), pk=self.kwargs.get('event_pk'))
@@ -411,4 +412,4 @@ def event_statistics(request, slug, pk):
         return render(request, 'products/event_statistics.html', context)
     
     except Http404:
-        return redirect('404')
+        return render(request, '404.html', status=404)

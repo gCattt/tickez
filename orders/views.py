@@ -42,7 +42,7 @@ def checkout(request):
                 try:
                     biglietto = get_object_or_404(Biglietto, id=ticket_id)
                 except Http404:
-                    return redirect('404')
+                    return render(request, '404.html', status=404)
                 quantity = int(value)
                 
                 if quantity > biglietto.quantita_vendibile:
@@ -85,13 +85,13 @@ def process_payment(request):
             try:
                 utente = get_object_or_404(Utente, user=request.user)
             except Http404:
-                return redirect('404')
+                return render(request, '404.html', status=404)
             
             # ottieni l'organizzatore che ha creato i biglietti (basta il primo)
             try:
                 biglietto = get_object_or_404(Biglietto, id=selected_tickets[0])
             except Http404:
-                return redirect('404')
+                return render(request, '404.html', status=404)
             organizzatore = biglietto.organizzatore
             evento = biglietto.evento
             
@@ -108,7 +108,7 @@ def process_payment(request):
                 try:
                     biglietto = get_object_or_404(Biglietto, id=ticket_id)
                 except Http404:
-                    return redirect('404')
+                    return render(request, '404.html', status=404)
                 
                 biglietto.quantita_vendibile -= 1
                 biglietto.save()
@@ -145,7 +145,7 @@ class UpdatePurchaseView(GroupRequiredMixin, UserPassesTestMixin, UpdateView):
         try:
             return super().dispatch(request, *args, **kwargs)
         except Http404:
-            return redirect('404')
+            return render(request, '404.html', status=404)
 
     def get_object(self, queryset=None):
         queryset = self.get_queryset()

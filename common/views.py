@@ -38,7 +38,7 @@ class VenueDetailView(DetailView):
         try:
             return super().dispatch(request, *args, **kwargs)
         except Http404:
-            return redirect('404')
+            return render(request, '404.html', status=404)
 
     def get_object(self, queryset=None):
         slug = self.kwargs.get('slug')

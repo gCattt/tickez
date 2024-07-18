@@ -116,6 +116,8 @@ def toggle_follow(request, entity_type, entity_pk):
                     return redirect(entity.get_absolute_url())
                 
         return redirect(entity.get_absolute_url())
+    except KeyError:
+        return render(request, '404.html', status=404)
     except Http404:
         return render(request, '404.html', status=404)
 
@@ -142,7 +144,7 @@ class ProfileView(LoginRequiredMixin, UpdateView):
         try:
             return super().dispatch(request, *args, **kwargs)
         except Http404:
-            return redirect('404')
+            return render(request, '404.html', status=404)
 
     def get_object(self, queryset=None):
         if hasattr(self.request.user, 'organizzatore'):
@@ -204,7 +206,7 @@ class ArtistDetailView(DetailView):
         try:
             return super().dispatch(request, *args, **kwargs)
         except Http404:
-            return redirect('404')
+            return render(request, '404.html', status=404)
 
     def get_object(self, queryset=None):
         slug = self.kwargs.get('slug')
