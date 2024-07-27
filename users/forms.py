@@ -12,6 +12,7 @@ import os
 from django.utils import timezone
 
 
+# creazione Utente
 class CustomerCreationForm(UserCreationForm):
     # campi aggiuntivi del modello Utente
     nome = forms.CharField(
@@ -53,6 +54,7 @@ class CustomerCreationForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super(CustomerCreationForm, self).__init__(*args, **kwargs)
 
+        # la classe FormHelper offre un modo semplice per gestire il layout e lo stile degli elementi di un form
         self.helper = FormHelper()
         self.helper.form_id = 'customer-creation-crispy-form'
         self.helper.form_method = 'POST'
@@ -83,6 +85,7 @@ class CustomerCreationForm(UserCreationForm):
         )
 
     def save(self, commit=True):
+        # creazione oggetto Utente ed associazione con il model User
         user = super().save(commit=False)
         user.first_name = self.cleaned_data['nome']
         user.last_name = self.cleaned_data['cognome']
@@ -160,6 +163,7 @@ class CustomerCreationForm(UserCreationForm):
         return telefono
 
 
+# creazione Organizzatore
 class OrganizerCreationForm(UserCreationForm):
     # campi aggiuntivi del modello Organizzatore
     nome = forms.CharField(
@@ -186,6 +190,7 @@ class OrganizerCreationForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super(OrganizerCreationForm, self).__init__(*args, **kwargs)
 
+        # la classe FormHelper offre un modo semplice per gestire il layout e lo stile degli elementi di un form
         self.helper = FormHelper()
         self.helper.form_id = 'organizer-creation-crispy-form'
         self.helper.form_method = 'POST'
@@ -203,6 +208,7 @@ class OrganizerCreationForm(UserCreationForm):
         )
 
     def save(self, commit=True):
+        # creazione oggetto Organizzatore ed associazione con il model User
         user = super().save(commit=False)
         user.email = self.cleaned_data["email"]
         if commit:
@@ -249,6 +255,7 @@ class OrganizerCreationForm(UserCreationForm):
         return immagine_profilo
 
 
+# modifica Utente
 class CustomerEditCrispyForm(forms.ModelForm):
     # campo aggiuntivo del modello User
     username = forms.CharField(
@@ -288,6 +295,7 @@ class CustomerEditCrispyForm(forms.ModelForm):
 
         self.initial['username'] = self.instance.user.username
 
+        # la classe FormHelper offre un modo semplice per gestire il layout e lo stile degli elementi di un form
         self.helper = FormHelper()
         self.helper.form_id = 'customer-edit-crispy-form'
         self.helper.form_method = 'POST'
@@ -319,9 +327,11 @@ class CustomerEditCrispyForm(forms.ModelForm):
     def save(self, commit=True):
         instance = super().save(commit=False)
         
+        # la modifica del model Utente si riflette sul model User
         instance.user.username = self.cleaned_data['username']
 
         if self.cleaned_data.get('remove_immagine_profilo'):
+            # se esiste una immagine profilo associata all'istanza, la si rimuove dal file system del server e si setta il campo nel db a None
             if instance.immagine_profilo:
                 try:
                     os.unlink(instance.immagine_profilo.path)
@@ -391,7 +401,8 @@ class CustomerEditCrispyForm(forms.ModelForm):
             raise forms.ValidationError("Il numero di telefono deve contenere solo cifre.")
         return telefono
 
-    
+
+# modifica Organizzatore
 class OrganizzatoreEditCrispyForm(forms.ModelForm):
     # campo aggiuntivo del modello User
     username = forms.CharField(
@@ -437,9 +448,11 @@ class OrganizzatoreEditCrispyForm(forms.ModelForm):
     def save(self, commit=True):
         instance = super().save(commit=False)
         
+        # la modifica del model Organizzatore si riflette sul model User
         instance.user.username = self.cleaned_data['username']
 
         if self.cleaned_data.get('remove_immagine_profilo'):
+            # se esiste una immagine profilo associata all'istanza, la si rimuove dal file system del server e si setta il campo nel db a None
             if instance.immagine_profilo:
                 try:
                     os.unlink(instance.immagine_profilo.path)

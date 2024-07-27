@@ -74,6 +74,7 @@
     {% endif %}
 </div>
 
+<!-- i grafici sono stati creati tramite Chart.js -->
 <script>
     {% if biglietti_venduti > 0 %}
     // grafico età dei partecipanti, divisa per fasce
@@ -200,7 +201,7 @@
     });
     
 
-    var venditePerTipologia = {{ vendite_per_tipologia|safe }};
+    var venditePerTipologia = {{ vendite_per_tipologia }};
     var labels = Object.keys(venditePerTipologia);
     var data = Object.values(venditePerTipologia);
     

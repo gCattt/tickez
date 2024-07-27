@@ -26,6 +26,7 @@ def users(request):
     return render(request, '404.html', status=404)
 
 
+# login
 def login_user(request):
     if request.method == "POST":
         username = request.POST["username"].strip()
@@ -49,6 +50,7 @@ def login_user(request):
         return render(request, 'users/registration/login.html', {})
     
 
+# creazione Utente
 class CustomerCreateView(CreateView):
     form_class = CustomerCreationForm
     template_name = "users/registration/user_create.html"
@@ -72,7 +74,8 @@ class CustomerCreateView(CreateView):
         context['entity'] = 'Utente'
         return context
     
-    
+
+# creazione Organizzatore
 class OrganizerCreateView(PermissionRequiredMixin, CreateView):
     permission_required = "is_staff" # solo l'admin (is_staff di default) può registrare gli organizzatori
     form_class = OrganizerCreationForm
@@ -91,10 +94,12 @@ class OrganizerCreateView(PermissionRequiredMixin, CreateView):
         return context
     
 
+# funzione di test per gestire l'autenticazione degli utenti
 def is_customer(user):
     return user.groups.filter(name="Clienti").exists()
 
 @user_passes_test(is_customer)
+# funzionalità follow-unfollow
 def toggle_follow(request, entity_type, entity_pk):
     # mappa il tipo di entità al modello corrispondente
     entity_model = {
@@ -122,6 +127,7 @@ def toggle_follow(request, entity_type, entity_pk):
         return render(request, '404.html', status=404)
 
 
+# visualizzazione profilo admin
 class AdminProfileView(SuperuserRequiredMixin, DetailView):
     model = User
     template_name = 'users/admin_profile.html'
@@ -131,6 +137,7 @@ class AdminProfileView(SuperuserRequiredMixin, DetailView):
         return self.request.user
     
 
+# visualizzazione profilo Utente o Organizzatore
 class ProfileView(LoginRequiredMixin, UpdateView):
     template_name = 'users/profile.html'
     success_url = reverse_lazy('users:profile')
@@ -167,6 +174,7 @@ class ProfileView(LoginRequiredMixin, UpdateView):
         context['immagine_profilo'] = profile_owner.immagine_profilo_url
 
         orders_paginator = Paginator(profile_owner.ordini.order_by('-data_ora'), self.orders_per_page)
+        # con get_page django gestisce internamente le eccezioni e garantisce che venga sempre restituita una pagina valida.
         context['orders'] = orders_paginator.get_page(self.request.GET.get('page_orders'))
 
         if hasattr(self.request.user, 'organizzatore'):
@@ -185,6 +193,7 @@ class ProfileView(LoginRequiredMixin, UpdateView):
         return context
     
 
+# elenco artisti (organizzatori), in ordine alfabetico
 class ArtistsListView(ListView):
     model = Organizzatore
     template_name = 'users/artists.html' 
@@ -196,6 +205,7 @@ class ArtistsListView(ListView):
         return artist_list.order_by('nome')
     
 
+# dettagli artista (organizzatore)
 class ArtistDetailView(DetailView):
     model = Organizzatore
     template_name = "users/artist_details.html"
@@ -220,6 +230,7 @@ class ArtistDetailView(DetailView):
 
         events = self.object.eventi_organizzati.order_by('data_ora')
         paginator = Paginator(events, self.paginate_by)
+        # con get_page django gestisce internamente le eccezioni e garantisce che venga sempre restituita una pagina valida.
         events = paginator.get_page(self.request.GET.get('page'))
         
         context['planned_events'] = events

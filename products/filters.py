@@ -4,7 +4,7 @@ from django import forms
 
 from products.models import Evento
 
-
+# form di filtraggio degli eventi
 class EventoFilter(django_filters.FilterSet):
     SORT_CHOICES = (
         ('data_ora', 'Data ↑'),
@@ -65,10 +65,12 @@ class EventoFilter(django_filters.FilterSet):
         }),
     )
 
+    # applica l'ordinamento desiderato
     def filter_by_sort(self, queryset, name, value):
         expression = {'data_ora': 'data_ora', '-data_ora': '-data_ora', 'nome': 'nome', '-nome': '-nome'}
         return queryset.order_by(expression[value])
     
     class Meta:
         model = Evento
+        # al di fuori di sort, per cui abbiamo specificato un metodo personalizzato, i restanti filtri operano già sui campi del modello specificati
         fields = ['sort', 'category', 'city', 'from_date', 'until_date']

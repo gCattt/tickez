@@ -37,6 +37,7 @@ class BigliettoAcquistato(models.Model):
     def __str__(self):
         return f'{self.biglietto.tipologia} - {self.nome_acquirente} {self.cognome_acquirente}, {self.data_acquisto}'
     
+    # funzione utilizzata per determinare la possibilità o meno di effettuare il cambio nominativo di un biglietto acquistato
     def can_edit(self):
         return timezone.now() <= (self.biglietto.evento.data_ora - timedelta(days=15))
     

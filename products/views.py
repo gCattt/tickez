@@ -32,6 +32,7 @@ def products(request):
     return render(request, '404.html', status=404)
 
 
+# elenco eventi, filtrati ed in ordine temporale
 class EventsListView(ListView):
     model = Evento
     template_name = 'products/events.html' 
@@ -47,7 +48,7 @@ class EventsListView(ListView):
         context['filter'] = self.evento_filter
         return context
 
-    
+# dettagli evento
 class EventDetailView(DetailView):
     model = Evento
     template_name = "products/event_details.html"
@@ -71,6 +72,7 @@ class EventDetailView(DetailView):
         evento.visualizzazioni += 1
         evento.save()
 
+        # una notifica viene segnata come letta solo quando l'utente osserva i dettagli dell'evento in questione
         if self.request.user.is_authenticated:
             try:
                 utente = self.request.user.utente
@@ -104,7 +106,8 @@ class OrganizerOrSuperuserRequiredMixin(UserPassesTestMixin):
     def handle_no_permission(self):
         # in caso di tentato accesso ad una view protetta, senza i permessi adatti, reindirizza al login
         return redirect(f'{settings.LOGIN_URL}&next={self.request.path}')
-    
+
+# creazione notifica
 def notify(event):
     organizzatore = event.organizzatore
     notification_text = f"Nuovo evento di {organizzatore.nome}: {event.nome} | Scopri i dettagli e Acquista!"
@@ -118,6 +121,7 @@ def notify(event):
     )
 
 @user_passes_test(is_allowed)
+# creazione evento
 def create_event(request):
     entity = 'Evento'
     form_class = AdminEventCrispyForm if request.user.is_superuser else EventCrispyForm
@@ -127,6 +131,7 @@ def create_event(request):
         if form.is_valid():
             event = form.save(commit=False)
             if request.user.is_superuser:
+                # il form dell'admin prevede già un campo 'organizzatore'
                 event.save()
                 messages.success(request, f'Evento "{event.nome}" creato con successo!')
             else:
@@ -147,6 +152,7 @@ def create_event(request):
 
 
 @user_passes_test(is_allowed)
+# creazione tipologia di biglietto
 def create_ticket(request, event_slug, event_pk):
     entity = 'Biglietto'
     try:
@@ -171,6 +177,7 @@ def create_ticket(request, event_slug, event_pk):
     return render(request, 'products/create_entity.html', {'form': form, 'entity': entity, 'event': event})
 
 
+# modifica evento
 class UpdateEventView(OrganizerOrSuperuserRequiredMixin, UpdateView):
     model = Evento
     template_name = "products/update_entity.html"
@@ -211,6 +218,7 @@ class UpdateEventView(OrganizerOrSuperuserRequiredMixin, UpdateView):
         return super().form_valid(form)
     
 
+# modifica tipologia di biglietto associata ad un evento
 class UpdateTicketView(OrganizerOrSuperuserRequiredMixin, UpdateView):
     model = Biglietto
     form_class = TicketCrispyForm
@@ -260,6 +268,7 @@ class UpdateTicketView(OrganizerOrSuperuserRequiredMixin, UpdateView):
         return super().form_valid(form)
     
 
+# rimozione evento
 class DeleteEventView(OrganizerOrSuperuserRequiredMixin, DeleteView):
     model = Evento
     template_name = "products/delete_entity.html"
@@ -288,6 +297,7 @@ class DeleteEventView(OrganizerOrSuperuserRequiredMixin, DeleteView):
         return context
 
 
+# rimozione tipologia di biglietto associata ad un evento
 class DeleteTicketView(OrganizerOrSuperuserRequiredMixin, DeleteView):
     model = Biglietto
     template_name = "products/delete_entity.html"
@@ -321,6 +331,7 @@ class DeleteTicketView(OrganizerOrSuperuserRequiredMixin, DeleteView):
     
 
 @user_passes_test(is_allowed)
+# calcolo statistiche evento
 def event_statistics(request, slug, pk):
     try:
         evento = get_object_or_404(Evento, slug=slug, pk=pk)
@@ -329,7 +340,7 @@ def event_statistics(request, slug, pk):
         biglietti_venduti = BigliettoAcquistato.objects.filter(biglietto__evento=evento).count()
         revenue_totale = BigliettoAcquistato.objects.filter(biglietto__evento=evento).aggregate(Sum('prezzo_acquisto'))['prezzo_acquisto__sum'] or 0
         
-        # calcolo delle fasce di età dei partecipanti
+        # calcolo delle fasce di età dei partecipanti ('values' evita il conteggio duplicato di record, visto che gli utenti possono acquistare più biglietti)
         current_year = datetime.now().year
         fasce_eta = {
             '0_18': BigliettoAcquistato.objects.filter(
@@ -390,9 +401,9 @@ def event_statistics(request, slug, pk):
         )
         # dati fittizi per il test
         test_data = [
-            {'giorno': timezone.datetime(2024, 7, 1, 0, 0), 'count': 10},
-            {'giorno': timezone.datetime(2024, 7, 8, 0, 0), 'count': 15},
-            {'giorno': timezone.datetime(2024, 8, 22, 0, 0), 'count': 25},
+            {'giorno': timezone.datetime(2024, 10, 1, 0, 0), 'count': 10},
+            {'giorno': timezone.datetime(2024, 9, 20, 0, 0), 'count': 15},
+            {'giorno': timezone.datetime(2024, 9, 22, 0, 0), 'count': 25},
             {'giorno': timezone.datetime(2024, 9, 25, 0, 0), 'count': 5},
         ]
         vendite_per_giorno = list(vendite_per_giorno) + test_data

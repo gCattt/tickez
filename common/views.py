@@ -16,7 +16,7 @@ from products.filters import EventoFilter
 def common(request):
     return render(request, '404.html', status=404)
 
-
+# elenco luoghi, in ordine alfabetico
 class VenuesListView(ListView):
     model = Luogo
     template_name = 'common/venues.html' 
@@ -27,7 +27,7 @@ class VenuesListView(ListView):
         
         return venue_list.order_by('nome')
     
-
+# dettagli luogo
 class VenueDetailView(DetailView):
     model = Luogo
     template_name = "common/venue_details.html"
@@ -45,7 +45,6 @@ class VenueDetailView(DetailView):
         pk = self.kwargs.get('pk')
         return get_object_or_404(Luogo, slug=slug, pk=pk)
 
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -53,13 +52,14 @@ class VenueDetailView(DetailView):
 
         events = self.get_object().eventi_programmati.order_by('data_ora')
         paginator = Paginator(events, self.paginate_by)
+        # con get_page django gestisce internamente le eccezioni e garantisce che venga sempre restituita una pagina valida.
         events = paginator.get_page(self.request.GET.get('page'))
 
         context['planned_events'] = events
 
         return context
     
-    
+# funzionalità di ricerca tramite 'keywords'
 def search_results(request):
     events = Evento.objects.all()
     venues = Luogo.objects.all()
@@ -74,6 +74,7 @@ def search_results(request):
             artists = artists.filter(nome__icontains=term)
             venues = venues.filter(nome__icontains=term)
 
+    # applicazione del form di filtraggio agli eventi
     evento_filter = EventoFilter(request.GET, queryset=events)
     events = evento_filter.qs
 
@@ -85,7 +86,6 @@ def search_results(request):
     events_paginator = Paginator(events.order_by('data_ora'), 5)
     artists_paginator = Paginator(artists.order_by('nome'), 8)
     venues_paginator = Paginator(venues.order_by('nome'), 8)
-
     # con get_page django gestisce internamente le eccezioni e garantisce che venga sempre restituita una pagina valida.
     events = events_paginator.get_page(request.GET.get('page_events'))
     artists = artists_paginator.get_page(request.GET.get('page_artists'))

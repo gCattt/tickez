@@ -10,7 +10,7 @@ import os
 
 from django.utils import timezone
 
-
+# creazione/modifica di eventi da parte dell'admin (aggiunge il campo organizzatore)
 class AdminEventCrispyForm(forms.ModelForm):
     class Meta:
         model = Evento
@@ -32,6 +32,7 @@ class AdminEventCrispyForm(forms.ModelForm):
 
         self.initial['data_ora'] = self.instance.data_ora.strftime('%Y-%m-%dT%H:%M')
 
+        # la classe FormHelper offre un modo semplice per gestire il layout e lo stile degli elementi di un form
         self.helper = FormHelper()
         self.helper.form_id = 'event-crispy-form'
         self.helper.form_method = 'POST'
@@ -51,12 +52,12 @@ class AdminEventCrispyForm(forms.ModelForm):
             'descrizione'
         )
 
-    # validazione lato server
+    # validazione lato server:
     def clean_nome(self):
         nome = self.cleaned_data['nome']
         instance = getattr(self, 'instance', None)
         if instance and instance.pk:
-            # modifica
+            # modifica (devo escludere l'istanza del modello considerata)
             if Evento.objects.exclude(pk=instance.pk).filter(nome=nome).exists():
                 raise forms.ValidationError("Questo nome evento è già utilizzato.")
         else:
@@ -108,6 +109,7 @@ class AdminEventCrispyForm(forms.ModelForm):
         return locandina
 
 
+# creazione/modifica di eventi da parte di un Organizzatore
 class EventCrispyForm(forms.ModelForm):
     # aggiorna locandina senza mostrare il percorso del file attualmente caricato
     locandina = forms.ImageField(label=('Aggiorna locandina'), required=False, widget=forms.FileInput)
@@ -132,6 +134,7 @@ class EventCrispyForm(forms.ModelForm):
 
         self.initial['data_ora'] = self.instance.data_ora.strftime('%Y-%m-%dT%H:%M')
 
+        # la classe FormHelper offre un modo semplice per gestire il layout e lo stile degli elementi di un form
         self.helper = FormHelper()
         self.helper.form_id = 'event-crispy-form'
         self.helper.form_method = 'POST'
@@ -155,6 +158,7 @@ class EventCrispyForm(forms.ModelForm):
         instance = super().save(commit=False)
 
         if self.cleaned_data.get('remove_locandina'):
+            # se esiste una locandina associata all'istanza, la si rimuove dal file system del server e si setta il campo nel db a None
             if instance.locandina:
                 try:
                     os.unlink(instance.locandina.path)
@@ -167,12 +171,12 @@ class EventCrispyForm(forms.ModelForm):
 
         return instance
     
-    # validazione lato server
+    # validazione lato server:
     def clean_nome(self):
         nome = self.cleaned_data['nome']
         instance = getattr(self, 'instance', None)
         if instance and instance.pk:
-            # modifica
+            # modifica (devo escludere l'istanza del modello considerata)
             if Evento.objects.exclude(pk=instance.pk).filter(nome=nome).exists():
                 raise forms.ValidationError("Questo nome evento è già utilizzato.")
         else:
@@ -223,6 +227,7 @@ class EventCrispyForm(forms.ModelForm):
         return locandina
     
 
+# creazione/modifica di tipologie di biglietti associate agli eventi
 class TicketCrispyForm(forms.ModelForm):
     class Meta:
         model = Biglietto
@@ -243,6 +248,8 @@ class TicketCrispyForm(forms.ModelForm):
         self.evento = kwargs.pop('evento', None)
         action = kwargs.pop('action', 'Crea Biglietto')
         super(TicketCrispyForm, self).__init__(*args, **kwargs)
+
+        # la classe FormHelper offre un modo semplice per gestire il layout e lo stile degli elementi di un form
         self.helper = FormHelper()
         self.helper.form_id = 'ticket-crispy-form'
         self.helper.form_method = 'POST'
@@ -259,7 +266,7 @@ class TicketCrispyForm(forms.ModelForm):
             'descrizione'
         )
 
-    # validazione lato server
+    # validazione lato server:
     def clean_prezzo(self):
         prezzo = self.cleaned_data['prezzo']
         if prezzo <= 0:
@@ -272,6 +279,7 @@ class TicketCrispyForm(forms.ModelForm):
             raise forms.ValidationError("La quantità disponibile non può essere negativa.")
         print(self.evento)
         if self.evento:
+            # valida la quantità in relazione alla capienza del luogo dell'evento
             capienza = self.evento.luogo.capienza_persone
 
             # calcola la quantità totale dei biglietti escludendo il biglietto attualmente in modifica

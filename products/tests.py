@@ -14,6 +14,7 @@ from django.contrib.auth.models import User, Group
 from django.utils import timezone
 
 
+# modifica evento
 class UpdateEventViewTest(TestCase):
 
     def setUp(self):
@@ -71,18 +72,21 @@ class UpdateEventViewTest(TestCase):
         self.client = Client()
         self.update_url = reverse('products:update-event', kwargs={'slug': self.evento.slug, 'pk': self.evento.pk})
 
+    # corretta renderizzazione del template
     def test_view_uses_correct_template(self):
         self.client.login(username='testuser2_organizzatore', password='password123_organizzatore')
         response = self.client.get(self.update_url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'products/update_entity.html')
 
+    # evento non trovato
     def test_event_not_found(self):
         self.client.login(username='testuser2_organizzatore', password='password123_organizzatore')
         invalid_url = reverse('products:update-event', kwargs={'slug': 'invalid-slug', 'pk': 9999})
         response = self.client.get(invalid_url)
         self.assertEqual(response.status_code, 404)
 
+    # utenti non autorizzati:
     def test_redirect_if_not_logged_in(self):
         response = self.client.get(self.update_url)
         self.assertRedirects(response, f'{settings.LOGIN_URL}&next={self.update_url}')
@@ -97,12 +101,7 @@ class UpdateEventViewTest(TestCase):
         response = self.client.get(self.update_url)
         self.assertRedirects(response, f'{settings.LOGIN_URL}&next={self.update_url}')
 
-    def test_access_template_for_owning_organizer(self):
-        self.client.login(username='testuser2_organizzatore', password='password123_organizzatore')
-        response = self.client.get(self.update_url)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'products/update_entity.html')
-
+    # modifica eseguita correttamente:
     def test_successful_event_update(self):
         self.client.login(username='testuser2_organizzatore', password='password123_organizzatore')
         post_data = {
@@ -118,6 +117,26 @@ class UpdateEventViewTest(TestCase):
         self.assertEqual(self.evento.nome, 'Updated Evento di Test')
         self.assertEqual(self.evento.descrizione, 'Descrizione aggiornata')
 
+    def test_success_message_display(self):
+        self.client.login(username='testuser2_organizzatore', password='password123_organizzatore')
+
+        # dati di aggiornamento dell'evento
+        post_data = {
+            'nome': 'Updated Evento di Test',
+            'categoria': 'Concerti',
+            'data_ora': (timezone.now() + timezone.timedelta(days=2)).strftime('%Y-%m-%dT%H:%M'),
+            'descrizione': 'Descrizione aggiornata',
+            'luogo': self.luogo.pk,
+        }
+        response = self.client.post(self.update_url, post_data)
+        self.evento.refresh_from_db()  # ricarica l'evento per ottenere il nuovo slug se cambiato
+        self.assertRedirects(response, self.evento.get_absolute_url())
+
+        # verifica che il messaggio di successo sia presente
+        messages = list(get_messages(response.wsgi_request))
+        self.assertTrue(any(msg.message == 'Modifiche salvate con successo!' for msg in messages))
+
+    # compilazione del form errata:
     def test_invalid_event_update(self):
         self.client.login(username='testuser2_organizzatore', password='password123_organizzatore')
         post_data = {
@@ -157,22 +176,3 @@ class UpdateEventViewTest(TestCase):
         form = response.context['form']
         self.assertTrue(form.errors)
         self.assertIn('data_ora', form.errors)
-
-    def test_success_message_display(self):
-        self.client.login(username='testuser2_organizzatore', password='password123_organizzatore')
-
-        # Dati di aggiornamento dell'evento
-        post_data = {
-            'nome': 'Updated Evento di Test',
-            'categoria': 'Concerti',
-            'data_ora': (timezone.now() + timezone.timedelta(days=2)).strftime('%Y-%m-%dT%H:%M'),
-            'descrizione': 'Descrizione aggiornata',
-            'luogo': self.luogo.pk,
-        }
-        response = self.client.post(self.update_url, post_data)
-        self.evento.refresh_from_db()  # ricarica l'evento per ottenere il nuovo slug se cambiato
-        self.assertRedirects(response, self.evento.get_absolute_url())
-
-        # Verifica che il messaggio di successo sia presente
-        messages = list(get_messages(response.wsgi_request))
-        self.assertTrue(any(msg.message == 'Modifiche salvate con successo!' for msg in messages))

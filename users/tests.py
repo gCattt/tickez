@@ -14,6 +14,7 @@ from django.contrib.auth.models import User, Group
 from django.utils import timezone
 
 
+# funzionalità follow-unfollow
 class ToggleFollowTestCase(TestCase):
     
     def setUp(self):

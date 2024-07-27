@@ -60,6 +60,10 @@ class Organizzatore(models.Model):
     descrizione = models.TextField(null=True, blank=True, default='')
     immagine_profilo = models.ImageField(null=True, blank=True, upload_to="images/organizers")
 
+    '''
+    l'eliminazione non è bidirezionale per impostazione predefinita per motivi di sicurezza e integrità dei dati.
+    l'oggetto User, quindi, persiste anche se l'oggetto Organizzatore viene eliminato
+    '''
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     followers = models.ManyToManyField(Utente, blank=True, default=None, related_name='organizzatori_preferiti')
 
@@ -67,6 +71,7 @@ class Organizzatore(models.Model):
     def __str__(self):
         return self.nome
     
+    # restituisce l'URL assoluto per la visualizzazione dettagliata di un Organizzatore
     def get_absolute_url(self):
         return reverse("users:artist-details", kwargs={"slug": self.slug, "pk": self.pk})
     
@@ -75,6 +80,7 @@ class Organizzatore(models.Model):
         self.user.email = self.email
         self.user.save()
         
+        # lo slug viene aggiornato alla creazione di un Organizzatore e ad ogni modifica del suo nome
         if not self.slug or slugify(self.nome) != self.slug:
             self.slug = slugify(self.nome)
         super().save(*args, **kwargs)

@@ -15,7 +15,7 @@
       <div style="flex-grow: 1; max-width: calc(100% - 220px);">
           <h1 style="font-weight:600; word-break: break-word;">{{ object.nome }}</h1>
           <p><a href="{% url 'users:artist-details' object.organizzatore.slug object.organizzatore.pk %}" style="text-decoration: underline; color: black;">{{object.organizzatore}}</a><br>
-              <a href="{% url 'common:venue-details' object.luogo.slug object.luogo.pk %}" style="text-decoration: underline; color: black;">{{object.luogo}}</a></p>
+             <a href="{% url 'common:venue-details' object.luogo.slug object.luogo.pk %}" style="text-decoration: underline; color: black;">{{object.luogo}}</a></p>
           <p>{{object.data_ora}}</p>
           
           {% if request.user.utente or request.user.is_superuser or not request.user.is_authenticated %}

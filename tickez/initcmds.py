@@ -12,7 +12,8 @@ from datetime import datetime, timedelta
 from django.utils import timezone
 import sys, os, json, random
 
- 
+
+# totale eliminazione dei dati 
 def erase_db():
     # salta l'inizializzazione se si stanno eseguendo i test
     if 'test' in sys.argv:
@@ -37,6 +38,7 @@ def reset_ids(tables):
 		with connection.cursor() as cursor:
 			cursor.execute(f"DELETE FROM sqlite_sequence WHERE name = '{t}';")
 
+# definizione degli utenti dell'applicazione
 def init_users():
     # superuser
     admin = User.objects.create_superuser(username="admin", password="password")
@@ -88,6 +90,7 @@ def init_users():
 
     print("Utenti creati con successo.\n")
 
+# definizione dei luoghi
 def init_venues():
     venues_file = os.path.join(settings.BASE_DIR, 'static', 'json', 'venues.json')
 
@@ -117,6 +120,7 @@ def init_venues():
 
     print("Luoghi creati con successo.\n")
 
+# definizione degli eventi
 def init_events():
     events_file = os.path.join(settings.BASE_DIR, 'static', 'json', 'events.json')
 
@@ -159,6 +163,7 @@ def init_events():
 
     print(f"Eventi creati con successo.\n")
 
+# definizione delle tipologie di biglietti
 def init_tickets():
     tickets_file = os.path.join(settings.BASE_DIR, 'static', 'json', 'tickets.json')
 
@@ -190,6 +195,7 @@ def init_tickets():
         
     print(f"Biglietti creati con successo.\n")
 
+# definizione ordini
 def init_orders():
     for _ in range(10):
         utente = random.choice(Utente.objects.all())
@@ -224,6 +230,7 @@ def init_orders():
 
     print(f"Ordini creati con successo.\n")
 
+# definizione dati iniziali del database
 def init_db():
     # salta l'inizializzazione se si stanno eseguendo i test
     if 'test' in sys.argv:

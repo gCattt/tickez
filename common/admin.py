@@ -6,6 +6,7 @@ from django.utils.http import urlencode
 from django.utils.html import format_html
 
 
+# personalizzazione dell'interfaccia di amministrazione per il model Luogo
 class LuogoAdmin(admin.ModelAdmin):
     model = Luogo
     
@@ -25,6 +26,7 @@ class LuogoAdmin(admin.ModelAdmin):
         }),
     )
 
+    # funzione per creare un link alla lista di eventi programmati per un dato luogo (identificato da uno specifico id)
     def evento_link(self, obj):
         count = obj.eventi_programmati.count()
         url = (
@@ -37,6 +39,7 @@ class LuogoAdmin(admin.ModelAdmin):
     evento_link.short_description = "Eventi Programmati"
 
 
+# personalizzazione dell'interfaccia di amministrazione per il model Notifica
 class NotificaAdmin(admin.ModelAdmin):
     model = Notifica
 

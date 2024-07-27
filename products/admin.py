@@ -6,6 +6,7 @@ from django.utils.http import urlencode
 from django.utils.html import format_html
 
 
+# personalizzazione dell'interfaccia di amministrazione per il model Evento
 class EventoAdmin(admin.ModelAdmin):
     model = Evento
 
@@ -28,6 +29,7 @@ class EventoAdmin(admin.ModelAdmin):
         }),
     )
 
+    # funzione per creare un link all'organizzatore di un dato evento
     def organizzatore_link(self, obj):
         name = obj.organizzatore
         url = (
@@ -39,6 +41,7 @@ class EventoAdmin(admin.ModelAdmin):
 
     organizzatore_link.short_description = "Organizzatore"
 
+    # funzione per creare un link al luogo in cui si svolge un dato evento
     def luogo_link(self, obj):
         name = obj.luogo.nome
         url = (
@@ -51,6 +54,7 @@ class EventoAdmin(admin.ModelAdmin):
     luogo_link.short_description = "Luogo"
 
 
+# personalizzazione dell'interfaccia di amministrazione per il model Biglietto
 class BigliettoAdmin(admin.ModelAdmin):
     model = Biglietto
 
@@ -69,6 +73,7 @@ class BigliettoAdmin(admin.ModelAdmin):
         }),
     )
 
+    # funzione per creare un link all'evento di riferimento di un dato biglietto
     def evento_link(self, obj):
         name = obj.evento.nome
         url = (

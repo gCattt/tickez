@@ -23,6 +23,8 @@ from django.conf import settings
 from . import views
 from django.views.generic.base import RedirectView
 
+
+# definizione degli URL patterns per l'applicazione + aggiunta URL per servire file statici e media in fase di sviluppo
 urlpatterns = [
     path('admin/', admin.site.urls),
 
@@ -38,6 +40,8 @@ urlpatterns = [
     
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
+
+# personalizzazione dei titoli dell'area di amministrazione
 admin.site.site_header = "Tickez Administration Page"
 admin.site.site_title = "Tickez"
 admin.site.index_title = "Admin Area"

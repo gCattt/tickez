@@ -6,6 +6,7 @@
 {% block title %}Tickez | Biglietti per Concerti, Festival e Teatro{% endblock %}
 
 {% block content %}
+<!-- link diretti alla visualizzazione degli eventi filtrati per catgoria (Concerti, Festival e Teatro) -->
 <div class="container">
     <h4 style="font-weight: bold; margin-top: 20px;">Categorie</h4>
     <hr style="opacity:0.1;">
@@ -43,6 +44,7 @@
     </div>
 </div>
 <div style="height: 70px;"></div>
+<!-- la sezione degli eventi consigliati viene visualizzata solo da utenti autenticati che hanno effettuato almeno un acquisto -->
 {% if recommended_events %}
 <div class="container">
     <h4 style="font-weight: bold;">Consigliati per te</h4>
@@ -51,7 +53,7 @@
         <ul class="horizontal-list">
             {% for e in recommended_events %}
                 <li class="card" style="width: 20rem;">
-                    <!--utilizzo la property locandina_url per determinare, appunto, l'url dell'immagine-->
+                    <!-- la property locandina_url viene utilizzata, appunto, per recuperare l'url dell'immagine -->
                     <img src="{{ e.locandina_url }}" class="card-img-top w-100" style="height: 166px; object-fit: cover;">
                     <div class="card-body d-flex flex-column justify-content-center">
                         <p class="card-title" style="font-weight:600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{e.nome}}</p>
@@ -66,6 +68,7 @@
 </div>
 <div style="height: 35px;"></div>
 {% endif %}
+<!-- visualizzazione "parziale" degli eventi in ordine di data crescente -->
 <div class="container">
     <h4 style="font-weight: bold;">Prossimi eventi</h4>
     <hr style="opacity:0.1;">
@@ -74,7 +77,7 @@
         <ul class="horizontal-list">
             {% for e in object_list %}
                 <li class="card" style="width: 20rem;">
-                    <!--utilizzo la property locandina_url per determinare, appunto, l'url dell'immagine-->
+                    <!-- la property locandina_url viene utilizzata, appunto, per recuperare l'url dell'immagine -->
                     <img src="{{ e.locandina_url }}" class="card-img-top w-100" style="height: 166px; object-fit: cover;">
                     <div class="card-body d-flex flex-column justify-content-center">
                         <p class="card-title" style="font-weight:600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{e.nome}}</p>
@@ -94,6 +97,7 @@
     {% endif %}
 </div>
 <div style="height: 70px;"></div>
+<!-- link diretti alla visualizzazione degli Artisti, organizzatori degli eventi, e i Luoghi che li possono ospitare -->
 <div class="container">
     <h4 style="font-weight: bold;">Scopri</h4>
     <hr style="opacity:0.1;">

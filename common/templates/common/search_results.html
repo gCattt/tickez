@@ -11,6 +11,7 @@
         <a href="{% url 'homepage' %}" class="text-decoration-none text-dark ms-2"><i class="fas fa-times" style="font-size: 1.7rem;"></i></a>
     </h1>
     
+    <!-- i risultati della ricerca vengono suddivisi in Eventi, Artisti e Luoghi -->
     <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item" role="presentation">
         <button class="nav-link {% if request.GET.page_events or not request.GET.page_artists and not request.GET.page_venues %}active{% endif %}" id="events-tab" data-bs-toggle="tab" data-bs-target="#events" type="button" role="tab" aria-controls="events" aria-selected="true">Eventi</button>
@@ -35,7 +36,7 @@
                         <div class="form-group me-3">
                             {{ filter.form.category }}
                             {% if request.GET.category %}
-                            <a  class="text-decoration-none text-dark ms-2" 
+                            <a  class="text-decoration-none text-dark ms-2"
                                 href="?{% for key, value in request.GET.items %}{% if key != 'category' %}{{ key }}={{ value }}{% if not forloop.last %}&{% endif %}{% endif %}{% endfor %}">
                                 <i class="fas fa-times" style="font-size: 0.8rem;"></i>
                             </a>
@@ -72,6 +73,7 @@
                     </div>
                 </div>
             </form>
+            <!-- il form di filtraggio viene re-inviato ad ogni modifica dei filtri -->
             <script>
                 document.addEventListener('DOMContentLoaded', function () {
                     const form = document.getElementById('filterForm');

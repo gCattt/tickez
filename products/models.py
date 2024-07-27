@@ -37,9 +37,11 @@ class Evento(models.Model):
         else:
             return join(settings.STATIC_URL, 'images/defaults/default_event.jpg')
 
+    # restituisce l'URL assoluto per la visualizzazione dettagliata di un Evento
     def get_absolute_url(self):
         return reverse("products:event-details", kwargs={"slug": self.slug, "pk": self.pk})
     
+    # lo slug viene aggiornato alla creazione di un Evento e ad ogni modifica del suo nome
     def save(self, *args, **kwargs):
         if not self.slug or slugify(self.nome) != self.slug:
             self.slug = slugify(self.nome)
@@ -64,9 +66,11 @@ class Biglietto(models.Model):
     def __str__(self):
         return f"{self.tipologia} - {self.evento}"
 
+    # restituisce l'URL assoluto per la visualizzazione dettagliata del Luogo associato al Biglietto
     def get_absolute_url(self):
         return self.evento.get_absolute_url()
     
+    # lo slug viene aggiornato alla creazione di un Biglietto e ad ogni modifica della sua tipologia
     def save(self, *args, **kwargs):
         if not self.slug or slugify(self.tipologia) != self.slug:
             self.slug = slugify(self.tipologia)

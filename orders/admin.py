@@ -6,6 +6,7 @@ from django.utils.http import urlencode
 from django.utils.html import format_html
 
 
+# personalizzazione dell'interfaccia di amministrazione per il model Ordine
 class OrdineAdmin(admin.ModelAdmin):
     model = Ordine
 
@@ -24,6 +25,7 @@ class OrdineAdmin(admin.ModelAdmin):
         }),
     )
 
+    # funzione per creare un link alla lista di biglietti acquistati per un dato ordine (identificato da uno specifico id)
     def view_tickets_link(self, obj):
         count = obj.biglietti_acquistati.count()
         url = (
@@ -36,6 +38,7 @@ class OrdineAdmin(admin.ModelAdmin):
     view_tickets_link.short_description = "Biglietti Acquistati"
 
 
+# personalizzazione dell'interfaccia di amministrazione per il model BigliettoAcquistato
 class BigliettoAcquistatoAdmin(admin.ModelAdmin):
     model = BigliettoAcquistato
 
@@ -54,6 +57,7 @@ class BigliettoAcquistatoAdmin(admin.ModelAdmin):
         }),
     )
 
+    # funzione per creare un link alla tipologia di biglietto di un dato biglietto acquistato
     def biglietto_link(self, obj):
         name = obj.biglietto.tipologia
         url = (

@@ -33,11 +33,13 @@ class Luogo(models.Model):
         else:
             return join(settings.STATIC_URL, 'images/defaults/default_venue.jpg')
 
+    # restituisce l'URL assoluto per la visualizzazione dettagliata di un Luogo
     def get_absolute_url(self):
         return reverse("common:venue-details", kwargs={"slug": self.slug, "pk": self.pk})
     
+    # lo slug viene aggiornato alla creazione di un Luogo e ad ogni modifica del suo nome
     def save(self, *args, **kwargs):
-        if not self.slug:
+        if not self.slug or slugify(self.nome) != self.slug:
             self.slug = slugify(self.nome)
         super().save(*args, **kwargs)
     

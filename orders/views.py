@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import Http404
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse_lazy
 
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.mixins import UserPassesTestMixin
 from braces.views import GroupRequiredMixin
 
@@ -25,17 +25,19 @@ def orders(request):
     return render(request, '404.html', status=404)
 
 
+# funzione di test per gestire l'autenticazione degli utenti
 def is_customer(user):
     return user.groups.filter(name="Clienti").exists()
 
 @user_passes_test(is_customer)
+# raccolta dati per il riepilogo ordine
 def checkout(request):
     if request.method == 'POST':
         selected_tickets = []
         total = 0
         flag_tickets = False  # verifica se sono stati selezionati dei biglietti
 
-        # recupera i biglietti selezionati
+        # recupera id e quantità dei biglietti selezionati
         for key, value in request.POST.items():
             if key.startswith("quantita_") and int(value) > 0:
                 ticket_id = key.split("_")[1]
@@ -45,11 +47,13 @@ def checkout(request):
                     return render(request, '404.html', status=404)
                 quantity = int(value)
                 
+                # verifica la quantità vendibile del biglietto considerato
                 if quantity > biglietto.quantita_vendibile:
                     messages.error(request, f'La quantità richiesta per il biglietto "{biglietto.tipologia}" è maggiore della quantità attualmente disponibile ({biglietto.quantita_vendibile}).')
                     event_url = request.POST.get('evento_url')
                     return redirect(event_url)
 
+                # se tutto va a buon fine aggiorna i biglietti selezionati ed il totale dell'ordine
                 for _ in range(quantity):
                     selected_tickets.append(biglietto)
                     total += biglietto.prezzo
@@ -60,7 +64,7 @@ def checkout(request):
             event_url = request.POST.get('evento_url')
             return redirect(event_url)
 
-        # memorizza i biglietti selezionati nella sessione (gli ID in quanto l'oggetto Biglietto non è serializzabile)
+        # memorizza i biglietti selezionati nella sessione (gli id nello specifico, in quanto l'oggetto Biglietto non è serializzabile)
         request.session['selected_tickets'] = [t.id for t in selected_tickets]
         request.session['total'] = total
         
@@ -74,10 +78,12 @@ def checkout(request):
     return redirect('homepage')
 
 @user_passes_test(is_customer)
+# riepilogo ordine ed elaborazione pagamento
 def process_payment(request):
     if request.method == 'POST':
         form = CheckoutCrispyForm(request.POST)
         if form.is_valid():
+            # recupero dei dati della sessione
             selected_tickets = request.session.get('selected_tickets', [])
             total = request.session.get('total', 0)
             
@@ -103,7 +109,7 @@ def process_payment(request):
                 data_ora=timezone.now()
             )
             
-            # aggiorna la quantità dei biglietti e associa i biglietti all'ordine appena creato
+            # aggiorna la quantità dei biglietti e associa i biglietti acquistati all'ordine appena creato
             for ticket_id in selected_tickets:
                 try:
                     biglietto = get_object_or_404(Biglietto, id=ticket_id)
@@ -134,6 +140,7 @@ def process_payment(request):
     return render(request, 'orders/checkout.html', {'form': form})
 
 
+# funzionalità di modifica nominativo, accessibile dai soli Clienti
 class UpdatePurchaseView(GroupRequiredMixin, UserPassesTestMixin, UpdateView):
     group_required = ['Clienti']
     model = BigliettoAcquistato
@@ -174,7 +181,7 @@ class UpdatePurchaseView(GroupRequiredMixin, UserPassesTestMixin, UpdateView):
         return redirect(f'{settings.LOGIN_URL}&next={self.request.path}')
     
     def form_valid(self, form):
-        ticket = form.instance
+        ticket = form.instance # recupero dell'istanza del modello attualmente utilizzata
         if ticket.can_edit():
             messages.success(self.request, f'{ticket.biglietto.tipologia} aggiornato con successo (ordine N.{ticket.ordine.id} - {ticket.data_acquisto.strftime("%d/%m/%Y")}).')
             return super().form_valid(form)

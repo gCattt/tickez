@@ -7,7 +7,7 @@ from orders.models import BigliettoAcquistato
 
 from django.utils import timezone
 
-
+# elaborazione del pagamento
 class CheckoutCrispyForm(forms.Form):
     titolare_carta = forms.CharField(
         max_length=100,
@@ -33,6 +33,8 @@ class CheckoutCrispyForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(CheckoutCrispyForm, self).__init__(*args, **kwargs)
+
+        # la classe FormHelper offre un modo semplice per gestire il layout e lo stile degli elementi di un form
         self.helper = FormHelper()
         self.helper.form_id = 'checkout-crispy-form'
         self.helper.form_method = 'POST'
@@ -49,7 +51,7 @@ class CheckoutCrispyForm(forms.Form):
             )
         )
 
-    # validazione lato server
+    # validazione lato server:
     def clean_titolare_carta(self):
         titolare_carta = self.cleaned_data['titolare_carta']
         if any(char.isdigit() for char in titolare_carta):
@@ -58,7 +60,7 @@ class CheckoutCrispyForm(forms.Form):
     
     def clean_numero_carta(self):
         numero_carta = self.cleaned_data['numero_carta']
-        sanitized_number = numero_carta.replace(' ', '').replace('-', '')  # rimuovi spazi e trattini
+        sanitized_number = numero_carta.replace(' ', '').replace('-', '')  # rimuovi eventuali spazi e trattini
         if not sanitized_number.isdigit():
             raise forms.ValidationError("Il numero della carta non è valido.")
         return numero_carta
@@ -75,7 +77,7 @@ class CheckoutCrispyForm(forms.Form):
             raise forms.ValidationError("Il CVV deve essere un numero di 3 cifre.")
         return cvv
 
-
+# funzionalità di modifica del nominativo
 class BigliettoAcquistatoCrispyForm(forms.ModelForm):
     class Meta:
         model = BigliettoAcquistato
@@ -98,6 +100,7 @@ class BigliettoAcquistatoCrispyForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(BigliettoAcquistatoCrispyForm, self).__init__(*args, **kwargs)
 
+        # la classe FormHelper offre un modo semplice per gestire il layout e lo stile degli elementi di un form
         self.helper = FormHelper()
         self.helper.form_id = 'biglietto-acquistato-crispy-form'
         self.helper.form_method = 'POST'
@@ -118,7 +121,7 @@ class BigliettoAcquistatoCrispyForm(forms.ModelForm):
             ),
         )
 
-    # validazione lato server
+    # validazione lato server:
     def clean_nome_acquirente(self):
         nome_acquirente = self.cleaned_data['nome_acquirente']
         if any(char.isdigit() for char in nome_acquirente):
