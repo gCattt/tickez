@@ -6,7 +6,7 @@
         "data_nascita": "1990-05-15",
         "sesso": "Femmina",
         "stato": "Svizzera",
-        "telefono": "+39 333 1234567",
+        "telefono": "3331234567",
         "username": "mariarossi",
         "password": "clientepw"
     },
@@ -17,7 +17,7 @@
         "data_nascita": "2000-08-20",
         "sesso": "Maschio",
         "stato": "Germania",
-        "telefono": "+39 347 9876543",
+        "telefono": "3479876543",
         "username": "lucaverdi",
         "password": "clientepw"
     },
@@ -28,7 +28,7 @@
         "data_nascita": "2010-03-10",
         "sesso": "Altro",
         "stato": "Italia",
-        "telefono": "+39 340 5556789",
+        "telefono": "3405556789",
         "username": "chiarabianchi",
         "password": "clientepw"
     },
@@ -39,7 +39,7 @@
         "data_nascita": "1986-11-25",
         "sesso": "Maschio",
         "stato": "Italia",
-        "telefono": "+39 349 1112233",
+        "telefono": "3491112233",
         "username": "marcorusso",
         "password": "clientepw"
     },
@@ -50,7 +50,7 @@
         "data_nascita": "1970-05-15",
         "sesso": "Maschio",
         "stato": "Italia",
-        "telefono": "+39123456789",
+        "telefono": "3711312538",
         "username": "giorgiorossi",
         "password": "clientepw"
     }
