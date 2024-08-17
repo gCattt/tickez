@@ -127,7 +127,7 @@ def create_event(request):
     form_class = AdminEventCrispyForm if request.user.is_superuser else EventCrispyForm
 
     if request.method == 'POST':
-        form = form_class(request.POST, request.FILES)
+        form = form_class(request.POST, request.FILES, user=request.user)
         if form.is_valid():
             event = form.save(commit=False)
             if request.user.is_superuser:
@@ -146,7 +146,7 @@ def create_event(request):
             notify(event)
             return redirect(event.get_absolute_url())
     else:
-        form = form_class()
+        form = form_class(user=request.user)
     
     return render(request, 'products/create_entity.html', {'form': form, 'entity': entity})
 
@@ -204,6 +204,7 @@ class UpdateEventView(OrganizerOrSuperuserRequiredMixin, UpdateView):
     
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
         kwargs['action'] = 'Salva Modifiche'
         return kwargs
     

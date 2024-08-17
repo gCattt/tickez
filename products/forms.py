@@ -1,9 +1,12 @@
 from django import forms
 
+from django.shortcuts import get_object_or_404
+
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column, Submit, Reset
 
 from products.models import Evento, Biglietto
+from users.models import Organizzatore
 from django.db.models import Sum
 
 import os
@@ -130,6 +133,7 @@ class EventCrispyForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         action = kwargs.pop('action', 'Crea Evento')
+        self.user = kwargs.pop('user', None) 
         super(EventCrispyForm, self).__init__(*args, **kwargs)
 
         self.initial['data_ora'] = self.instance.data_ora.strftime('%Y-%m-%dT%H:%M')
@@ -193,9 +197,10 @@ class EventCrispyForm(forms.ModelForm):
             raise forms.ValidationError("La data e l'ora dell'evento non possono essere nel passato.")
         
         # evita sovrapposizioni per lo stesso organizzatore
-        if instance.organizzatore:
+        organizzatore = get_object_or_404(Organizzatore, user=self.user)
+        if organizzatore:
             eventi_stesso_giorno = Evento.objects.filter(
-                organizzatore=instance.organizzatore,
+                organizzatore=organizzatore,
                 data_ora__date=data_ora.date()
             )
             if instance and instance.pk:
