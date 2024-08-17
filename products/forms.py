@@ -277,7 +277,6 @@ class TicketCrispyForm(forms.ModelForm):
         quantita = self.cleaned_data['quantita']
         if quantita < 0:
             raise forms.ValidationError("La quantità disponibile non può essere negativa.")
-        print(self.evento)
         if self.evento:
             # valida la quantità in relazione alla capienza del luogo dell'evento
             capienza = self.evento.luogo.capienza_persone

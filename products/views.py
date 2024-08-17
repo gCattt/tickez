@@ -380,6 +380,11 @@ def event_statistics(request, slug, pk):
             .values('sesso_acquirente')
             .annotate(count=Count('sesso_acquirente'))
         )
+        # trasforma il queryset in un dizionario ordinato per garantire l'ordine definito dalle label del grafico
+        sesso_partecipanti_dict = {'Altro': 0, 'Femmina': 0, 'Maschio': 0}
+        for sesso in sesso_partecipanti:
+            sesso_partecipanti_dict[sesso['sesso_acquirente']] = sesso['count']
+        print(sesso_partecipanti_dict)
 
         # biglietti venduti per ogni tipologia
         biglietti_acquistati = BigliettoAcquistato.objects.filter(biglietto__evento=evento)
@@ -415,7 +420,7 @@ def event_statistics(request, slug, pk):
             'revenue_totale': revenue_totale,
             'fasce_eta': fasce_eta,
             'nazionalita_partecipanti': nazionalita_partecipanti,
-            'sesso_partecipanti': sesso_partecipanti,
+            'sesso_partecipanti': sesso_partecipanti_dict,
             'vendite_per_tipologia': vendite_per_tipologia,
             'vendite_per_giorno': vendite_per_giorno,
         }
