@@ -83,7 +83,7 @@ def search_results(request):
     total_venues = venues.count()
     
     # paginazione dei risultati
-    events_paginator = Paginator(events.order_by('data_ora'), 5)
+    events_paginator = Paginator(events, 5)
     artists_paginator = Paginator(artists.order_by('nome'), 8)
     venues_paginator = Paginator(venues.order_by('nome'), 8)
     # con get_page django gestisce internamente le eccezioni e garantisce che venga sempre restituita una pagina valida.
