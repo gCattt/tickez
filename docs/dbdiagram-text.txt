@@ -1,0 +1,133 @@
+Table Luogo {
+  id int [pk, increment]
+  nome varchar(50)
+  slug varchar(200)
+  indirizzo varchar(255)
+  citta varchar(100)
+  capienza_persone int
+  immagine varchar(255)
+}
+
+Table Notifica {
+  id int [pk, increment]
+  testo varchar(50)
+  data_ora datetime
+  letta boolean
+  ordine_id int
+  evento_id int
+  organizzatore_id int
+  luogo_id int
+}
+
+Table Ordine {
+  id int [pk, increment]
+  data_ora datetime
+  totale float
+  utente_id int
+  organizzatore_id int
+  evento_id int
+}
+
+Table BigliettoAcquistato {
+  id int [pk, increment]
+  nome_acquirente varchar(50)
+  cognome_acquirente varchar(50)
+  data_acquisto datetime
+  data_nascita_acquirente date
+  sesso_acquirente varchar(10)
+  stato_acquirente varchar(50)
+  prezzo_acquisto float
+  biglietto_id int
+  ordine_id int
+}
+
+Table Evento {
+  id int [pk, increment]
+  nome varchar(100)
+  slug varchar(200)
+  categoria varchar(100)
+  data_ora datetime
+  locandina varchar(255)
+  descrizione text
+  visualizzazioni int
+  organizzatore_id int
+  luogo_id int
+}
+
+Table Biglietto {
+  id int [pk, increment]
+  tipologia varchar(100)
+  slug varchar(200)
+  prezzo float
+  quantita int
+  quantita_vendibile int
+  descrizione text
+  evento_id int
+  organizzatore_id int
+}
+
+Table Utente {
+  id int [pk, increment]
+  nome varchar(50)
+  cognome varchar(50)
+  email varchar(255) [unique]
+  data_nascita date
+  sesso varchar(10)
+  stato varchar(50)
+  telefono varchar(20)
+  immagine_profilo varchar(255)
+  user int [unique, ref: - User.id]
+}
+
+Table Organizzatore {
+  id int [pk, increment]
+  nome varchar(50)
+  slug varchar(100)
+  email varchar(255) [unique]
+  descrizione text
+  immagine_profilo varchar(255)
+  user int [unique, ref: - User.id]
+}
+
+Table User {
+  id int [pk, increment]
+  password varchar(128)
+  last_login datetime
+  is_superuser boolean
+  username varchar(150) [unique]
+  first_name varchar(30)
+  last_name varchar(30)
+  email varchar(254)
+  is_staff boolean
+  is_active boolean
+  date_joined datetime
+}
+
+// Relazioni Foreign-Key
+
+Ref: Notifica.ordine_id > Ordine.id
+Ref: Notifica.evento_id > Evento.id
+Ref: Notifica.organizzatore_id > Organizzatore.id
+Ref: Notifica.luogo_id > Luogo.id
+
+Ref: Ordine.utente_id > Utente.id
+Ref: Ordine.organizzatore_id > Organizzatore.id
+Ref: Ordine.evento_id > Evento.id
+
+Ref: BigliettoAcquistato.biglietto_id > Biglietto.id
+Ref: BigliettoAcquistato.ordine_id > Ordine.id
+
+Ref: Evento.organizzatore_id > Organizzatore.id
+Ref: Evento.luogo_id > Luogo.id
+
+Ref: Biglietto.evento_id > Evento.id
+Ref: Biglietto.organizzatore_id > Organizzatore.id
+
+// Relazioni Many-to-Many
+
+Ref followers_luogo: Luogo.id <> Utente.id
+Ref affittuari_luogo: Luogo.id <> Organizzatore.id
+
+Ref eventi_preferiti: Evento.id <> Utente.id
+
+Ref followers_organizzatore: Organizzatore.id <> Utente.id
