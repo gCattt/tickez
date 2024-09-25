@@ -36,19 +36,23 @@ def home_page(request):
 
             # restituisce i 5 elementi più affini
             def get_user_recommendations(utente_id, user_event_matrix, user_similarity_df, top_n=5):
-                # ordina per somiglianza decrescente gli utenti della colonna 'utente_id', escluso se stesso, ottenendo così i più simili
+                # ordina per somiglianza decrescente gli utenti (id), escluso se stesso, ottenendo così i più simili
                 similar_users = user_similarity_df[utente_id].sort_values(ascending=False).index[1:]
+                # ricava le similarità dagli id
+                similarities = user_similarity_df.loc[utente_id, similar_users]
 
-                # recupera le righe della matrice utente-elemento corrispondenti agli utenti nella lista 'similar_users', e quindi i loro eventi acquistati
+                # righe della matrice utente-elemento corrispondenti agli utenti nella lista 'similar_users', e quindi i loro eventi acquistati
                 similar_users_events = user_event_matrix.loc[similar_users]
 
-                # somma le interazioni degli utenti simili per ottenere un punteggio di raccomandazione
-                # axis = 0 specifica che l'operazione avviene lungo le righe, producendo una somma per ciascuna colonna
-                recommendations = similar_users_events.sum(axis=0).sort_values(ascending=False)
+                # somma (lungo le righe) degli acquisti pesati per ottenere un punteggio di raccomandazione di ogni evento
+                weighted_recommendations = (similar_users_events.T * similarities).T.sum()
 
-                # rimuove dagli elementi consigliati gli eventi che l'utente ha già acquistato (quindi in cui la cella è !=0)
+                # serie contenente i punteggi di raccomandazione in ordine decrescente
+                recommendations = weighted_recommendations.sort_values(ascending=False)
+
+                # rimuove dagli elementi consigliati gli eventi che l'utente ha già acquistato
                 user_events = user_event_matrix.loc[utente_id]
-                recommendations = recommendations[user_events == 0]
+                recommendations = recommendations[user_events == 0] # utilizzo di una maschera booleana (seleziono gli elementi per cui è true)
 
                 return recommendations.head(top_n).index
             
