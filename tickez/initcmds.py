@@ -69,10 +69,10 @@ def init_users():
             clienti_group.user_set.add(utente)
             cliente.save()
 
-        # organizzatori
-        organizzatori_file = os.path.join(settings.BASE_DIR, 'static', 'json', 'organizers.json')
-        with open(organizzatori_file, 'r', encoding='utf-8') as f:
-            organizzatori_data = json.load(f)
+    # organizzatori
+    organizzatori_file = os.path.join(settings.BASE_DIR, 'static', 'json', 'organizers.json')
+    with open(organizzatori_file, 'r', encoding='utf-8') as f:
+        organizzatori_data = json.load(f)
 
         for organizzatore_data in organizzatori_data:
             username = organizzatore_data['username']

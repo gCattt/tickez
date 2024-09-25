@@ -339,9 +339,9 @@ def event_statistics(request, slug, pk):
 
         visualizzazioni_evento = evento.visualizzazioni
         biglietti_venduti = BigliettoAcquistato.objects.filter(biglietto__evento=evento).count()
-        revenue_totale = BigliettoAcquistato.objects.filter(biglietto__evento=evento).aggregate(Sum('prezzo_acquisto'))['prezzo_acquisto__sum'] or 0
+        revenue_totale = BigliettoAcquistato.objects.filter(biglietto__evento=evento).aggregate(Sum('prezzo_acquisto'))['prezzo_acquisto__sum'] or 0 # .aggregate() restituisce un dizionario in cui la chiave è il nome dell'operazione (es. prezzo_acquisto__sum) e il valore è il risultato dell'aggregazione
         
-        # calcolo delle fasce di età dei partecipanti ('values' evita il conteggio duplicato di record, visto che gli utenti possono acquistare più biglietti)
+        # calcolo delle fasce di età dei partecipanti ('values()', associato a 'count()', evita il conteggio duplicato di record, visto che gli utenti possono acquistare più biglietti)
         current_year = datetime.now().year
         fasce_eta = {
             '0_18': BigliettoAcquistato.objects.filter(
@@ -370,7 +370,7 @@ def event_statistics(request, slug, pk):
         BigliettoAcquistato.objects
             .filter(biglietto__evento=evento)
             .values('stato_acquirente')
-            .annotate(count=Count('stato_acquirente'))
+            .annotate(count=Count('stato_acquirente')) # 'annotate()' aggiunge un campo 'count' che conta le occorrenze per ciascun gruppo definito da 'values()'
             .order_by('-count')[:5]
         )
 

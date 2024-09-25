@@ -58,7 +58,7 @@ class AdminEventCrispyForm(forms.ModelForm):
     # validazione lato server:
     def clean_nome(self):
         nome = self.cleaned_data['nome']
-        instance = getattr(self, 'instance', None)
+        instance = getattr(self, 'instance', None) # 'instance' rappresenta l'istanza del modello che viene utilizzata per il modulo, se esiste
         if instance and instance.pk:
             # modifica (devo escludere l'istanza del modello considerata)
             if Evento.objects.exclude(pk=instance.pk).filter(nome=nome).exists():
@@ -84,7 +84,7 @@ class AdminEventCrispyForm(forms.ModelForm):
                 data_ora__date=data_ora.date()
             )
             if instance and instance.pk:
-                eventi_stesso_giorno = eventi_stesso_giorno.exclude(pk=instance.pk)
+                eventi_stesso_giorno = eventi_stesso_giorno.exclude(pk=instance.pk) # devo escludere l'istanza del modello considerata
             if eventi_stesso_giorno.exists():
                 raise forms.ValidationError("L'organizzatore ha già un altro evento programmato in questa data.")
 
@@ -96,7 +96,7 @@ class AdminEventCrispyForm(forms.ModelForm):
                 data_ora__date=data_ora.date()
             )
             if instance and instance.pk:
-                eventi_stesso_luogo = eventi_stesso_luogo.exclude(pk=instance.pk)
+                eventi_stesso_luogo = eventi_stesso_luogo.exclude(pk=instance.pk) # devo escludere l'istanza del modello considerata
             if eventi_stesso_luogo.exists():
                 raise forms.ValidationError("Questo luogo ha già un altro evento programmato in questa data.")
             
@@ -178,7 +178,7 @@ class EventCrispyForm(forms.ModelForm):
     # validazione lato server:
     def clean_nome(self):
         nome = self.cleaned_data['nome']
-        instance = getattr(self, 'instance', None)
+        instance = getattr(self, 'instance', None) # 'instance' rappresenta l'istanza del modello che viene utilizzata per il modulo, se esiste
         if instance and instance.pk:
             # modifica (devo escludere l'istanza del modello considerata)
             if Evento.objects.exclude(pk=instance.pk).filter(nome=nome).exists():
@@ -204,7 +204,7 @@ class EventCrispyForm(forms.ModelForm):
                 data_ora__date=data_ora.date()
             )
             if instance and instance.pk:
-                eventi_stesso_giorno = eventi_stesso_giorno.exclude(pk=instance.pk)
+                eventi_stesso_giorno = eventi_stesso_giorno.exclude(pk=instance.pk) # devo escludere l'istanza del modello considerata
             if eventi_stesso_giorno.exists():
                 raise forms.ValidationError("L'organizzatore ha già un altro evento programmato in questa data.")
 
@@ -216,7 +216,7 @@ class EventCrispyForm(forms.ModelForm):
                 data_ora__date=data_ora.date()
             )
             if instance and instance.pk:
-                eventi_stesso_luogo = eventi_stesso_luogo.exclude(pk=instance.pk)
+                eventi_stesso_luogo = eventi_stesso_luogo.exclude(pk=instance.pk) # devo escludere l'istanza del modello considerata
             if eventi_stesso_luogo.exists():
                 raise forms.ValidationError("Questo luogo ha già un altro evento programmato in questa data.")
 

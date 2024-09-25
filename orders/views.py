@@ -37,7 +37,7 @@ def checkout(request):
         total = 0
         flag_tickets = False  # verifica se sono stati selezionati dei biglietti
 
-        # recupera id e quantità dei biglietti selezionati
+        # recupera id e quantità dei biglietti selezionati (in event_details.html)
         for key, value in request.POST.items():
             if key.startswith("quantita_") and int(value) > 0:
                 ticket_id = key.split("_")[1]
@@ -65,6 +65,7 @@ def checkout(request):
             return redirect(event_url)
 
         # memorizza i biglietti selezionati nella sessione (gli id nello specifico, in quanto l'oggetto Biglietto non è serializzabile)
+        # session è meccanismo che consente di memorizzare e recuperare informazioni specifiche dell'utente tra diverse richieste HTTP
         request.session['selected_tickets'] = [t.id for t in selected_tickets]
         request.session['total'] = total
         
@@ -164,7 +165,7 @@ class UpdatePurchaseView(GroupRequiredMixin, UserPassesTestMixin, UpdateView):
 
         return biglietto_acquistato
     
-    def test_func(self):
+    def test_func(self): # ... da UserPassesTestMixin, personalizza la gestione di utenti non autorizzati
         user = self.request.user
 
         # verifica l'appartenenza al gruppo 'Clienti'
