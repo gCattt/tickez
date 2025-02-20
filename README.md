@@ -1,4 +1,5 @@
-# tickez
+# ![banner](https://github.com/user-attachments/assets/bb547292-1766-4655-99f4-1d7942b09a12)
+
 This webapp is designed to simplify the process of selling and managing tickets for music events, providing an easy-to-use platform for both event organizers and attendees.
 
 For more detailed information, refer to the [tickez-report](./docs/tickez-report.pdf).
